@@ -1,0 +1,24 @@
+﻿path_or_url,label,http_status_observed,discovered_via
+/,Home,200,homepage
+/pages/about-us,About Us,200,sitemap
+/pages/faqs,FAQs,200,sitemap
+/pages/brands,Brands,404,sitemap (listed but 404)
+/pages/wish-list,Wish List,200,sitemap
+/pages/shop-by-brand,Shop by Brand,404,sitemap (listed but 404)
+/pages/customer-reviews,Customer Reviews,404,sitemap (listed but 404); footer link
+/pages/consign,Consign,200,sitemap
+/pages/sell,Sell,200,sitemap
+/pages/visit-us,Visit Us,200,sitemap
+/pages/wishlist,(header wishlist icon target),404,header link
+/blogs/news,News (blog index),200,sitemap
+/blogs/news/main-account-disabled,MAIN ACCOUNT DISABLED (article),200,sitemap
+/policies/refund-policy,Refund policy,200,agents.md
+/search?q=chanel,Search results,200,header search
+/collections/all,All (Shopify default),200,wishlist page link
+/collections/vendors?q=Hermes,Vendor listing (product-page brand link),200,product page
+/account/login,Account login,200,header (not exercised)
+/cart,Cart page,200,drawer link (not exercised)
+/agents.md,Agent instructions,200,robots.txt
+/.well-known/ucp,UCP merchant profile,200,robots.txt
+https://a-and-j-luxury.myshopify.com/shop-by-brand,"Footer ""Brands"" link target",unreachable from test network (connection reset); unverified,footer link
+/shop-by-brand,"(same path as footer Brands link, on primary domain)",404,tested directly
