@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap">
 <style>
 /* Tokens: website_documentation/datasets/design_tokens.json (default scheme) */
-:root{--ink:#222;--mute:#666;--line:#eee;--ph:#f3f3f3;--surf:#f5f5f5;--err:#da3f3f;--ok:#3a8735;--font:Poppins,system-ui,sans-serif}
+:root{--ink:#222;--mute:#666;--line:#eee;--ph:#f3f3f3;--surf:#f5f5f5;--err:#da3f3f;--ok:#3a8735;--font:Poppins,system-ui,sans-serif;--ease:cubic-bezier(.22,.8,.3,1)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font:400 14px/1.5 var(--font);color:var(--ink);background:#fff}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -42,7 +42,10 @@ main{flex:1;overflow-y:auto;overscroll-behavior:contain}
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 10px;font-size:11px;color:var(--mute)}
 .nav a[aria-current]{color:#000;font-weight:500}
 .pill{position:relative;width:56px;height:30px;border-radius:15px;display:grid;place-items:center}
-[aria-current] .pill{background:#000;color:#fff}
+.pill::before{content:"";position:absolute;inset:0;border-radius:15px;background:#000;opacity:0;transform:scaleX(.4);transition:transform .3s var(--ease),opacity .2s}
+.pill>.i{position:relative}
+[aria-current] .pill{color:#fff}
+[aria-current] .pill::before{opacity:1;transform:none}
 .bd{position:absolute;top:-4px;right:-2px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--err);color:#fff;font-size:10px;line-height:16px;text-align:center}
 .bd[hidden]{display:none}
 
@@ -63,8 +66,8 @@ main{flex:1;overflow-y:auto;overscroll-behavior:contain}
 .slide::after{content:"";position:absolute;inset:0;background:#0003}
 .slide .btn{position:relative;z-index:1}
 .dots{position:absolute;left:0;right:0;bottom:20px;display:flex;justify-content:center;gap:8px}
-.dots i{width:8px;height:8px;border-radius:50%;background:#fff6}
-.dots i.on{background:#fff}
+.dots i{width:8px;height:8px;border-radius:4px;background:#fff6;transition:transform .3s var(--ease),background-color .3s}
+.dots i.on{transform:scaleX(2.75);background:#fff}
 .sec{font-size:24px;font-weight:300;text-align:center;padding:32px 16px 12px}
 .tabs{display:flex;gap:22px;overflow-x:auto;padding:0 16px;justify-content:center;scrollbar-width:none}
 .tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:8px 0;font-size:16px;color:var(--mute);cursor:pointer;white-space:nowrap}
@@ -171,21 +174,65 @@ fieldset{border:0;margin-bottom:14px}
 /* Sheet, toast, lightbox */
 .sheet{position:absolute;inset:0;z-index:20;display:flex;align-items:flex-end}
 .sheet[hidden],.lb[hidden]{display:none}
-.scrim{position:absolute;inset:0;background:#0007}
-.panel{position:relative;width:100%;max-height:88%;overflow:auto;background:#fff;padding:20px 16px calc(20px + env(safe-area-inset-bottom));border-radius:16px 16px 0 0;animation:up .25s ease-out}
+.scrim{position:absolute;inset:0;background:#0007;animation:fi .25s ease}
+.panel{position:relative;width:100%;max-height:88%;overflow:auto;background:#fff;padding:0 16px calc(20px + env(safe-area-inset-bottom));border-radius:16px 16px 0 0;animation:up .35s var(--ease);transition:transform .25s var(--ease)}
+.grab{position:sticky;top:0;z-index:1;height:20px;margin:0 -16px;display:grid;place-items:center;background:#fff;touch-action:none;cursor:grab}
+.grab::before{content:"";width:36px;height:4px;border-radius:2px;background:#ccc}
+.sheet.out .scrim{animation:fo .18s forwards}
+.sheet.out .panel{animation:out .18s ease-in forwards}
 .panel h2{font-size:18px;font-weight:500}
 .panel blockquote{margin:12px 0;padding:12px;background:var(--surf);white-space:pre-line;font-size:13px}
 .panel .stack{display:grid;gap:8px}
 .sh-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .foot{margin-top:16px}
-@keyframes up{from{transform:translateY(40px);opacity:0}}
-.toast{position:absolute;left:16px;right:16px;bottom:84px;z-index:30;padding:12px 16px;background:var(--ink);color:#fff;opacity:0;pointer-events:none;transition:opacity .2s}
-.toast.on{opacity:1}
+@keyframes up{from{transform:translateY(100%)}}
+@keyframes out{to{transform:translateY(100%)}}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;z-index:30;padding:12px 16px;background:var(--ink);color:#fff;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .25s,transform .3s var(--ease)}
+.toast.on{opacity:1;transform:none}
 .lb{position:absolute;inset:0;z-index:25;background:#000;display:grid;place-items:center;overflow:auto}
 .lb img{width:100%;transition:transform .25s;cursor:zoom-in}
 .lb img.z{transform:scale(2.4);cursor:zoom-out}
 .lb .ib{position:absolute;top:8px;right:8px;z-index:2;background:#fffd}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---- Motion. Only transform/opacity are animated (compositor-friendly); all of it is off under reduced-motion ---- */
+@keyframes fi{from{opacity:0}}
+@keyframes fo{to{opacity:0}}
+@keyframes dn{from{opacity:0;transform:translateY(-6px)}}
+@keyframes sh{to{transform:translateX(100%)}}
+@keyframes logo{from{opacity:0;transform:scale(.94)}}
+@keyframes splash{0%,62%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes rev{from{opacity:0;transform:translateY(28px)}}
+@keyframes lbl{0%{opacity:0;transform:translateX(60px)}40%,60%{opacity:1;transform:none}100%{opacity:0;transform:translateX(-60px)}}
+.splash{position:absolute;inset:0;z-index:60;display:grid;place-items:center;background:#fff;pointer-events:none;animation:splash .9s ease forwards}
+.splash img{width:140px;animation:logo .7s var(--ease) both}
+/* Images: skeleton shimmer while loading, then fade in (.ld is added by JS on load/error) */
+main img:not(.ld){opacity:0}
+main img.ld{animation:fi .5s ease}
+.ph,.gal{position:relative;overflow:hidden}
+.ph::after,.gal::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 35%,#fffa 50%,transparent 65%);transform:translateX(-100%);animation:sh 1.4s ease-in-out infinite}
+.ph:has(img.ld)::after,.gal:has(img.ld)::after{display:none}
+.row,.grid,.lb{animation:fi .4s ease}
+details[open]>.dbody{animation:dn .3s var(--ease)}
+/* Press + hover feedback */
+.btn,.chip,.seg button,.nav a,.list a{transition:transform .15s var(--ease),background-color .2s,color .2s,opacity .2s}
+.btn:active,.chip:active,.seg button:active{transform:scale(.97)}
+.list a:active{background:var(--surf)}
+.card a:active{opacity:.8}
+.card .ph img,.tile img{transition:transform .7s var(--ease)}
+.tile:active img{transform:scale(1.04)}
+@media(hover:hover){
+ .btn:hover{background:var(--ink)}
+ .btn.o:hover{background:#000;color:#fff}
+ .btn.w:hover{background:#fff;color:#000}
+ .card:hover .ph img,.tile:hover img{transform:scale(1.04)}
+}
+@media(pointer:fine){main{user-select:none}}
+img,a{-webkit-user-drag:none}
+/* Scroll-driven (no JS): sections rise into view; hero label glides against the swipe. Falls back to static. */
+@supports (animation-timeline:view()){
+ .sec,.tile,.band>img,.band .tx,.perks,.grid .card{animation:rev linear both;animation-timeline:view();animation-range:entry 0% entry 40%}
+ .slide .btn{animation:lbl linear both;animation-timeline:view(inline)}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.splash{display:none}}
 </style>
 </head>
 <body>
@@ -219,10 +266,11 @@ fieldset{border:0;margin-bottom:14px}
   <a href="#/wishlist" data-n="wish"><span class="pill"><svg class="i"><use href="#i-heart"/></svg><b class="bd" id="wbd" hidden></b></span>Wishlist</a>
   <a href="#/more" data-n="more"><span class="pill"><svg class="i"><use href="#i-more"/></svg></span>More</a>
  </nav>
- <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true" tabindex="-1"></div></div>
+ <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true" tabindex="-1"><div class="grab" id="grab"></div><div id="pbody"></div></div></div>
  <div class="lb" id="lb" hidden><button class="ib" data-act="lbclose" aria-label="Close">
   <svg class="i"><use href="#i-close"/></svg></button><img alt=""></div>
  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+ <div class="splash" aria-hidden="true"><img src="../website_documentation/assets/branding/logopng.png" alt=""></div>
 </div>
 
 <script src="data.js"></script>
@@ -246,6 +294,10 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 };
 let wish = store.get('aj-wish', []), recent = store.get('aj-recent', []);
+const reduced = matchMedia('(prefers-reduced-motion:reduce)').matches;
+// CSS hides <main> images until they carry .ld, so they fade in once loaded. 'error' reveals too, so nothing stays invisible.
+// Listen on document, not window: <img> load events never reach window (DOM spec), only document, and only in capture.
+['load', 'error'].forEach(t => document.addEventListener(t, e => e.target.tagName === 'IMG' && e.target.classList.add('ld'), true));
 
 const CONTACT = {
   viber: 'viber://chat?number=%2B639277537322', wa: 'https://wa.me/639152345968',
@@ -280,8 +332,16 @@ const heart = id => `<button class="heart ${wish.includes(id) ? 'on' : ''}" data
 
 let toastT;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
-function openSheet(html) { $('#panel').innerHTML = html; $('#sheet').hidden = false; $('#panel').focus(); }
-function closeSheet() { $('#sheet').hidden = true; }
+let sheetT;
+function openSheet(html) {
+  clearTimeout(sheetT); const s = $('#sheet'); s.classList.remove('out');
+  $('#pbody').innerHTML = html; s.hidden = false; $('#panel').focus();
+}
+function closeSheet() { // slides down, then hides; also resets any swipe offset
+  const s = $('#sheet'); if (s.hidden || s.classList.contains('out')) return;
+  s.classList.add('out');
+  sheetT = setTimeout(() => { s.hidden = true; s.classList.remove('out'); $('#panel').style.cssText = ''; $('.scrim').style.cssText = ''; }, 180);
+}
 
 // Viber/WhatsApp hand-off: the business runs on chat, so the app composes the message.
 // wa.me honours ?text=; Viber's prefill isn't confirmed, so Viber gets a Copy button instead.
@@ -299,15 +359,17 @@ let homeTab = 'new-arrivals', sellTab = 'consign', lastCol = null, F, timer;
 const resetF = () => F = {brands: [], ranks: [], min: '', max: '', stock: false, sort: 'featured', cols: 2};
 resetF();
 
+const feat = () => `<div class="tabs" role="tablist">${TABS.map(([h, l]) => `<button role="tab" data-act="tab" data-h="${h}" aria-selected="${h === homeTab}">${l}</button>`).join('')}</div>
+  <div class="row">${P.filter(p => inCol(p, homeTab)).slice(0, 8).map(card).join('')}</div>
+  <div class="cta"><a class="btn o" href="#/c/${homeTab}">Shop collection</a></div>`;
+
 function home() {
   return `<div class="ann">BUY, SELL, &amp; CONSIGN</div>
   <div class="herow"><div class="hero" id="hero">${SLIDES.map(([f, l, h]) =>
     `<a class="slide" href="#/c/${h}"><img src="${IMG(f)}" alt=""><span class="btn w">${l}</span></a>`).join('')}</div>
    <div class="dots" id="dots">${SLIDES.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div></div>
   <h2 class="sec">Featured Collection</h2>
-  <div class="tabs" role="tablist">${TABS.map(([h, l]) => `<button role="tab" data-act="tab" data-h="${h}" aria-selected="${h === homeTab}">${l}</button>`).join('')}</div>
-  <div class="row">${P.filter(p => inCol(p, homeTab)).slice(0, 8).map(card).join('')}</div>
-  <div class="cta"><a class="btn o" href="#/c/${homeTab}">Shop collection</a></div>
+  <div id="feat">${feat()}</div>
   <div class="tiles">${TILES.map(([h, l, n]) => `<a class="tile" href="#/c/${h}"><img src="${IMG('homepage/' + n + '.jpg')}" alt=""><span>${l}</span></a>`).join('')}</div>
   <section class="band dark"><img src="${IMG('homepage/viber_image_2024-10-03_16-00-46-832.jpg')}" alt="">
    <div class="tx"><h2>Sell or Consign with Us!</h2><p>Looking for a new home for your luxury items? We can certainly help sell them for you!</p>
@@ -478,12 +540,25 @@ const R = {
   page: {nav: 'more', top: a => PAGES[a]?.t || '', back: 1, view: page}
 };
 
+// Screen transition: entering content slides in from the side it "comes from" (deeper / later tab = right).
+const TAB_ORDER = ['home', 'shop', 'sell', 'wish', 'more'];
+const ENTER = {
+  fwd: [{opacity: 0, transform: 'translateX(32px)'}, {opacity: 1, transform: 'none'}],
+  back: [{opacity: 0, transform: 'translateX(-32px)'}, {opacity: 1, transform: 'none'}],
+  fade: [{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'none'}]
+};
+let prev = null, cur = R.home;
+
 function render(keep) {
   clearInterval(timer);
   const [, r = 'home', a = ''] = (location.hash.slice(1) || '/home').split('?')[0].split('/');
   const arg = decodeURIComponent(a), d = R[r] || {top: '', back: 1, view: notFound};
   if (!keep) closeSheet();
   if (r !== 'c' && r !== 'p') lastCol = null;
+  const depth = d.back ? (r === 'p' ? 2 : 1) : 0, tab = TAB_ORDER.indexOf(d.nav);
+  const dir = !prev || keep ? null : depth !== prev.depth ? (depth > prev.depth ? 'fwd' : 'back')
+    : depth === 0 && tab !== prev.tab ? (tab > prev.tab ? 'fwd' : 'back') : 'fade';
+  prev = {depth, tab}; cur = d;
   const t = typeof d.top === 'function' ? d.top(arg) : d.top;
   const right = r === 'p' ? heart(arg) : r === 'search' ? '' : `<a class="ib" href="#/search" aria-label="Search">${ic('search')}</a>`;
   $('#top').innerHTML = (d.back ? `<button class="ib" data-act="back" aria-label="Back">${ic('back')}</button>` : d.top === 'logo' ? '<span class="ib"></span>' : '')
@@ -492,6 +567,7 @@ function render(keep) {
   const m = $('#main'), y = m.scrollTop;
   m.innerHTML = d.view(arg);
   m.scrollTop = keep ? y : 0;
+  if (dir && !reduced) m.animate(ENTER[dir], {duration: 320, easing: 'cubic-bezier(.22,.8,.3,1)'});
   $('#nav').hidden = !!(d.nonav || r === 'p');
   document.querySelectorAll('#nav a').forEach(x => x.toggleAttribute('aria-current', x.dataset.n === d.nav));
   if (r === 'search') $('#q').focus({preventScroll: true});
@@ -501,7 +577,9 @@ function render(keep) {
 function hero() {
   const h = $('#hero'), n = h.children.length; let i = 0;
   h.addEventListener('scroll', () => { i = Math.round(h.scrollLeft / h.clientWidth); document.querySelectorAll('#dots i').forEach((d, k) => d.classList.toggle('on', k === i)); }, {passive: true});
-  if (!matchMedia('(prefers-reduced-motion:reduce)').matches) timer = setInterval(() => h.scrollTo({left: ((i + 1) % n) * h.clientWidth, behavior: 'smooth'}), 5000);
+  const play = () => { clearInterval(timer); if (!reduced) timer = setInterval(() => h.scrollTo({left: ((i + 1) % n) * h.clientWidth, behavior: 'smooth'}), 5000); };
+  ['touchstart', 'pointerdown'].forEach(t => h.addEventListener(t, play, {passive: true})); // user is driving: restart the countdown
+  play();
 }
 
 /* ---------- events ---------- */
@@ -509,12 +587,18 @@ const ACT = {
   wish(el) {
     const id = el.dataset.id, on = !wish.includes(id);
     wish = on ? [...wish, id] : wish.filter(x => x !== id); store.set('aj-wish', wish);
-    document.querySelectorAll(`.heart[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    document.querySelectorAll(`.heart[data-id="${id}"]`).forEach(b => {
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+      if (on && !reduced) b.firstElementChild.animate([{transform: 'scale(.7)'}, {transform: 'scale(1.25)', offset: .6}, {transform: 'none'}], {duration: 350, easing: 'cubic-bezier(.3,1.4,.5,1)'});
+    });
     updBadge(); toast(on ? 'Added to wishlist' : 'Removed from wishlist');
-    if (location.hash.startsWith('#/wishlist')) render(true);
+    if (!on && location.hash.startsWith('#/wishlist')) { // card shrinks away; full re-render only for the empty state
+      const c = el.closest('.card'), done = () => { c.remove(); if (!wish.length) render(true); };
+      reduced ? done() : c.animate([{opacity: 1, transform: 'none'}, {opacity: 0, transform: 'scale(.96)'}], {duration: 220, easing: 'ease-in', fill: 'forwards'}).finished.then(done);
+    }
   },
   back() { history.length > 1 ? history.back() : location.hash = '#/home'; },
-  tab(el) { homeTab = el.dataset.h; render(true); },
+  tab(el) { homeTab = el.dataset.h; $('#feat').innerHTML = feat(); },
   seg(el) { sellTab = el.dataset.t; render(); },
   brand(el) { resetF(); F.brands = [el.dataset.b]; lastCol = 'all-products'; location.hash = '#/c/all-products'; },
   filters() { openSheet(filterSheet()); },
@@ -555,6 +639,51 @@ $('#lb img').addEventListener('click', e => {
   const i = e.target, r = i.getBoundingClientRect();
   i.style.transformOrigin = `${e.clientX - r.left}px ${e.clientY - r.top}px`; i.classList.toggle('z');
 });
+
+/* ---------- swipe gestures ---------- */
+// Swipe sideways on page content: next/previous tab, or back on inner screens. Swipes that start inside a
+// horizontally scrollable strip (hero, product rows, quotes) are left alone so those keep scrolling natively.
+const HREF = {home: '#/home', shop: '#/shop', sell: '#/sell', wish: '#/wishlist', more: '#/more'};
+const hScroller = el => { for (; el && el.id !== 'main'; el = el.parentElement) if (el.scrollWidth > el.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return true; return false; };
+function swipe(dx, dy, t) {
+  if (!$('#lb').hidden) { if (dy > 90 && Math.abs(dx) < dy * .6 && !$('#lb img').classList.contains('z')) ACT.lbclose(); return; }
+  if (!$('#sheet').hidden || Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.8 || !t.closest('#main') || t.closest('input,select,textarea') || hScroller(t)) return;
+  if (cur.back) { if (dx > 0) ACT.back(); return; }
+  const next = HREF[TAB_ORDER[TAB_ORDER.indexOf(cur.nav) + (dx < 0 ? 1 : -1)]];
+  if (next) location.hash = next;
+}
+let tp; // touch
+document.addEventListener('touchstart', e => { tp = e.touches.length === 1 ? {x: e.touches[0].clientX, y: e.touches[0].clientY, t: e.target} : null; }, {passive: true});
+document.addEventListener('touchend', e => { if (!tp) return; const c = e.changedTouches[0]; swipe(c.clientX - tp.x, c.clientY - tp.y, tp.t); tp = null; }, {passive: true});
+
+// Mouse: same gestures for the desktop demo, plus drag-to-scroll on the strips (browsers only do that for touch).
+let mp, noClick;
+document.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'mouse' || e.button) return;
+  const s = e.target.closest('.hero,.row,.quotes,.tabs');
+  mp = {x: e.clientX, y: e.clientY, t: e.target, s: s && s.scrollWidth > s.clientWidth ? s : null};
+  if (mp.s) { mp.l = mp.s.scrollLeft; mp.s.style.scrollSnapType = 'none'; }
+});
+document.addEventListener('pointermove', e => { if (mp?.s) mp.s.scrollLeft = mp.l - (e.clientX - mp.x); });
+const endPtr = (e, cancelled) => {
+  if (!mp) return;
+  const {x, y, t, s} = mp, dx = e.clientX - x, dy = e.clientY - y; mp = null;
+  if (s) { s.style.scrollSnapType = ''; if (s.id === 'hero') s.scrollTo({left: Math.round(s.scrollLeft / s.clientWidth) * s.clientWidth, behavior: 'smooth'}); }
+  if (Math.hypot(dx, dy) > 8) { noClick = true; setTimeout(() => noClick = false); } // a drag must not also "click" the card under the cursor
+  if (!cancelled) swipe(dx, dy, t);
+};
+document.addEventListener('pointerup', e => endPtr(e));
+document.addEventListener('pointercancel', e => endPtr(e, true)); // always restore scroll-snap, even if the browser aborts the drag
+document.addEventListener('click', e => { if (noClick) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+
+// Bottom sheet: drag the handle down to dismiss (a quick flick also dismisses).
+(() => {
+  const g = $('#grab'), p = $('#panel'), sc = $('.scrim'); let y0 = null, dy = 0, t0 = 0;
+  g.addEventListener('pointerdown', e => { y0 = e.clientY; dy = 0; t0 = Date.now(); g.setPointerCapture(e.pointerId); p.style.transition = 'none'; });
+  g.addEventListener('pointermove', e => { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); p.style.transform = `translateY(${dy}px)`; sc.style.opacity = Math.max(0, 1 - dy / p.offsetHeight); });
+  const end = () => { if (y0 === null) return; y0 = null; p.style.transition = ''; if (dy > 90 || dy / (Date.now() - t0) > .6) closeSheet(); else { p.style.transform = ''; sc.style.opacity = ''; } };
+  g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+})();
 
 function updBadge() { const b = $('#wbd'); b.textContent = wish.length; b.hidden = !wish.length; }
 function tick() { $('#clock').textContent = new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'}); }
