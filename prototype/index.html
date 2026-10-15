@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en-PH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>A&amp;J Luxury</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap">
+<style>
+/* Tokens: website_documentation/datasets/design_tokens.json (default scheme) */
+:root{--ink:#222;--mute:#666;--line:#eee;--ph:#f3f3f3;--surf:#f5f5f5;--err:#da3f3f;--ok:#3a8735;--font:Poppins,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font:400 14px/1.5 var(--font);color:var(--ink);background:#fff}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid #000;outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* Phone frame on wide screens, full-bleed on a real phone */
+#app{position:relative;display:flex;flex-direction:column;height:100dvh;overflow:hidden;background:#fff}
+.sb{display:none}
+@media(min-width:520px){
+ body{background:#e6e6e6;display:grid;place-items:center;min-height:100dvh;padding:24px}
+ #app{width:406px;height:min(860px,calc(100dvh - 48px));border:8px solid #111;border-radius:36px;box-shadow:0 24px 60px #0003}
+ .sb{display:flex;justify-content:space-between;padding:6px 22px 2px;font-size:12px;font-weight:500}
+}
+main{flex:1;overflow-y:auto;overscroll-behavior:contain}
+
+/* App bar + bottom navigation (48dp touch targets) */
+.top{display:flex;align-items:center;min-height:56px;padding:0 4px;border-bottom:1px solid var(--line)}
+.tt{flex:1;min-width:0;font-size:20px;font-weight:300;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt.c{text-align:center;padding:0}
+.tt img{height:40px;margin:auto}
+.top input{flex:1;min-width:0;border:0;min-height:48px;padding:0 8px;font-size:16px;outline:0}
+.ib{width:48px;height:48px;flex:none;display:grid;place-items:center;background:none;border:0;border-radius:50%;cursor:pointer}
+.ib:active{background:#0001}
+.nav{display:flex;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nav[hidden]{display:none}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 10px;font-size:11px;color:var(--mute)}
+.nav a[aria-current]{color:#000;font-weight:500}
+.pill{position:relative;width:56px;height:30px;border-radius:15px;display:grid;place-items:center}
+[aria-current] .pill{background:#000;color:#fff}
+.bd{position:absolute;top:-4px;right:-2px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--err);color:#fff;font-size:10px;line-height:16px;text-align:center}
+.bd[hidden]{display:none}
+
+/* Buttons: square, 1px letter-spacing, uppercase (tokens) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border:1px solid #000;background:#000;color:#fff;font-weight:500;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-align:center}
+.btn:active{background:var(--ink)}
+.btn.o{background:#fff;color:#000}
+.btn.w{background:transparent;border-color:#fff;color:#fff}
+.btn.blk{display:flex;width:100%}
+
+/* Home */
+.ann{background:#000;color:#fff;text-align:center;font-size:12px;letter-spacing:1px;padding:8px}
+.herow{position:relative}
+.hero{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.hero::-webkit-scrollbar{display:none}
+.slide{position:relative;flex:0 0 100%;height:460px;scroll-snap-align:start;display:grid;place-items:end center;padding-bottom:56px}
+.slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slide::after{content:"";position:absolute;inset:0;background:#0003}
+.slide .btn{position:relative;z-index:1}
+.dots{position:absolute;left:0;right:0;bottom:20px;display:flex;justify-content:center;gap:8px}
+.dots i{width:8px;height:8px;border-radius:50%;background:#fff6}
+.dots i.on{background:#fff}
+.sec{font-size:24px;font-weight:300;text-align:center;padding:32px 16px 12px}
+.tabs{display:flex;gap:22px;overflow-x:auto;padding:0 16px;justify-content:center;scrollbar-width:none}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:8px 0;font-size:16px;color:var(--mute);cursor:pointer;white-space:nowrap}
+.tabs [aria-selected=true]{color:#000;border-color:#000}
+.row{display:flex;gap:12px;overflow-x:auto;padding:16px;scroll-snap-type:x proximity;scrollbar-width:none}
+.row .card{flex:0 0 150px;scroll-snap-align:start}
+.cta{text-align:center;padding:0 16px 8px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:16px 4px 0}
+.tile{position:relative;aspect-ratio:1;display:grid;place-items:center;overflow:hidden;color:#fff;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+.tile:first-child{grid-column:span 2;aspect-ratio:2/1}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile::after{content:"";position:absolute;inset:0;background:#0003}
+.tile span{position:relative;z-index:1}
+.band{margin-top:32px}
+.band img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.band .tx{padding:28px 20px 32px}
+.band h2{font-size:24px;font-weight:300;margin-bottom:10px}
+.band p{margin-bottom:20px}
+.dark{background:#000;color:#fff}
+.quotes{display:flex;gap:12px;overflow-x:auto;padding:0 16px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.quote{flex:0 0 82%;scroll-snap-align:start;border:1px solid var(--line);padding:16px}
+.quote .st{letter-spacing:2px}
+.quote p{margin:8px 0;font-weight:300}
+.quote small{color:var(--mute)}
+.perks{display:grid;grid-template-columns:1fr 1fr;background:#f9f9f9;margin-top:32px}
+.perk{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 12px;text-align:center;font-size:12px;letter-spacing:.5px;text-transform:uppercase}
+
+/* Product cards + grids */
+.card{position:relative;min-width:0}
+.card .ph{aspect-ratio:1;background:var(--ph)}
+.card img{width:100%;height:100%;object-fit:cover}
+.card .b{margin-top:8px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--mute)}
+.card .t{font-size:13px;font-weight:300;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .pr{margin-top:2px}
+.heart{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;cursor:pointer}
+.card .heart{position:absolute;top:0;right:0}
+.card .heart .i{background:#fffd;border-radius:50%;padding:4px;width:30px;height:30px}
+.heart.on .i{fill:currentColor}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 12px;padding:16px}
+.grid.g1{grid-template-columns:1fr}
+.tool{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.tool .btn{min-height:44px;padding:0 14px;font-size:12px}
+.tool select{flex:1;min-width:0;min-height:44px;padding:0 8px;border:1px solid #ccc;border-radius:5px;background:#fff}
+.tool .ib{width:44px;height:44px}
+.tool .ib[aria-pressed=true]{background:#000;color:#fff}
+.cnt{padding:12px 16px 0;color:var(--mute);font-size:13px}
+.empty{padding:48px 24px;text-align:center;color:var(--mute)}
+.empty .btn{margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px}
+.chip{min-height:40px;padding:0 16px;border:1px solid #ccc;border-radius:20px;background:#fff;cursor:pointer}
+.h2{font-size:16px;font-weight:500;padding:20px 16px 10px}
+.list a,.list button.r{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:56px;padding:0 16px;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;cursor:pointer}
+.list small{color:var(--mute);margin-left:auto}
+.sres{display:flex;gap:12px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line)}
+.sres img{width:56px;height:56px;object-fit:cover;background:var(--ph)}
+
+/* Product */
+.gal{position:relative;background:var(--ph);aspect-ratio:1}
+.gal img{width:100%;height:100%;object-fit:cover}
+.gal .zoom{position:absolute;right:8px;bottom:8px;background:#fffd;border-radius:50%}
+.pad{padding:16px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tag{border:1px solid #000;padding:2px 8px;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.pbrand{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+.pt{font-size:22px;font-weight:300;line-height:1.3;margin:4px 0 8px}
+.price{font-size:20px;font-weight:500}
+.facts{margin:16px 0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px}
+.facts dt{color:var(--mute)}
+.ship{display:flex;gap:8px;align-items:center;color:var(--mute);font-size:13px}
+details{border-top:1px solid var(--line)}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{display:flex;justify-content:space-between;align-items:center;min-height:56px;padding:0 16px;font-weight:500;cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary .i{transition:transform .2s}
+details[open] summary .i{transform:rotate(180deg)}
+.dbody{padding:0 16px 20px;white-space:pre-line}
+.dbody ul{padding-left:18px;margin:6px 0 12px;white-space:normal}
+.dbody small{display:block;margin-top:12px;color:var(--mute)}
+.buy{position:sticky;bottom:0;display:flex;gap:8px;align-items:center;padding:10px 12px;background:#fff;border-top:1px solid var(--line)}
+.buy{justify-content:space-between}
+.buy .btn{padding:0 24px}
+
+/* Pages + forms */
+.lead{padding:20px 16px 8px;font-weight:300;font-size:18px;line-height:1.5}
+.pg{padding:16px}
+.pg h2{font-size:18px;font-weight:500;margin:20px 0 8px}
+.pg p,.pg li{margin-bottom:8px}
+.pg ul,.pg ol{padding-left:20px}
+.pg img{width:100%;margin-bottom:16px}
+.seg{display:flex;margin:16px;border:1px solid #000}
+.seg button{flex:1;min-height:48px;border:0;background:#fff;font-weight:500;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.seg [aria-pressed=true]{background:#000;color:#fff}
+.fld{display:block;margin-bottom:14px}
+.fld>span,legend{display:block;font-size:12px;color:var(--mute);margin-bottom:4px}
+input[type=text],input[type=tel],input[type=number],select,textarea{width:100%;min-height:48px;padding:10px 12px;border:1px solid #ccc;border-radius:5px;background:#fff}
+textarea{min-height:88px;resize:vertical}
+fieldset{border:0;margin-bottom:14px}
+.chk{display:flex;align-items:center;gap:12px;min-height:44px}
+.chk input{width:20px;height:20px;accent-color:#000}
+.chk em{margin-left:auto;font-style:normal;color:var(--mute)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.note{background:var(--surf);padding:12px;font-size:13px;margin-bottom:14px}
+
+/* Sheet, toast, lightbox */
+.sheet{position:absolute;inset:0;z-index:20;display:flex;align-items:flex-end}
+.sheet[hidden],.lb[hidden]{display:none}
+.scrim{position:absolute;inset:0;background:#0007}
+.panel{position:relative;width:100%;max-height:88%;overflow:auto;background:#fff;padding:20px 16px calc(20px + env(safe-area-inset-bottom));border-radius:16px 16px 0 0;animation:up .25s ease-out}
+.panel h2{font-size:18px;font-weight:500}
+.panel blockquote{margin:12px 0;padding:12px;background:var(--surf);white-space:pre-line;font-size:13px}
+.panel .stack{display:grid;gap:8px}
+.sh-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.foot{margin-top:16px}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;z-index:30;padding:12px 16px;background:var(--ink);color:#fff;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.lb{position:absolute;inset:0;z-index:25;background:#000;display:grid;place-items:center;overflow:auto}
+.lb img{width:100%;transition:transform .25s;cursor:zoom-in}
+.lb img.z{transform:scale(2.4);cursor:zoom-out}
+.lb .ib{position:absolute;top:8px;right:8px;z-index:2;background:#fffd}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></symbol>
+ <symbol id="i-shop" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></symbol>
+ <symbol id="i-sell" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/></symbol>
+ <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></symbol>
+ <symbol id="i-more" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+ <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5M11 6l-6 6 6 6"/></symbol>
+ <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+ <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"/></symbol>
+ <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+ <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+ <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5M11 8v6M8 11h6"/></symbol>
+ <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.500-3 8-7 10-4-2-7-5.500-7-10V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+ <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15"/><path d="M4 10h16M8 3v4M16 3v4"/></symbol>
+ <symbol id="i-rows" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6"/><rect x="4" y="13" width="16" height="6"/></symbol>
+</svg>
+
+<div id="app">
+ <div class="sb" aria-hidden="true"><span id="clock"></span><span>5G ▮▮▮ 87%</span></div>
+ <header class="top" id="top"></header>
+ <main id="main" tabindex="-1"></main>
+ <nav class="nav" id="nav" aria-label="Primary">
+  <a href="#/home" data-n="home"><span class="pill"><svg class="i"><use href="#i-home"/></svg></span>Home</a>
+  <a href="#/shop" data-n="shop"><span class="pill"><svg class="i"><use href="#i-shop"/></svg></span>Shop</a>
+  <a href="#/sell" data-n="sell"><span class="pill"><svg class="i"><use href="#i-sell"/></svg></span>Sell</a>
+  <a href="#/wishlist" data-n="wish"><span class="pill"><svg class="i"><use href="#i-heart"/></svg><b class="bd" id="wbd" hidden></b></span>Wishlist</a>
+  <a href="#/more" data-n="more"><span class="pill"><svg class="i"><use href="#i-more"/></svg></span>More</a>
+ </nav>
+ <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true" tabindex="-1"></div></div>
+ <div class="lb" id="lb" hidden><button class="ib" data-act="lbclose" aria-label="Close">
+  <svg class="i"><use href="#i-close"/></svg></button><img alt=""></div>
+ <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+/* ---------- data + helpers ---------- */
+const P = DATA.products;
+// The Shopify feed is wrong for these two products (vendor field; and the Evelyne is also missing
+// from the "bags" collection). A real app needs clean brand/category fields; here we patch by hand.
+const BRAND_FIX = {'15395946430644': 'Hermes', '15395946299572': 'Maison Margiela'};
+P.forEach(p => p.brand = BRAND_FIX[p.id] || p.brand);
+P.find(p => p.id === '15395946430644').col.push('bags');
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const peso = n => '₱' + n.toLocaleString('en-PH');
+const items = n => `${n} item${n === 1 ? '' : 's'}`;
+const ic = n => `<svg class="i" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const IMG = f => `../website_documentation/assets/${f}`;
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+let wish = store.get('aj-wish', []), recent = store.get('aj-recent', []);
+
+const CONTACT = {
+  viber: 'viber://chat?number=%2B639277537322', wa: 'https://wa.me/639152345968',
+  tel: 'tel:+639277537322', mail: 'mailto:info@aandjluxury.com',
+  fb: 'https://www.facebook.com/ajluxuryph/', ig: 'https://instagram.com/shopwithaandj',
+  map: 'https://maps.app.goo.gl/PjbRczJUrrEGHG4t5'
+};
+const SLIDES = [
+  ['homepage/viber_image_2024-10-03_16-00-25-456_bc30339d-2cd7-4ad6-b794-48ed6cf900f8.jpg', 'Shop Bags', 'bags'],
+  ['homepage/viber_image_2024-10-03_16-00-42-866_4afce564-3b47-40ae-9776-581e9be257e2.jpg', 'Shop Shoes', 'shoes'],
+  ['homepage/viber_image_2024-10-03_16-00-47-757.jpg', 'Shop SLGs', 'wallets']];
+const TILES = [['bags','Bags','2'],['wallets','SLGs','5'],['shoes','Shoes','4'],['watches','Watches','3'],['accessories','Accessories','1']];
+const TABS = [['new-arrivals','New Arrivals'],['bags','Bags'],['shoes','Shoes'],['wallets','SLGs']];
+const PERKS = [['truck','Free shipping within Metro Manila'],['shield','100% authentic'],['tag','Low price guaranteed'],['cal','Layaway with minimal interest']];
+const TITLES = {bags:'Bags',shoes:'Shoes',wallets:'Small Leather Goods',watches:'Watches',accessories:'Accessories','all-products':'All Products','new-arrivals':'New Arrivals','brand-new':'Brand New','pre-loved':'Pre-loved'};
+const RANKS = ['Brand New','9.8/10','9.5/10','9.3/10','9/10','8.8/10','8.5/10','8.3/10','8/10','7.5/10'];
+const POPULAR = ['Hermes','Louis Vuitton','Goyard','Chanel','Double Flap','Belt','Wallet','WOC'];
+
+// Collection membership: the feed's own collection handles, plus "accessories" derived here
+// (the website has no such collection; its home tile is a dead link).
+const inCol = (p, h) => h === 'accessories'
+  ? !['bags','wallets','shoes','watches'].some(c => p.col.includes(c))
+  : p.col.includes(h) || h === 'pre-loved' && p.cond === 'PRE LOVED';
+const match = q => P.filter(p => q.toLowerCase().split(/\s+/).every(w => (p.brand + ' ' + p.title).toLowerCase().includes(w)));
+
+/* ---------- shared UI ---------- */
+const card = p => `<article class="card">
+  <a href="#/p/${p.id}"><div class="ph"><img loading="lazy" src="${p.img}" alt="${esc(p.title)}"></div>
+  <div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div><div class="pr">${peso(p.price)}</div></a>
+  ${heart(p.id)}</article>`;
+const heart = id => `<button class="heart ${wish.includes(id) ? 'on' : ''}" data-act="wish" data-id="${id}" aria-pressed="${wish.includes(id)}" aria-label="Wishlist">${ic('heart')}</button>`;
+
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
+function openSheet(html) { $('#panel').innerHTML = html; $('#sheet').hidden = false; $('#panel').focus(); }
+function closeSheet() { $('#sheet').hidden = true; }
+
+// Viber/WhatsApp hand-off: the business runs on chat, so the app composes the message.
+// wa.me honours ?text=; Viber's prefill isn't confirmed, so Viber gets a Copy button instead.
+let lastMsg = '';
+function handoff(text) {
+  lastMsg = text;
+  openSheet(`<div class="sh-h"><h2>Message the shop</h2><button class="ib" data-act="close" aria-label="Close">${ic('close')}</button></div>
+   <p>This opens your chat app. Review the message, then send it.</p><blockquote>${esc(text)}</blockquote>
+   <div class="stack"><a class="btn blk" target="_blank" rel="noopener" href="${CONTACT.wa}?text=${encodeURIComponent(text)}">Open WhatsApp</a>
+   <a class="btn o blk" href="${CONTACT.viber}" data-act="copy">Copy message &amp; open Viber</a></div>`);
+}
+
+/* ---------- views ---------- */
+let homeTab = 'new-arrivals', sellTab = 'consign', lastCol = null, F, timer;
+const resetF = () => F = {brands: [], ranks: [], min: '', max: '', stock: false, sort: 'featured', cols: 2};
+resetF();
+
+function home() {
+  return `<div class="ann">BUY, SELL, &amp; CONSIGN</div>
+  <div class="herow"><div class="hero" id="hero">${SLIDES.map(([f, l, h]) =>
+    `<a class="slide" href="#/c/${h}"><img src="${IMG(f)}" alt=""><span class="btn w">${l}</span></a>`).join('')}</div>
+   <div class="dots" id="dots">${SLIDES.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div></div>
+  <h2 class="sec">Featured Collection</h2>
+  <div class="tabs" role="tablist">${TABS.map(([h, l]) => `<button role="tab" data-act="tab" data-h="${h}" aria-selected="${h === homeTab}">${l}</button>`).join('')}</div>
+  <div class="row">${P.filter(p => inCol(p, homeTab)).slice(0, 8).map(card).join('')}</div>
+  <div class="cta"><a class="btn o" href="#/c/${homeTab}">Shop collection</a></div>
+  <div class="tiles">${TILES.map(([h, l, n]) => `<a class="tile" href="#/c/${h}"><img src="${IMG('homepage/' + n + '.jpg')}" alt=""><span>${l}</span></a>`).join('')}</div>
+  <section class="band dark"><img src="${IMG('homepage/viber_image_2024-10-03_16-00-46-832.jpg')}" alt="">
+   <div class="tx"><h2>Sell or Consign with Us!</h2><p>Looking for a new home for your luxury items? We can certainly help sell them for you!</p>
+   <a class="btn w" href="#/sell">Read more</a></div></section>
+  <section class="band"><img src="${IMG('homepage/viber_image_2024-10-03_16-00-24-592_e779bcb0-62f3-452c-81af-5c08c656ddf1.jpg')}" alt="">
+   <div class="tx"><h2>We invite you to explore and discover the art of bliss with A&amp;J Luxury.</h2>
+   <a class="btn o" href="#/page/about">Read more</a></div></section>
+  <h2 class="sec">What People Are Saying</h2>
+  <div class="quotes">${DATA.testimonials.map(t => `<figure class="quote"><div class="st" aria-label="5 stars">★★★★★</div>
+   <p>${esc(t.quote)}</p><small>${esc(t.attribution)}</small></figure>`).join('')}</div>
+  <div class="perks">${PERKS.map(([i, t]) => `<div class="perk">${ic(i === 'tag' ? 'sell' : i)}${t}</div>`).join('')}</div>`;
+}
+
+function shop() {
+  const n = h => P.filter(p => inCol(p, h)).length;
+  const brands = [...new Set(P.map(p => p.brand))].sort();
+  return `<div class="list">${['bags','shoes','wallets','watches','accessories','all-products'].map(h =>
+    `<a href="#/c/${h}">${TITLES[h]}<small>${n(h)}</small>${ic('chev')}</a>`).join('')}</div>
+  <h2 class="h2">Condition</h2>
+  <div class="two" style="padding:0 16px"><a class="btn o" href="#/c/brand-new">Brand new</a><a class="btn o" href="#/c/pre-loved">Pre-loved</a></div>
+  <h2 class="h2">Shop by brand</h2>
+  <div class="chips" style="padding-bottom:24px">${brands.map(b => `<button class="chip" data-act="brand" data-b="${esc(b)}">${esc(b)}</button>`).join('')}</div>`;
+}
+
+function applyF(list) {
+  const out = list.filter(p => (!F.brands.length || F.brands.includes(p.brand)) && (!F.ranks.length || F.ranks.includes(p.rank)) &&
+    (!F.min || p.price >= +F.min) && (!F.max || p.price <= +F.max) && (!F.stock || p.avail));
+  const s = {'price-asc': (a, b) => a.price - b.price, 'price-desc': (a, b) => b.price - a.price, az: (a, b) => a.title.localeCompare(b.title)}[F.sort];
+  return s ? out.sort(s) : out;
+}
+
+function colBody(h) {
+  const base = P.filter(p => inCol(p, h)), list = applyF(base);
+  const nf = F.brands.length + F.ranks.length + (F.min || F.max ? 1 : 0) + (F.stock ? 1 : 0);
+  return `<div class="tool"><button class="btn o" data-act="filters">${ic('filter')}Filter${nf ? ` (${nf})` : ''}</button>
+   <select data-f="sort" aria-label="Sort">${[['featured','Featured'],['price-asc','Price: low to high'],['price-desc','Price: high to low'],['az','A–Z']].map(([v, l]) => `<option value="${v}" ${F.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+   <button class="ib" data-act="dens" data-c="1" aria-pressed="${F.cols === 1}" aria-label="One column">${ic('rows')}</button>
+   <button class="ib" data-act="dens" data-c="2" aria-pressed="${F.cols === 2}" aria-label="Two columns">${ic('shop')}</button></div>
+  <p class="cnt">${items(list.length)}</p>
+  ${list.length ? `<div class="grid g${F.cols}">${list.map(card).join('')}</div>`
+    : base.length ? `<div class="empty">No items match your filters.<br><button class="btn" data-act="clearf">Clear filters</button></div>`
+    : `<div class="empty">Sorry, there are no products in this collection.</div>`}`;
+}
+function collection(h) {
+  if (lastCol !== h) { resetF(); lastCol = h; }
+  return `<div id="colbody">${colBody(h)}</div>`;
+}
+const refreshCol = () => { const b = $('#colbody'); if (b) { b.innerHTML = colBody(lastCol); const s = $('#shown'); if (s) s.textContent = `Show ${items(applyF(P.filter(p => inCol(p, lastCol))).length)}`; } };
+
+function filterSheet() {
+  const base = P.filter(p => inCol(p, lastCol));
+  const brands = [...new Set(base.map(p => p.brand))].sort(), ranks = RANKS.filter(r => base.some(p => p.rank === r));
+  const chk = (k, v, on, n) => `<label class="chk"><input type="checkbox" data-f="${k}" value="${esc(v)}" ${on ? 'checked' : ''}><span>${esc(v)}</span><em>${n}</em></label>`;
+  return `<div class="sh-h"><h2>Filters</h2><button class="ib" data-act="close" aria-label="Close">${ic('close')}</button></div>
+  <fieldset><legend>Brand</legend>${brands.map(b => chk('brand', b, F.brands.includes(b), base.filter(p => p.brand === b).length)).join('')}</fieldset>
+  <fieldset><legend>Condition rank</legend>${ranks.map(r => chk('rank', r, F.ranks.includes(r), base.filter(p => p.rank === r).length)).join('')}</fieldset>
+  <fieldset><legend>Price (₱)</legend><div class="two">
+   <input type="number" inputmode="numeric" min="0" placeholder="From" data-f="min" value="${F.min}" aria-label="Minimum price">
+   <input type="number" inputmode="numeric" min="0" placeholder="To" data-f="max" value="${F.max}" aria-label="Maximum price"></div></fieldset>
+  <label class="chk"><input type="checkbox" data-f="stock" ${F.stock ? 'checked' : ''}><span>In stock only</span></label>
+  <div class="two foot"><button class="btn o" data-act="clearf" data-reopen="1">Clear all</button>
+   <button class="btn" data-act="close" id="shown">Show ${items(applyF(base).length)}</button></div>`;
+}
+
+function search() { return `<div id="res">${results('')}</div>`; }
+function results(raw) {
+  const q = raw.trim();
+  if (!q) return `<h2 class="h2">Popular searches</h2><div class="chips">${POPULAR.filter(t => match(t).length).map(t => `<button class="chip" data-act="pop" data-q="${esc(t)}">${esc(t)}</button>`).join('')}</div>`;
+  const hit = match(q);
+  return `<p class="cnt">Found ${hit.length} result${hit.length === 1 ? '' : 's'} for “${esc(q)}”</p>` +
+    (hit.length ? hit.map(p => `<a class="sres" href="#/p/${p.id}"><img src="${p.img}" alt=""><div><div class="pbrand">${esc(p.brand)}</div>${esc(p.title)}<div>${peso(p.price)}</div></div></a>`).join('')
+      : `<div class="empty">No products found. Try a brand name such as “Chanel”.</div>`);
+}
+
+function product(id) {
+  const p = P.find(x => x.id === id);
+  if (!p) return notFound();
+  recent = [id, ...recent.filter(x => x !== id)].slice(0, 8); store.set('aj-recent', recent);
+  const seen = recent.slice(1).map(i => P.find(x => x.id === i)).filter(Boolean);
+  const fact = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
+  return `<div class="gal"><img src="${p.img}" alt="${esc(p.title)}"><button class="ib zoom" data-act="zoom" aria-label="Zoom in">${ic('zoom')}</button></div>
+  <div class="pad"><div class="tags"><span class="tag">${p.cond === 'BRAND NEW' ? 'Brand new' : 'Pre-loved'}</span>${p.avail ? '' : '<span class="tag">Sold out</span>'}</div>
+   <div class="pbrand">${esc(p.brand)}</div><h1 class="pt">${esc(p.title)}</h1><div class="price">${peso(p.price)}</div>
+   <dl class="facts">${fact('Brand', p.brand)}${fact('Rank', p.rank)}${fact('Inclusions', p.inc)}${fact('Flaws', p.cond === 'PRE LOVED' ? p.flaw : '')}</dl>
+   <div class="ship">${ic('truck')}On hand · Free shipping within Metro Manila</div></div>
+  <details open><summary>Product details${ic('down')}</summary><div class="dbody">${esc(p.title)}
+Condition: ${esc(p.rank)}${p.cond === 'PRE LOVED' ? `\nFlaw/s: ${esc(p.flaw || '—')}` : ''}
+Inclusions: ${esc(p.inc || '—')}
+<small>A&amp;J Luxury is not affiliated with any of the brand names posted. All rights and trademarks solely belong to the brand owners.</small></div></details>
+  <details><summary>Layaway policy${ic('down')}</summary><div class="dbody">30% fixed down payment. The balance is paid in equal monthly payments. The down payment is forfeited if the agreed time frame is exceeded.
+<button class="btn o blk" style="margin-top:12px" data-act="inquire" data-id="${p.id}" data-q="layaway">Ask about layaway</button></div></details>
+  <details><summary>Payment options${ic('down')}</summary><div class="dbody"><ul><li>BDO, BPI, GCash, UnionBank</li>
+   <li>Credit card via BDO Checkout (card fee applies)</li><li>Up to 12 months instalment via BDO credit card, 1% interest per month</li>
+   <li>Cash on delivery within Metro Manila (additional fee, not for sale items)</li><li>Cash upon pick-up (down payment secures the item)</li></ul></div></details>
+  ${seen.length ? `<h2 class="h2">Recently viewed</h2><div class="row">${seen.map(card).join('')}</div>` : ''}
+  <div class="buy"><div class="price" style="padding-left:4px">${peso(p.price)}</div><button class="btn" data-act="inquire" data-id="${p.id}">Inquire to buy</button></div>`;
+}
+
+function wishlist() {
+  const l = wish.map(i => P.find(p => p.id === i)).filter(Boolean);
+  return l.length ? `<div class="grid g2">${l.map(card).join('')}</div>`
+    : `<div class="empty">No products were added to the wishlist.<br><a class="btn" href="#/shop" style="margin-top:16px">Back to shopping</a></div>`;
+}
+
+function sell() {
+  const c = sellTab === 'consign';
+  return `<div class="seg" role="group" aria-label="Consign or sell">
+   <button data-act="seg" data-t="consign" aria-pressed="${c}">Consign</button><button data-act="seg" data-t="sell" aria-pressed="${!c}">Sell to us</button></div>
+  <p class="lead">${c ? 'Looking for a new home for your luxury items? We can certainly help sell them for you!' : 'Are you struggling with where to sell your luxury items? In need of quick cash?'}</p>
+  <div class="pg">${c ? `<h2>Why consign with us?</h2><ul><li>Quick and easy</li><li>Hassle-free</li><li>Competitive</li><li>Sustainable</li></ul>
+   <h2>How it works</h2><ol><li>Fill in the form below, or message us on Viber / WhatsApp, with photos, inclusions, flaws and where you bought the item.</li>
+   <li>Drop it off at the showroom or ship it via Grab, Lalamove or LBC.</li><li>We authenticate and list it.</li>
+   <li>You are paid after the buyer receives the item — cash, deposit or in-store credit.</li></ol>
+   <h2>Good to know</h2><ul><li>Only 100% authentic items in at least excellent condition.</li><li>We add a minimal mark-up and may decline items with no room for it.</li>
+   <li>Consignment period: 1 to 5 months.</li><li>Pull-out fee: ₱2,000 per item if pulled before one month. Give at least 1 business day notice.</li></ul>`
+  : `<h2>How to sell</h2><ol><li>Fill in the form below, or message us on Viber / WhatsApp.</li><li>We appraise and authenticate the item when we receive it.</li>
+   <li>Allow 24 hours to schedule your payment.</li><li>Get paid by cash, deposit or in-store credit.</li></ol>`}
+  <h2>Tell us about your item</h2>
+  <form id="sellform">
+   <label class="fld"><span>Your name *</span><input type="text" name="name" required autocomplete="name"></label>
+   <label class="fld"><span>Mobile / Viber number *</span><input type="tel" name="tel" required autocomplete="tel" placeholder="09XX XXX XXXX"></label>
+   <label class="fld"><span>Brand and item *</span><input type="text" name="item" required placeholder="e.g. Chanel Classic Flap Medium"></label>
+   <label class="fld"><span>Condition</span><select name="cond"><option>Brand New</option><option>9.5/10 or above</option><option>9/10</option><option>8/10</option><option>7.5/10 or below</option></select></label>
+   <fieldset><legend>Inclusions</legend>${['Box','Dustbag','Receipt','Care booklet','Authenticity card'].map(x => `<label class="chk"><input type="checkbox" name="inc" value="${x}"><span>${x}</span></label>`).join('')}</fieldset>
+   <label class="fld"><span>Store of purchase</span><input type="text" name="store"></label>
+   <label class="fld"><span>Flaws</span><textarea name="flaws" placeholder="Scratches, marks, wear…"></textarea></label>
+   <p class="note">Next step: you'll send your photos in Viber or WhatsApp. The message is written for you.</p>
+   <button class="btn blk" type="submit">Continue to chat</button></form></div>`;
+}
+
+const PAGES = {
+  about: {t: 'About Us', v: () => `<div class="pg"><img src="${IMG('pages/viber_image_2024-10-03_16-00-29-495.jpg')}" alt="">
+    <p>A&amp;J Luxury was started by two sisters, Alex and Joyce, who began selling mid-brands in 2018. During the 2020 pandemic they sourced brand-new pieces directly from Italy, and later opened the doors to consignment.</p>
+    <p>Today we are one of the leading consignment shops in the country, and we are always transparent about the condition of every item.</p>
+    <p>We invite you to explore and discover the art of bliss with A&amp;J Luxury.</p></div>`},
+  faqs: {t: 'FAQs', v: () => DATA.faqs.map((f, i) => `<details ${i ? '' : 'open'}><summary>${esc(f.question)}${ic('down')}</summary><div class="dbody">${esc(f.answer)}</div></details>`).join('')},
+  visit: {t: 'Visit Us', v: () => `<div class="pg"><h2>A&amp;J Showroom</h2><p><b>Address</b><br>South Caloocan</p><a class="btn o blk" target="_blank" rel="noopener" href="${CONTACT.map}">Get directions</a>
+    <h2>We're open</h2><p>Every day, 12nn to 8pm</p>
+    <h2>Message us first</h2><p>Let us know what you'd like to see so the item is on hand when you arrive.</p>
+    <a class="btn blk" href="${CONTACT.viber}">Viber 09277537322</a></div>`},
+  policy: {t: 'Returns & Refunds', v: () => `<div class="pg"><p>All sales are final.</p><ul><li>Returns are only entertained for undeclared flaws or missing inclusions — <b>exchange only</b>.</li>
+    <li>Notify us within 24 hours, with the security tag intact.</li><li>Ship the item back within 48 hours; the client pays shipping both ways.</li>
+    <li>Pre-ordered items cannot be returned. Refunds are typically not available and orders cannot be cancelled.</li></ul>
+    <p>Please review the photos and description carefully before buying.</p></div>`}
+};
+const page = k => PAGES[k] ? PAGES[k].v() : notFound();
+
+function more() {
+  const ext = (l, h, s) => `<a href="${h}" ${h.startsWith('http') ? 'target="_blank" rel="noopener"' : ''}>${l}<small>${s}</small></a>`;
+  return `<div class="list">${Object.entries(PAGES).map(([k, v]) => `<a href="#/page/${k}">${v.t}${ic('chev')}</a>`).join('')}</div>
+  <h2 class="h2">Contact us</h2><div class="list">${ext('Viber', CONTACT.viber, '09277537322')}${ext('WhatsApp', CONTACT.wa, '09152345968')}
+   ${ext('Call', CONTACT.tel, '+63 927 753 7322')}${ext('Email', CONTACT.mail, 'info@aandjluxury.com')}
+   ${ext('Facebook', CONTACT.fb, '@ajluxuryph')}${ext('Instagram', CONTACT.ig, '@shopwithaandj')}</div>
+  <p class="cnt" style="padding-bottom:24px">Prototype build · 17-item sample of the 991-product catalogue.</p>`;
+}
+const notFound = () => `<div class="empty" style="background:#f5f1ed;margin:16px;padding:64px 16px"><h1 style="font-weight:300">Oops! Page not found!</h1><a class="btn" href="#/home" style="margin-top:20px">Go to Home</a></div>`;
+
+/* ---------- router ---------- */
+const R = {
+  home: {nav: 'home', top: 'logo', view: home},
+  shop: {nav: 'shop', top: 'Shop', view: shop},
+  c: {nav: 'shop', top: a => TITLES[a] || 'Collection', back: 1, view: collection},
+  p: {top: '', back: 1, view: product},
+  search: {top: 'search', back: 1, view: search, nonav: 1},
+  wishlist: {nav: 'wish', top: 'Wishlist', view: wishlist},
+  sell: {nav: 'sell', top: 'Consign & Sell', view: sell},
+  more: {nav: 'more', top: 'More', view: more},
+  page: {nav: 'more', top: a => PAGES[a]?.t || '', back: 1, view: page}
+};
+
+function render(keep) {
+  clearInterval(timer);
+  const [, r = 'home', a = ''] = (location.hash.slice(1) || '/home').split('?')[0].split('/');
+  const arg = decodeURIComponent(a), d = R[r] || {top: '', back: 1, view: notFound};
+  if (!keep) closeSheet();
+  if (r !== 'c' && r !== 'p') lastCol = null;
+  const t = typeof d.top === 'function' ? d.top(arg) : d.top;
+  const right = r === 'p' ? heart(arg) : r === 'search' ? '' : `<a class="ib" href="#/search" aria-label="Search">${ic('search')}</a>`;
+  $('#top').innerHTML = (d.back ? `<button class="ib" data-act="back" aria-label="Back">${ic('back')}</button>` : d.top === 'logo' ? '<span class="ib"></span>' : '')
+    + (t === 'search' ? `<input id="q" type="search" placeholder="Search brands, bags, wallets…" aria-label="Search" autocomplete="off">`
+      : `<div class="tt ${t === 'logo' ? 'c' : ''}">${t === 'logo' ? `<img src="${IMG('branding/logopng.png')}" alt="A&J Luxury">` : esc(t)}</div>`) + right;
+  const m = $('#main'), y = m.scrollTop;
+  m.innerHTML = d.view(arg);
+  m.scrollTop = keep ? y : 0;
+  $('#nav').hidden = !!(d.nonav || r === 'p');
+  document.querySelectorAll('#nav a').forEach(x => x.toggleAttribute('aria-current', x.dataset.n === d.nav));
+  if (r === 'search') $('#q').focus({preventScroll: true});
+  if ($('#hero')) hero();
+}
+
+function hero() {
+  const h = $('#hero'), n = h.children.length; let i = 0;
+  h.addEventListener('scroll', () => { i = Math.round(h.scrollLeft / h.clientWidth); document.querySelectorAll('#dots i').forEach((d, k) => d.classList.toggle('on', k === i)); }, {passive: true});
+  if (!matchMedia('(prefers-reduced-motion:reduce)').matches) timer = setInterval(() => h.scrollTo({left: ((i + 1) % n) * h.clientWidth, behavior: 'smooth'}), 5000);
+}
+
+/* ---------- events ---------- */
+const ACT = {
+  wish(el) {
+    const id = el.dataset.id, on = !wish.includes(id);
+    wish = on ? [...wish, id] : wish.filter(x => x !== id); store.set('aj-wish', wish);
+    document.querySelectorAll(`.heart[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    updBadge(); toast(on ? 'Added to wishlist' : 'Removed from wishlist');
+    if (location.hash.startsWith('#/wishlist')) render(true);
+  },
+  back() { history.length > 1 ? history.back() : location.hash = '#/home'; },
+  tab(el) { homeTab = el.dataset.h; render(true); },
+  seg(el) { sellTab = el.dataset.t; render(); },
+  brand(el) { resetF(); F.brands = [el.dataset.b]; lastCol = 'all-products'; location.hash = '#/c/all-products'; },
+  filters() { openSheet(filterSheet()); },
+  clearf(el) { Object.assign(F, {brands: [], ranks: [], min: '', max: '', stock: false}); refreshCol(); if (el.dataset.reopen) openSheet(filterSheet()); },
+  dens(el) { F.cols = +el.dataset.c; refreshCol(); },
+  close: closeSheet,
+  pop(el) { const q = $('#q'); q.value = el.dataset.q; q.dispatchEvent(new Event('input', {bubbles: true})); },
+  zoom() { const lb = $('#lb'); lb.querySelector('img').src = $('.gal img').src; lb.querySelector('img').className = ''; lb.hidden = false; },
+  lbclose() { $('#lb').hidden = true; },
+  inquire(el) {
+    const p = P.find(x => x.id === el.dataset.id);
+    handoff(`Hi A&J Luxury! ${el.dataset.q === 'layaway' ? 'I\'d like to ask about layaway for' : 'I\'m interested in'} this item:\n${p.title} — ${peso(p.price)}\nIs it still available?`);
+  },
+  copy() { try { navigator.clipboard.writeText(lastMsg); toast('Message copied'); } catch { toast('Copy the message above'); } }
+};
+document.addEventListener('click', e => { const el = e.target.closest('[data-act]'); if (el) ACT[el.dataset.act]?.(el); });
+
+// Filters + sort write straight into F, then redraw the grid behind the sheet.
+const onField = e => {
+  const t = e.target, k = t.dataset.f; if (!k) return;
+  if (k === 'brand' || k === 'rank') { const l = F[k + 's']; const i = l.indexOf(t.value); if (t.checked && i < 0) l.push(t.value); if (!t.checked && i >= 0) l.splice(i, 1); }
+  else F[k] = k === 'stock' ? t.checked : t.value;
+  refreshCol();
+};
+document.addEventListener('change', onField);
+document.addEventListener('input', e => {
+  if (e.target.id === 'q') $('#res').innerHTML = results(e.target.value);
+  else if (e.target.type === 'number') onField(e);
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const d = new FormData(e.target);
+  const inc = d.getAll('inc').join(', ') || 'none';
+  handoff(`Hi A&J Luxury! I'd like to ${sellTab === 'consign' ? 'CONSIGN' : 'SELL'} an item.\nName: ${d.get('name')}\nNumber: ${d.get('tel')}\nItem: ${d.get('item')}\nCondition: ${d.get('cond')}\nInclusions: ${inc}\nStore of purchase: ${d.get('store') || '—'}\nFlaws: ${d.get('flaws') || 'none noted'}\nI'll send photos here.`);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); ACT.lbclose(); } });
+$('#lb img').addEventListener('click', e => {
+  const i = e.target, r = i.getBoundingClientRect();
+  i.style.transformOrigin = `${e.clientX - r.left}px ${e.clientY - r.top}px`; i.classList.toggle('z');
+});
+
+function updBadge() { const b = $('#wbd'); b.textContent = wish.length; b.hidden = !wish.length; }
+function tick() { $('#clock').textContent = new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'}); }
+addEventListener('hashchange', () => render());
+tick(); setInterval(tick, 30000); updBadge(); render();
+</script>
+</body>
+</html>
