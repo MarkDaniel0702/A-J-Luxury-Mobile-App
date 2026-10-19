@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en-PH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>A&amp;J Luxury Prototype 2</title>
+<style>
+/* Prototype 2: no A&J website images, logo or text assets. Pictures are generated placeholders (see art()). */
+:root{--ink:#222;--mute:#666;--line:#eee;--surf:#f5f5f5;--err:#da3f3f;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font:400 14px/1.5 var(--font);color:var(--ink);background:#fff}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid #000;outline-offset:2px}
+.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+#app{position:relative;display:flex;flex-direction:column;height:100dvh;overflow:hidden;background:#fff}
+@media(min-width:520px){
+ body{background:#e6e6e6;display:grid;place-items:center;min-height:100dvh;padding:24px}
+ #app{width:406px;height:min(860px,calc(100dvh - 48px));border:8px solid #111;border-radius:36px;box-shadow:0 24px 60px #0003}
+}
+main{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.top{display:flex;align-items:center;min-height:56px;padding:0 4px;border-bottom:1px solid var(--line)}
+.top[hidden],.nav[hidden],#gb[hidden],.sheet[hidden]{display:none}
+.tt{flex:1;padding:0 12px;font-size:18px;font-weight:300;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{width:48px;height:48px;flex:none;display:grid;place-items:center;background:none;border:0;border-radius:50%;cursor:pointer}
+.ib:active{background:#0001}
+#gb{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surf);padding:6px 16px;font-size:12px;color:var(--mute)}
+#gb button{background:none;border:0;font-weight:600;color:#000;text-decoration:underline;cursor:pointer;min-height:32px}
+.nav{display:flex;border-top:1px solid var(--line)}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 10px;font-size:11px;color:var(--mute)}
+.nav a[aria-current]{color:#000;font-weight:600}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border:1px solid #000;background:#000;color:#fff;font-weight:500;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.btn.o{background:#fff;color:#000}
+.btn.blk{display:flex;width:100%}
+.btn:active{opacity:.8}
+
+/* Login */
+.login{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:32px 24px}
+.brand{text-align:center;margin-bottom:32px}
+.brand b{display:block;font-size:30px;font-weight:300;letter-spacing:6px}
+.brand span{font-size:12px;letter-spacing:3px;color:var(--mute);text-transform:uppercase}
+.fld{display:block;margin-bottom:14px}
+.fld>span{display:block;font-size:12px;color:var(--mute);margin-bottom:4px}
+input[type=email],input[type=password],input[type=search],input[type=text]{width:100%;min-height:48px;padding:10px 12px;border:1px solid #ccc;border-radius:5px;background:#fff;font-size:16px}
+.or{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--mute);font-size:12px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.fine{margin-top:20px;font-size:12px;color:var(--mute);text-align:center}
+.fine a,.lnk{background:none;border:0;text-decoration:underline;color:#000;cursor:pointer}
+
+/* Home + browse */
+.hero{background:#000;color:#fff;padding:40px 24px;text-align:center}
+.hero h1{font-size:26px;font-weight:300;line-height:1.3}
+.hero p{margin:10px 0 20px;color:#ccc}
+.sec{font-size:20px;font-weight:300;padding:28px 16px 10px}
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:0 16px}
+.tile{position:relative;aspect-ratio:1;overflow:hidden}
+.tile span{position:absolute;left:0;right:0;bottom:0;padding:4px;background:#000a;color:#fff;font-size:11px;letter-spacing:1px;text-align:center;text-transform:uppercase}
+.row{display:flex;gap:12px;overflow-x:auto;padding:0 16px 8px;scrollbar-width:none}
+.row .card{flex:0 0 150px}
+.steps{padding:0 16px 24px;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:12px;padding:8px 0}
+.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border:1px solid #000;border-radius:50%;display:grid;place-items:center;font-size:12px}
+.note{margin:0 16px 24px;padding:12px;background:var(--surf);font-size:12px;color:var(--mute)}
+.card{position:relative;min-width:0}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--surf)}
+.card .b{margin-top:8px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--mute)}
+.card .t{font-size:13px;font-weight:300;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.heart{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;cursor:pointer}
+.card .heart{position:absolute;top:0;right:0}
+.card .heart .i{background:#fffd;border-radius:50%;padding:4px;width:30px;height:30px}
+.heart.on .i{fill:currentColor}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 12px;padding:16px}
+.tool{display:flex;gap:8px;padding:12px 16px 0}
+.tool select{min-height:48px;padding:0 8px;border:1px solid #ccc;border-radius:5px;background:#fff}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 0;scrollbar-width:none}
+.chip{flex:none;min-height:40px;padding:0 16px;border:1px solid #ccc;border-radius:20px;background:#fff;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed=true]{background:#000;color:#fff;border-color:#000}
+.cnt{padding:12px 16px 0;color:var(--mute);font-size:13px}
+.empty{padding:48px 24px;text-align:center;color:var(--mute)}
+
+/* Product */
+.pimg{width:100%;aspect-ratio:1;object-fit:cover}
+.pad{padding:16px}
+.tag{display:inline-block;border:1px solid #000;padding:2px 8px;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.pbrand{margin-top:8px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+.pt{font-size:22px;font-weight:300;line-height:1.3;margin:4px 0 8px}
+.price{font-size:20px;font-weight:500}
+.facts{margin:16px 0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px}
+.facts dt{color:var(--mute)}
+details{border-top:1px solid var(--line)}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;font-weight:500;cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+.dbody{padding:0 16px 16px;color:var(--mute)}
+.buy{position:sticky;bottom:0;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;border-top:1px solid var(--line)}
+
+/* Chat */
+.chat{display:flex;flex-direction:column;min-height:100%}
+.log{flex:1;padding:16px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:85%;padding:10px 12px;border-radius:14px;white-space:pre-line}
+.m.bot{align-self:flex-start;background:var(--surf);border-bottom-left-radius:4px}
+.m.me{align-self:flex-end;background:#000;color:#fff;border-bottom-right-radius:4px}
+.m small{display:block;margin-top:6px;color:var(--mute);font-size:11px}
+.qs{display:flex;gap:8px;overflow-x:auto;padding:0 16px 8px;scrollbar-width:none}
+.send{position:sticky;bottom:0;display:flex;gap:8px;padding:8px 12px;background:#fff;border-top:1px solid var(--line)}
+.send input{flex:1;border-radius:24px}
+.list{padding:8px 0}
+.row2{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+
+/* Sheet + toast */
+.sheet{position:absolute;inset:0;z-index:20;display:flex;align-items:flex-end}
+.scrim{position:absolute;inset:0;background:#0007}
+.panel{position:relative;width:100%;padding:24px 16px calc(20px + env(safe-area-inset-bottom));background:#fff;border-radius:16px 16px 0 0;display:grid;gap:8px}
+.panel h2{font-size:18px;font-weight:500}
+.panel p{color:var(--mute);margin-bottom:8px}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;z-index:30;padding:12px 16px;background:var(--ink);color:#fff;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></symbol>
+ <symbol id="i-shop" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></symbol>
+ <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+ <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.500 3.600-7 8-7s8 2.500 8 7"/></symbol>
+ <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.500-4.600-7.500-10.200A4.300 4.300 0 0 1 12 7.200a4.300 4.300 0 0 1 7.500 2.600C19.500 15.400 12 20 12 20z"/></symbol>
+ <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5M11 6l-6 6 6 6"/></symbol>
+ <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+ <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-6z"/></symbol>
+</svg>
+
+<div id="app">
+ <header class="top" id="top"></header>
+ <div id="gb" hidden><span>Guest mode · view only</span><button data-act="login">Log in</button></div>
+ <main id="main" tabindex="-1"></main>
+ <nav class="nav" id="nav" aria-label="Primary" hidden>
+  <a href="#/home" data-n="home"><svg class="i" aria-hidden="true"><use href="#i-home"/></svg>Home</a>
+  <a href="#/shop" data-n="shop"><svg class="i" aria-hidden="true"><use href="#i-shop"/></svg>Shop</a>
+  <a href="#/chat" data-n="chat"><svg class="i" aria-hidden="true"><use href="#i-chat"/></svg>Help</a>
+  <a href="#/account" data-n="account"><svg class="i" aria-hidden="true"><use href="#i-user"/></svg>Account</a>
+ </nav>
+ <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
+ <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const peso = n => '₱' + n.toLocaleString('en-PH');
+const ic = n => `<svg class="i" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+
+/* ---------- placeholder pictures: generated line-art on a soft tint, no third-party images ---------- */
+const CATS = [['bags','Bags'],['watches','Watches'],['jewelry','Jewelry'],['shoes','Shoes'],['wallets','Wallets'],['accessories','Accessories']];
+const SHAPE = {
+  bags: '<path d="M32 38C32 18 68 18 68 38"/><path d="M20 38h60l6 46H14z"/><path d="M40 52h20"/>',
+  watches: '<path d="M38 8h24l-4 20H42zM42 72h16l4 20H38z"/><circle cx="50" cy="50" r="22"/><path d="M50 50V37M50 50l9 6"/>',
+  jewelry: '<circle cx="50" cy="64" r="24"/><path d="M38 34l12-14 12 14-12 12z"/><path d="M38 34h24"/>',
+  shoes: '<path d="M12 64c18 0 22-24 32-26l8 10c12 4 34 6 36 18v8H12z"/><path d="M12 72h76"/>',
+  wallets: '<rect x="14" y="28" width="72" height="46" rx="6"/><path d="M14 44h72"/><circle cx="72" cy="59" r="4"/>',
+  accessories: '<circle cx="31" cy="54" r="16"/><circle cx="69" cy="54" r="16"/><path d="M47 52h6M15 50L6 40M85 50l9-10"/>'
+};
+const art = (cat, i, caption = true) => {
+  const h = (i * 47 + 20) % 360;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="hsl(${h} 20% 92%)"/>
+  <g fill="none" stroke="hsl(${h} 15% 32%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(15 8) scale(.7)">${SHAPE[cat]}</g>
+  ${caption ? `<text x="50" y="94" font-family="sans-serif" font-size="5" letter-spacing="1.5" text-anchor="middle" fill="hsl(${h} 10% 45%)">PLACEHOLDER IMAGE</text>` : ''}</svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+};
+
+/* ---------- sample catalogue: invented brands, titles and prices (NOT A&J's data) ---------- */
+const RAW = [
+ ['bags','Maison Aurel','Structured Top-Handle Bag in Black',185000,'9.5/10','Dustbag, strap','Light corner wear'],
+ ['bags','Casa Verdi','Quilted Shoulder Bag with Chain in Cream',142000,'9/10','Dustbag','Minor scuff on base'],
+ ['bags','Atelier Sol','Canvas Tote in Tan',68000,'Brand New','Dustbag, tag','None'],
+ ['watches','Lumière','Ladies Steel Watch with Diamond Bezel',96000,'9.3/10','Box, papers','Fine hairlines on strap'],
+ ['watches','Veloce','Automatic Chronograph 40mm',210000,'9.8/10','Box, papers, extra strap','None'],
+ ['watches','Lumière','Gold-tone Dress Watch',54000,'8.8/10','Box','Light case scratches'],
+ ['jewelry','Orfèvre Noir','Solitaire Ring in 18K Gold',120000,'Brand New','Box, pouch','None'],
+ ['jewelry','Orfèvre Noir','Pearl Drop Earrings',38000,'9.5/10','Pouch','None'],
+ ['jewelry','Atelier Sol','Chain Bracelet in Silver',27000,'9/10','Pouch','Slight tarnish on clasp'],
+ ['shoes','Casa Verdi','Leather Slingback Flats in Black',32000,'9.3/10','Box, dustbag','Sole wear'],
+ ['shoes','Veloce','Low-top Sneakers in White',24000,'9/10','Box','Light creasing'],
+ ['shoes','Maison Aurel','Block-heel Pumps in Nude',41000,'Brand New','Box, dustbag','None'],
+ ['wallets','Atelier Sol','Zip Wallet in Burgundy',52000,'Brand New','Box, felt, booklet','None'],
+ ['wallets','Maison Aurel','Card Holder in Caviar Leather',29000,'9.5/10','Box','None'],
+ ['wallets','Casa Verdi','Wallet on Chain in Black',88000,'9/10','Dustbag','Edge rubbing'],
+ ['accessories','Lumière','Oversized Sunglasses with Case',22000,'9.5/10','Case, cloth','None'],
+ ['accessories','Veloce','Silk Scarf in Orange',18000,'Brand New','Box','None'],
+ ['accessories','Casa Verdi','Leather Belt with Gold Buckle',26000,'9.3/10','Dustbag','Minor hole stretching']
+];
+const P = RAW.map(([cat, brand, title, price, rank, inc, flaw], i) => ({id: String(i), cat, brand, title, price, rank, inc, flaw, img: art(cat, i)}));
+
+/* ---------- chatbot: keyword match over approved FAQ answers ---------- */
+// Answers paraphrase A&J's public website FAQ/policies. Not yet confirmed by A&J; see AJ-Luxury-Permission-Request.md.
+const FAQ = [
+ {q: 'How do I buy?', k: ['buy','order','purchase','how to'], a: 'Browse the Shop, open an item and tap “Inquire to buy”. The A&J team confirms the item is still available and sends payment details by chat. You need to log in to inquire (guests can browse only).'},
+ {q: 'How does consignment work?', k: ['consign','sell my','selling my','pull out','pull-out','commission'], a: 'You send the item’s details and photos, then drop it off at the showroom or ship it. A&J authenticates and lists it, and you are paid after the buyer receives the item.\nConsignment period: 1 to 5 months. Pull-out fee: ₱2,000 per item if pulled out before one month. A&J accepts only items it can authenticate in excellent condition and may decline items.\n(In this prototype, the consign form is not built yet.)'},
+ {q: 'Shipping and delivery', k: ['ship','deliver','courier','metro manila','how long','rider'], a: 'Metro Manila: same-day delivery by Grab/Lalamove is possible if booked before the 6:00 PM cut-off. Outside Metro Manila: 1–2 business days processing. Delivery is nationwide only (no international shipping).\nWho pays shipping is unclear in the source material (the FAQ says the client pays; the homepage mentions free shipping within Metro Manila). A&J needs to confirm.'},
+ {q: 'Payment options', k: ['pay','payment','gcash','bdo','bpi','card','cod','cash','installment','instalment'], a: 'Bank transfer (BDO, BPI, UnionBank), GCash, credit card via BDO Checkout (+4% fee), cash on delivery within Metro Manila (extra fee, not for sale items), or cash on pick-up (a down payment reserves the item).'},
+ {q: 'Layaway', k: ['layaway','lay-away','down payment','downpayment','monthly'], a: 'Layaway: 30% fixed down payment, with the balance split into equal monthly payments. The down payment is forfeited if the agreed time frame is exceeded. Ask the A&J team for the exact terms on your item.'},
+ {q: 'Is it authentic?', k: ['authentic','fake','genuine','real','legit','original','counterfeit','certificate'], a: 'A&J says it sells only authentic items. I can’t confirm whether any specific item is authentic or fake. That is decided by A&J’s human experts, so please ask the team about the item you are interested in.\nDetails of A&J’s authentication process are still pending from A&J.'},
+ {q: 'Returns, refunds, cancellation', k: ['return','refund','cancel','exchange','money back'], a: 'All sales are final. Exchange only, and only for undeclared flaws or missing inclusions. Notify A&J within 24 hours of receiving the item (security tag intact), and ship it back within 48 hours. The client pays shipping both ways.\nPre-ordered items can’t be returned. Refunds are typically not available and orders can’t be cancelled, but you can contact the team about exceptional cases.'},
+ {q: 'Condition ratings', k: ['condition','rank','grade','flaw','9/10','scratch','wear'], a: 'Each item shows a condition rank out of 10 (or “Brand New”), plus its inclusions and any flaws. Review the photos and description carefully before buying.'},
+ {q: 'Visit the showroom', k: ['showroom','visit','store','location','address','open','hours','where'], a: 'Showroom visits are welcome. Message the team first so the items you want to see are on hand. Address and hours still need to be confirmed by A&J.'}
+];
+const FALLBACK = 'I’m not sure about that one. I can help with: how to buy, consignment, shipping, payment, layaway, authenticity, returns and the showroom.\nFor anything else, or a specific item, the A&J team can help directly (contact details to be provided by A&J).';
+const GREETING = 'Hi! I’m the A&J FAQ assistant (prototype). Ask me about buying, consigning, shipping, payment or authenticity.';
+function answer(text) {
+  const t = text.toLowerCase();
+  let best = null, bestScore = 0;
+  for (const f of FAQ) { const s = f.k.filter(k => t.includes(k)).length; if (s > bestScore) { best = f; bestScore = s; } }
+  if (/^(hi|hello|hey|good (morning|afternoon|evening))\b/.test(t) && !best) return GREETING;
+  if (/\b(thanks|thank you)\b/.test(t) && !best) return 'You’re welcome!';
+  return best ? best.a : FALLBACK;
+}
+
+/* ---------- state ---------- */
+let user = null;                      // null = logged out, 'guest', or {email}
+let wish = new Set(), q = '', cat = 'all', sort = 'featured';
+let msgs = [{who: 'bot', text: GREETING}];
+const isGuest = () => user === 'guest';
+
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2200); }
+function openSheet(html) { $('#panel').innerHTML = html; $('#sheet').hidden = false; }
+const closeSheet = () => $('#sheet').hidden = true;
+// Guests are view-only: any account action asks them to log in.
+function gate(what) {
+  if (!isGuest()) return false;
+  openSheet(`<h2>Log in to ${esc(what)}</h2><p>Guest mode is view only. Log in to save items and send inquiries.</p>
+   <button class="btn blk" data-act="login">Log in</button><button class="btn o blk" data-act="close">Keep browsing</button>`);
+  return true;
+}
+
+/* ---------- views ---------- */
+const heart = id => `<button class="heart ${wish.has(id) ? 'on' : ''}" data-act="wish" data-id="${id}" aria-pressed="${wish.has(id)}" aria-label="Wishlist">${ic('heart')}</button>`;
+const card = p => `<article class="card"><a href="#/p/${p.id}"><img loading="lazy" src="${p.img}" alt="${esc(p.title)} (placeholder image)">
+  <div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div><div>${peso(p.price)}</div></a>${heart(p.id)}</article>`;
+
+function login() {
+  return `<div class="login"><div class="brand"><b>A&amp;J</b><span>Luxury · Buy &amp; Consign</span></div>
+  <form id="loginform">
+   <label class="fld"><span>Email</span><input type="email" name="email" required autocomplete="email"></label>
+   <label class="fld"><span>Password</span><input type="password" name="pw" required autocomplete="current-password"></label>
+   <button class="btn blk" type="submit">Log in</button></form>
+  <div class="or">or</div>
+  <button class="btn o blk" data-act="guest">Continue as guest (view only)</button>
+  <p class="fine">No account? <button class="lnk" data-act="signup">Create one</button></p>
+  <p class="fine">Prototype: any email and password works. Nothing is sent or saved.</p></div>`;
+}
+
+function home() {
+  return `<section class="hero"><h1>Authenticated luxury.<br>Buy &amp; consign.</h1><p>Pre-loved and brand-new designer pieces.</p><a class="btn o" href="#/shop">Start browsing</a></section>
+  <h2 class="sec">Shop by category</h2>
+  <div class="tiles">${CATS.map(([c, l], i) => `<a class="tile" href="#/shop/${c}"><img src="${art(c, i + 3, false)}" alt=""><span>${l}</span></a>`).join('')}</div>
+  <h2 class="sec">New arrivals</h2>
+  <div class="row">${[...P].reverse().slice(0, 6).map(card).join('')}</div>
+  <h2 class="sec">How it works</h2>
+  <ol class="steps"><li>Browse items with condition and inclusions listed.</li><li>Inquire to buy; the A&amp;J team confirms availability.</li><li>Pay, then receive your item. Questions? Ask the Help assistant.</li></ol>
+  <p class="note">Prototype: items, prices and pictures are made-up samples. Pictures are generated placeholders, not photos.</p>`;
+}
+
+function list() {
+  let l = P.filter(p => (cat === 'all' || p.cat === cat) && q.toLowerCase().split(/\s+/).every(w => (p.brand + ' ' + p.title).toLowerCase().includes(w)));
+  if (sort === 'asc') l = [...l].sort((a, b) => a.price - b.price);
+  if (sort === 'desc') l = [...l].sort((a, b) => b.price - a.price);
+  return `<p class="cnt">${l.length} item${l.length === 1 ? '' : 's'}</p>` + (l.length ? `<div class="grid">${l.map(card).join('')}</div>` : '<div class="empty">No items found. Try another word or category.</div>');
+}
+function shop(arg) {
+  if (arg) cat = arg;
+  return `<div class="tool"><input type="search" id="q" placeholder="Search brand or item" aria-label="Search" value="${esc(q)}">
+   <select id="sort" aria-label="Sort"><option value="featured">Featured</option><option value="asc" ${sort === 'asc' ? 'selected' : ''}>Price ↑</option><option value="desc" ${sort === 'desc' ? 'selected' : ''}>Price ↓</option></select></div>
+  <div class="chips">${[['all','All'], ...CATS].map(([c, l]) => `<button class="chip" data-act="cat" data-c="${c}" aria-pressed="${cat === c}">${l}</button>`).join('')}</div>
+  <div id="list">${list()}</div>`;
+}
+
+function product(id) {
+  const p = P.find(x => x.id === id); if (!p) return '<div class="empty">Item not found.</div>';
+  const f = (k, v) => `<dt>${k}</dt><dd>${esc(v)}</dd>`;
+  return `<img class="pimg" src="${p.img}" alt="${esc(p.title)} (placeholder image)">
+  <div class="pad"><span class="tag">${p.rank === 'Brand New' ? 'Brand new' : 'Pre-loved'}</span>
+   <div class="pbrand">${esc(p.brand)}</div><h1 class="pt">${esc(p.title)}</h1><div class="price">${peso(p.price)}</div>
+   <dl class="facts">${f('Category', CATS.find(c => c[0] === p.cat)[1])}${f('Condition', p.rank)}${f('Inclusions', p.inc)}${f('Flaws', p.flaw)}</dl></div>
+  <details open><summary>Details${ic('down')}</summary><div class="dbody">Sample listing for the prototype. Real listings will carry A&amp;J’s own photos, description and condition notes.</div></details>
+  <details><summary>Authenticity${ic('down')}</summary><div class="dbody">Authentication details will come from A&amp;J per item. Not available in this prototype.</div></details>
+  <details><summary>Shipping &amp; payment${ic('down')}</summary><div class="dbody">See Help for delivery, payment, layaway and return policies.</div></details>
+  <div class="buy"><div class="price">${peso(p.price)}</div><a class="btn o" href="#/chat">Ask Help</a><button class="btn" data-act="inquire" data-id="${p.id}">Inquire to buy</button></div>`;
+}
+
+function chat() {
+  return `<div class="chat"><div class="log" id="log">${msgs.map(m => `<div class="m ${m.who}">${esc(m.text)}${m.who === 'bot' ? '<small>FAQ assistant · based on A&amp;J’s public policies, to be confirmed</small>' : ''}</div>`).join('')}</div>
+  <div class="qs">${FAQ.map(f => `<button class="chip" data-act="ask" data-t="${esc(f.q)}">${esc(f.q)}</button>`).join('')}</div>
+  <form class="send" id="chatform"><input type="text" id="msg" placeholder="Ask a question…" aria-label="Message" autocomplete="off"><button class="btn" aria-label="Send">${ic('send')}</button></form></div>`;
+}
+
+function account() {
+  if (isGuest()) return `<div class="empty"><p>You’re browsing as a guest.<br>Log in to save items and send inquiries.</p><p style="margin-top:16px"><button class="btn" data-act="login">Log in</button></p></div>`;
+  const w = P.filter(p => wish.has(p.id));
+  return `<div class="list"><div class="row2"><span>Email</span><b>${esc(user.email)}</b></div></div>
+  <h2 class="sec">Wishlist (${w.length})</h2>${w.length ? `<div class="grid">${w.map(card).join('')}</div>` : '<div class="empty">Nothing saved yet.</div>'}
+  <div class="pad"><button class="btn o blk" data-act="logout">Log out</button></div>`;
+}
+
+/* ---------- router ---------- */
+const R = {
+  login: {view: login, bare: 1},
+  home: {nav: 'home', title: 'A&J Luxury', view: home},
+  shop: {nav: 'shop', title: 'Shop', view: shop},
+  p: {back: 1, title: 'Item', view: product},
+  chat: {nav: 'chat', title: 'Help', view: chat},
+  account: {nav: 'account', title: 'Account', view: account}
+};
+function render() {
+  const [, r = 'login', a = ''] = (location.hash.slice(1) || '/login').split('/');
+  if (!user && r !== 'login') { location.hash = '#/login'; return; }
+  if (user && r === 'login') { location.hash = '#/home'; return; }
+  const d = R[r] || R.home;
+  closeSheet();
+  $('#top').hidden = $('#nav').hidden = !!d.bare;
+  $('#gb').hidden = !isGuest() || !!d.bare;
+  $('#top').innerHTML = (d.back ? `<button class="ib" data-act="back" aria-label="Back">${ic('back')}</button>` : '') + `<div class="tt">${esc(d.title || '')}</div>`;
+  $('#main').innerHTML = d.view(decodeURIComponent(a));
+  $('#main').scrollTop = r === 'chat' ? 1e6 : 0;
+  document.querySelectorAll('#nav a').forEach(x => x.toggleAttribute('aria-current', x.dataset.n === d.nav));
+}
+
+/* ---------- events ---------- */
+function say(text) {
+  msgs.push({who: 'me', text}, {who: 'bot', text: answer(text)});
+  render(); $('#msg')?.focus();
+}
+const ACT = {
+  login() { user = null; location.hash = '#/login'; render(); },
+  guest() { user = 'guest'; location.hash = '#/home'; render(); },
+  logout() { user = null; wish.clear(); location.hash = '#/login'; render(); },
+  signup() { toast('Sign-up is not part of this prototype'); },
+  close: closeSheet,
+  back() { history.length > 1 ? history.back() : location.hash = '#/shop'; },
+  cat(el) { location.hash = '#/shop'; cat = el.dataset.c; render(); }, // reset the hash so a #/shop/<cat> link doesn't override the chip
+  ask(el) { say(el.dataset.t); },
+  wish(el) {
+    if (gate('save items')) return;
+    const id = el.dataset.id; wish.has(id) ? wish.delete(id) : wish.add(id);
+    document.querySelectorAll(`.heart[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', wish.has(id)); b.setAttribute('aria-pressed', wish.has(id)); });
+    toast(wish.has(id) ? 'Added to wishlist' : 'Removed from wishlist');
+    if (location.hash.startsWith('#/account')) render();
+  },
+  inquire() { if (!gate('send an inquiry')) toast('Demo: this would open a chat with A&J'); }
+};
+document.addEventListener('click', e => { const el = e.target.closest('[data-act]'); if (el) ACT[el.dataset.act]?.(el); });
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  if (e.target.id === 'loginform') { user = {email: new FormData(e.target).get('email')}; location.hash = '#/home'; render(); }
+  if (e.target.id === 'chatform') { const t = $('#msg').value.trim(); if (t) say(t); }
+});
+document.addEventListener('input', e => { if (e.target.id === 'q') { q = e.target.value; $('#list').innerHTML = list(); } });
+document.addEventListener('change', e => { if (e.target.id === 'sort') { sort = e.target.value; $('#list').innerHTML = list(); } });
+document.addEventListener('keydown', e => e.key === 'Escape' && closeSheet());
+addEventListener('hashchange', render);
+render();
+</script>
+</body>
+</html>
