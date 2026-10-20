@@ -9,4 +9,4 @@ Clickable prototypes for a marketplace where users can buy and consign luxury it
 | `prototype3/index.html` | Prototype 3, Noir Salon |
 | `prototype4/index.html` | Prototype 4, Bloom |
 
-Prototypes 2 to 4 use only generated placeholder pictures and share the `shared/` folder, so keep them together. See `AJ-Luxury-Permission-Request.md` (Tasks 3 and 4) for details, features and known limits.
+Prototypes 2 to 4 use only generated placeholder pictures and share the `shared/` folder, so keep them together. Swiping works with a mouse drag or a finger. See `AJ-Luxury-Permission-Request.md` (Tasks 3 and 4) for details, features and known limits.

@@ -29,7 +29,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:800;letter-spacing:-.4px;line-heigh
 
 #app{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat);background:var(--bg);overflow:hidden}
 #app.full{padding-top:0}
-main{flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding-bottom:104px}
+main{flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding-bottom:104px}
 main.nodock{padding-bottom:24px}
 main::-webkit-scrollbar{display:none}
 main:focus-visible{outline:0}
@@ -361,6 +361,21 @@ details[open] summary .i{transform:rotate(180deg)}
 .qa small{display:block;font:400 13px var(--ui);color:var(--mute)}
 .toast{position:absolute;left:24px;right:24px;bottom:calc(var(--sab) + 92px);z-index:90;padding:14px 18px;border-radius:20px;background:var(--ink);color:#fff8e8;font-weight:500;font-size:14px;text-align:center;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .25s,transform .25s}
 .toast.on{opacity:1;transform:none}
+/* Swipe affordances, tap feedback, intro */
+:root{--gbg:#fffaf1;--gfg:#12372c}
+.lb .snap>*{width:100%}
+.card,.bt,.cat,.qa,.tile,.opt,.act,.chip,.disc{transition:transform .15s}
+.card:has(>a:active),.bt:active,.cat:active,.qa:active,.tile:active,.opt:active,.act:active,.chip:active,.disc:active{transform:scale(.97)}
+.lr:active{opacity:.6}
+.dock a::after{content:"";width:5px;height:5px;margin-top:2px;border-radius:50%;background:currentColor;opacity:0;transition:opacity .2s}
+.dock a[aria-current]::after{opacity:1}
+.intro{min-height:100%;display:flex;flex-direction:column}
+.intro .snap{flex:1}
+.intro section{width:100%;display:flex;flex-direction:column;justify-content:center;padding:20px 26px}
+.intro img{width:100%;height:320px;object-fit:cover;border-radius:36px;margin-bottom:26px;box-shadow:0 14px 30px #12372c2e}
+.intro h1{font-size:34px;margin-bottom:10px}
+.intro p{color:var(--mute);font-size:16px}
+.ibar{display:flex;justify-content:space-between;align-items:center;padding:4px 22px 0}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -373,12 +388,12 @@ details[open] summary .i{transform:rotate(180deg)}
     <main id="main" tabindex="-1"></main>
     <nav class="dock" id="dock" aria-label="Primary" hidden></nav>
     <div class="cta" id="cta" hidden></div>
-    <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
+    <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true" data-dismiss="close" data-dir="down"></div></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
    </div>
   </div>
  </div>
- <div class="cap"><b>Prototype 4 · Bloom</b>Log in with any email or mobile number and password, or continue as guest. Sign-up code: any 4 digits. Nothing is sent or saved.</div>
+ <div class="cap"><b>Prototype 4 · Bloom</b>Log in with any email or mobile number and password, or continue as guest. Sign-up code: any 4 digits. Nothing is sent or saved. Drag with the mouse to swipe.</div>
 </div>
 
 <script src="../shared/core.js"></script>
@@ -444,6 +459,11 @@ const eye = `<button type="button" class="eye" data-act="eye" aria-label="Show p
 const back = () => `<button class="rb" data-act="back" aria-label="Back">${ic('back')}</button>`;
 
 /* ---------- views: auth ---------- */
+function vWelcome() {
+  return `<div class="intro"><div class="snap" id="intro" data-dots="ind">${AJ.INTRO.map(([t, s, c], k) => `<section><img src="${AJ.art(c, k * 5 + 1, {s: 'pop', cap: false})}" alt=""><h1>${t}</h1><p>${s}</p></section>`).join('')}</div>
+  <div class="dots" id="ind">${AJ.INTRO.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div>
+  <div class="ibar"><a class="lnk" href="#/login">Skip</a><button class="btn" id="inext" data-act="inext">Next</button></div></div>`;
+}
 function vLogin() {
   return `<div class="lg"><div class="lgt"><div class="blob b1"></div><div class="blob b2"></div><div class="wm">A&amp;J</div><p>Buy &amp; consign luxury, the easy way.</p>
    <div class="fan">${[3, 10, 17].map((i, k) => `<img src="${art(ITEMS[i], 'Front', false)}" alt="" style="--r:${(k - 1) * 11}deg">`).join('')}</div></div>
@@ -451,7 +471,7 @@ function vLogin() {
    <label class="fld"><span>Password</span><input type="password" name="pw" autocomplete="current-password" value="${esc(D.pw || '')}">${eye}<small class="err" data-for="pw"></small></label>
    <button class="btn blk" type="submit">Log in</button></form>
   <div class="two" style="margin-top:12px"><a href="#/forgot">Forgot password?</a><a href="#/signup">Create account</a></div><div class="or">or</div>
-  <button class="btn o blk" data-act="guest">Continue as guest</button><p class="fine">Prototype: any email or mobile number and password works.</p></div></div>`;
+  <button class="btn o blk" data-act="guest">Continue as guest</button><p class="fine">Prototype: any email or mobile number and password works. <a class="lnk" href="#/welcome">View intro</a></p></div></div>`;
 }
 function vSignup() {
   return `<div class="tb">${back()}<div></div><div></div></div><div class="page"><h1>Create your account</h1><p>It takes a minute. We’ll text you a 4-digit code.</p>
@@ -484,7 +504,7 @@ function vHome() {
    <a class="rb" href="#/notifications" aria-label="Notifications">${ic('bell')}${un ? `<span class="dot">${un}</span>` : ''}</a></div>
    <a class="sbox" href="#/search">${ic('search', 's')} Search brands, bags, watches…</a>
    <div class="seg" role="group" aria-label="Mode"><button data-act="mode" data-v="buy" aria-pressed="${mode === 'buy'}">Buy</button><button data-act="mode" data-v="consign" aria-pressed="${mode === 'consign'}">Consign</button></div>`;
-  if (mode === 'consign') return head + `
+  if (mode === 'consign') return head + `<div data-swipe="swmode">
   <section class="trk"><small>Consignment tracker</small>${con ? `<h2 style="margin-top:4px">${esc(con.title)}</h2><div class="bar"><i style="width:${(con.at + 1) / STEPS.Consignment.length * 100}%"></i></div>
     <div style="display:flex;justify-content:space-between;font-size:13px;color:#d6e6dc"><span>${statusOf(con)}</span><span>Step ${con.at + 1} of ${STEPS.Consignment.length}</span></div><a class="btn y sm" style="margin-top:14px" href="#/act/${con.ref}">View tracker</a>`
     : `<h2 style="margin-top:4px">Nothing listed yet</h2><p style="color:#d6e6dc;margin:6px 0 14px">${g ? 'Log in to start a consignment and track it here.' : 'Start a request and follow every step here.'}</p>`}</section>
@@ -494,8 +514,8 @@ function vHome() {
   <div class="sh"><h2>Key terms</h2><a href="#/info/consignment">Full terms</a></div>
   <div class="scroll"><span class="chip sm" style="pointer-events:none">1–5 months</span><span class="chip sm" style="pointer-events:none">₱2,000 pull-out fee</span><span class="chip sm" style="pointer-events:none">1 day pull-out notice</span><span class="chip sm" style="pointer-events:none">Excellent condition+</span></div>
   <p class="note">Paraphrased from A&amp;J’s public website. Not yet confirmed by A&amp;J.</p>
-  <a class="lst lr" href="#/assistant" style="display:flex;margin-top:0"><span class="ico">${ic('chat')}</span><span>Questions about consigning?<small>Ask Ava</small></span>${ic('next')}</a>`;
-  return head + `
+  <a class="lst lr" href="#/assistant" style="display:flex;width:auto;margin-top:0"><span class="ico">${ic('chat')}</span><span>Questions about consigning?<small>Ask Ava</small></span>${ic('next')}</a></div>`;
+  return head + `<div data-swipe="swmode">
   <a class="disc" href="#/discover"><div><small>New · Discover</small><h2>Swipe to find<br>your next piece</h2><span class="btn y sm">Start swiping</span></div><div class="stk"><img src="${art(ITEMS[1], 'Front', false)}" alt=""><img src="${art(ITEMS[6], 'Front', false)}" alt=""></div></a>
   <div class="scroll cats">${CATS.map(([c, l], i) => `<a class="cat" href="#/shop/${c}"><img src="${art(ITEMS[i * 4 + 2], 'Front', false)}" alt="">${l}</a>`).join('')}</div>
   <div class="bento"><a class="bt a" href="#/shop?f=under30">${ic('tag')}<small>${ITEMS.filter(PRESET.under30[1]).length} pieces</small><b>Under ₱30,000</b></a><a class="bt b" href="#/shop?f=new">${ic('sparkle')}<small>${ITEMS.filter(p => p.isNew).length} pieces</small><b>Brand new</b></a>
@@ -504,7 +524,7 @@ function vHome() {
   <div class="sh"><h2>Trending</h2><a href="#/shop">See all</a></div><div class="row">${rowsOf(top)}</div>
   <div class="sh"><h2>How buying works</h2></div>
   <div class="how">${[['search', 'Find it', 'Browse by category, swipe in Discover, or search.'], ['chat', 'Chat to buy', 'Send an inquiry. The A&J team confirms it’s available.'], ['truck', 'Pay and receive', 'Bank, GCash or card. Delivered nationwide.']].map(([i, t, s]) => `<div><span class="ico">${ic(i)}</span><span><b>${t}</b><span>${s}</span></span></div>`).join('')}</div>
-  <p class="note">Prototype: pieces, prices and pictures are made-up samples. Pictures are generated placeholders, not photos.</p>`;
+  <p class="note">Prototype: pieces, prices and pictures are made-up samples. Pictures are generated placeholders, not photos.</p></div>`;
 }
 
 /* ---------- views: browse ---------- */
@@ -520,7 +540,7 @@ function vShop(arg) {
   <div class="scroll" style="padding-top:12px">${[['all', 'All'], ...CATS].map(([c, l]) => `<a class="chip sm" href="#/shop/${c}${pf ? '?f=' + pf : ''}" ${cat === c ? 'aria-current="true"' : ''}>${l}</a>`).join('')}</div>
   <div class="scroll" style="padding-top:8px">${[['featured', 'Featured'], ['asc', 'Price low to high'], ['desc', 'Price high to low']].map(([v, l]) => `<button class="chip sm" data-act="sort" data-v="${v}" aria-pressed="${sort === v}">${l}</button>`).join('')}</div>
   ${PRESET[pf] ? `<div><span class="fchip">${PRESET[pf][0]}<a href="#/shop/${cat}" aria-label="Remove filter">${ic('close', 's')}</a></span></div>` : ''}
-  <div id="list" data-cat="${cat}" data-pf="${pf || ''}">${shopList(cat, pf)}</div>`;
+  <div id="list" data-cat="${cat}" data-pf="${pf || ''}" data-swipe="swcat">${shopList(cat, pf)}</div>`;
 }
 function filterSheet() {
   const n = filt($('#list')?.dataset.cat || 'all', $('#list')?.dataset.pf).length;
@@ -575,7 +595,7 @@ function deck() {
   const left = DECK.slice(DK.i, DK.i + 3);
   if (!left.length) return `<div class="empty" style="padding-top:70px"><div class="ok" style="padding:0"><div class="big">${ic('check')}</div></div><h1 style="font-size:28px;color:var(--ink)">You’re all caught up</h1><p>You saved ${DK.saved} of ${DECK.length} pieces.</p>
     <a class="btn blk" href="#/saved" style="margin-top:18px">Review saved</a><a class="btn o blk" href="#/shop" style="margin-top:10px">Shop everything</a><button class="btn o blk" style="margin-top:10px" data-act="restart">Start over</button></div>`;
-  return `<div class="dkw" id="dkw">${left.map((p, k) => `<article class="dcard" data-id="${p.id}" style="transform:translateY(${k * 10}px) scale(${1 - k * .05});z-index:${9 - k}"><img src="${art(p)}" alt="${esc(p.title)} (placeholder image)">
+  return `<div class="dkw" id="dkw" data-nogesture>${left.map((p, k) => `<article class="dcard" data-id="${p.id}" style="transform:translateY(${k * 10}px) scale(${1 - k * .05});z-index:${9 - k}"><img src="${art(p)}" alt="${esc(p.title)} (placeholder image)">
     ${k === 0 ? '<span class="stamp s">SAVE</span><span class="stamp k">SKIP</span>' : ''}<div class="tx"><div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div><div class="pr">${peso(p.price)}</div></div></article>`).reverse().join('')}</div>
   <div class="dctl"><button class="k" data-act="swipe" data-d="-1" aria-label="Skip">${ic('close')}</button><button class="d" data-act="peek" aria-label="See details">${ic('info')}</button><button class="s" data-act="swipe" data-d="1" aria-label="Save">${ic('heart')}</button></div>`;
 }
@@ -623,9 +643,9 @@ function vActivity() {
   const l = S.req.filter(r => tab === 'all' || (tab === 'buy') === (r.type !== 'Consignment'));
   return `<div class="tb">${back()}<div class="tt">My activity</div><div></div></div>
   <div class="seg" role="group" aria-label="Filter">${[['all', 'All'], ['buy', 'Buying'], ['con', 'Consigning']].map(([v, t]) => `<button data-act="tab" data-v="${v}" aria-pressed="${tab === v}">${t}</button>`).join('')}</div>`
-  + (l.length ? l.map(r => `<a class="act" href="#/act/${r.ref}"><div class="ty"><span>${r.type} · ${r.date}</span>${r.sample ? '<span class="pill sm">Sample</span>' : ''}</div><b>${esc(r.title)}</b><span class="sub">${esc(r.sub)}</span>
+  + '<div data-swipe="swtab">' + (l.length ? l.map(r => `<a class="act" href="#/act/${r.ref}"><div class="ty"><span>${r.type} · ${r.date}</span>${r.sample ? '<span class="pill sm">Sample</span>' : ''}</div><b>${esc(r.title)}</b><span class="sub">${esc(r.sub)}</span>
     <div class="bar dk"><i style="width:${(r.at + 1) / STEPS[r.type].length * 100}%"></i></div><span class="pill">${statusOf(r)}</span></a>`).join('')
-    : `<div class="empty">${ic('box')}<p>Nothing here yet.<br>Inquiries, layaway requests and consignments show up here.</p><a class="btn" href="#/shop">Start shopping</a></div>`);
+    : `<div class="empty">${ic('box')}<p>Nothing here yet.<br>Inquiries, layaway requests and consignments show up here.</p><a class="btn" href="#/shop">Start shopping</a></div>`) + '</div>';
 }
 function vAct(ref) {
   const r = S.req.find(x => x.ref === ref); if (!r) return `<div class="tb">${back()}<div></div><div></div></div><div class="empty">${ic('search')}<p>Not found.</p><a class="btn" href="#/activity">My activity</a></div>`;
@@ -721,7 +741,7 @@ function vInfo(id) {
 
 /* ---------- router ---------- */
 const R = {
-  login: {bare: 1, lt: 1, view: vLogin}, signup: {bare: 1, view: vSignup}, verify: {bare: 1, view: vVerify}, forgot: {bare: 1, view: vForgot},
+  welcome: {bare: 1, view: vWelcome}, login: {bare: 1, lt: 1, view: vLogin}, signup: {bare: 1, view: vSignup}, verify: {bare: 1, view: vVerify}, forgot: {bare: 1, view: vForgot},
   home: {nav: 'home', view: vHome}, shop: {nav: 'shop', view: vShop}, search: {nav: 'shop', view: vSearch}, p: {nav: 'shop', up: '#/shop', view: vProduct, cta: ctaProduct},
   discover: {nav: 'home', view: vDiscover}, saved: {nav: 'me', view: vSaved}, layaway: {nav: 'home', view: vLayaway},
   activity: {nav: 'me', view: vActivity}, act: {nav: 'me', view: vAct}, consign: {nav: 'home', nodock: 1, view: vConsign, cta: ctaConsign},
@@ -734,8 +754,8 @@ const redirect = h => { history.replaceState(null, '', h); render(false); };
 const refresh = (keep = true) => { const t = $('#main').scrollTop; render(false); if (keep) { $('#main').scrollTop = t; $('#main').classList.add('still'); } }; // in-place updates keep scroll and skip the entry animation
 function render(nav = true) {
   const {name, args} = AJ.route(), r = name || 'login', a = args[0] || '';
-  if (!S.user && !['login', 'signup', 'verify', 'forgot', 'info'].includes(r)) return redirect('#/login');
-  if (S.user && r === 'login') return redirect('#/home');
+  if (!S.user && !['welcome', 'login', 'signup', 'verify', 'forgot', 'info'].includes(r)) return redirect('#/login');
+  if (S.user && (r === 'login' || r === 'welcome')) return redirect('#/home');
   const d = R[r] || R.home;
   if (nav && !first) depth++; first = false;
   closeSheet();
@@ -756,7 +776,7 @@ function render(nav = true) {
 const go = h => { location.hash = h; };
 const WIZ = /^(c[a-z]+|inc_.*)$/;
 function resetWizard() { Object.keys(D).filter(k => WIZ.test(k)).forEach(k => delete D[k]); CW = {step: 0, photos: new Set()}; }
-function enter(user) { S.user = user; ['pw', 'terms', 'otp0', 'otp1', 'otp2', 'otp3'].forEach(k => delete D[k]); if (user !== 'guest') seed(); go('#/home'); }
+function enter(user) { S.user = user; ['pw', 'terms', 'otp0', 'otp1', 'otp2', 'otp3'].forEach(k => delete D[k]); if (user !== 'guest') seed(); AJ.skeleton(); go('#/home'); }
 const ACT = {
   login() { S.user = null; go('#/login'); },
   guest() { enter('guest'); },
@@ -772,7 +792,7 @@ const ACT = {
     if (gate('save items')) return;
     const id = el.dataset.id; S.wish.has(id) ? S.wish.delete(id) : S.wish.add(id);
     $$(`.heart[data-id="${id}"], .rb[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', S.wish.has(id)); b.setAttribute('aria-pressed', S.wish.has(id)); });
-    toast(S.wish.has(id) ? 'Saved' : 'Removed from saved'); if (AJ.route().name === 'saved') refresh();
+    toast(S.wish.has(id) ? 'Saved' : 'Removed from saved'); if (S.wish.has(id)) AJ.pop(el); if (AJ.route().name === 'saved') refresh();
   },
   layout() { layout = layout === 'grid' ? 'list' : 'grid'; refresh(); },
   sort(el) { sort = el.dataset.v; refresh(); },
@@ -780,7 +800,19 @@ const ACT = {
   filters: filterSheet, fcond(el) { F.cond = el.dataset.v; filterSheet(); }, fbrand(el) { const v = el.dataset.v; F.brands.has(v) ? F.brands.delete(v) : F.brands.add(v); filterSheet(); },
   freset() { F.max = 250000; F.cond = 'any'; F.brands.clear(); filterSheet(); }, fdone() { closeSheet(); refresh(false); },
   sq(el) { sq = el.dataset.t; $('#sq').value = sq; $('#sres').innerHTML = results(sq); },
-  zoom(el) { const p = item(AJ.route().args[0]), v = p.views[el.dataset.i]; openSheet(`<button class="rb x" data-act="close" aria-label="Close">${ic('close')}</button><img src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"><p>${v} · ${+el.dataset.i + 1} of ${p.views.length}</p>`, 'lb'); },
+  zoom(el) { // full-screen viewer: swipe between photos, double-tap or pinch to zoom, swipe down to close
+    const p = item(AJ.route().args[0]), n = p.views.length;
+    openSheet(`<button class="rb x" data-act="close" aria-label="Close">${ic('close')}</button><div class="snap" id="lbs">${p.views.map((v, i) => `<div><div style="overflow:hidden"><img class="zoomable" src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"></div><p>${v} · ${i + 1} of ${n}</p></div>`).join('')}</div>
+     <p>Swipe for more · double-tap to zoom · swipe down to close</p>`, 'lb');
+    const s = $('#lbs'); s.scrollLeft = el.dataset.i * s.clientWidth;
+  },
+  inext() { const s = $('#intro'), i = Math.round(s.scrollLeft / s.clientWidth); i < s.children.length - 1 ? s.scrollTo({left: (i + 1) * s.clientWidth, behavior: 'smooth'}) : go('#/login'); },
+  swmode(el, d) { const n = d > 0 ? 'consign' : 'buy'; if (n === mode) return false; mode = n; refresh(false); $('#main').classList.add('still'); }, // swipe Home between Buy and Consign
+  swtab(el, d) { const L = ['all', 'buy', 'con'], n = L[L.indexOf(tab) + d]; if (!n) return false; tab = n; refresh(); },
+  swcat(el, d) { // swipe the shop list to the next / previous category
+    const L = ['all', ...CATS.map(c => c[0])], n = L[L.indexOf(el.dataset.cat) + d]; if (!n) return false;
+    history.replaceState(null, '', '#/shop/' + n + (el.dataset.pf ? '?f=' + el.dataset.pf : '')); refresh(); AJ.center($('.chip[aria-current]'));
+  },
   lm(el) { const c = layCalc(+el.dataset.p, +el.dataset.v); $$('[data-act=lm]').forEach(b => b.setAttribute('aria-pressed', b === el)); $('#lm').innerHTML = `${peso(c.m)}<span style="font:500 15px var(--ui)"> / month</span>`; $('#ld').textContent = `${peso(c.down)} down today · ${el.dataset.v} months`; },
   chat2buy(el) { if (!gate('send an inquiry')) inquirySheet(el.dataset.id); },
   swipe(el) { swipe(+el.dataset.d); }, peek() { const c = $('#dkw .dcard:last-child'); if (c) go('#/p/' + c.dataset.id); }, restart() { DK = {i: 0, saved: 0}; refresh(false); },
@@ -865,9 +897,19 @@ document.addEventListener('scroll', e => { // gallery dots
   const el = e.target; if (!el.dataset?.dots) return;
   const i = Math.round(el.scrollLeft / el.clientWidth);
   $$(`#${el.dataset.dots} i`).forEach((d, k) => d.classList.toggle('on', k === i));
+  if (el.id === 'intro') $('#inext').textContent = i === el.children.length - 1 ? 'Get started' : 'Next';
 }, true);
+AJ.gestures({ // swipe: back from the left edge, pull down to refresh lists, sheets and photo viewer drag down to close
+  act: (n, el, d) => ACT[n]?.(el, d),
+  edge: () => {
+    const r = AJ.route().name;
+    if (!S.user) return {signup: () => go('#/login'), verify: () => go('#/signup'), forgot: () => go('#/login'), info: ACT.back}[r] || null;
+    return ['home', 'shop', 'assistant', 'me'].includes(r) ? null : r === 'consign' && CW.step ? ACT.cback : ACT.back;
+  },
+  pull: () => ['home', 'shop', 'saved', 'activity', 'notifications'].includes(AJ.route().name) ? () => refresh() : null
+});
 addEventListener('hashchange', () => render());
-if (!location.hash) history.replaceState(null, '', '#/login');
+if (!location.hash) history.replaceState(null, '', '#/welcome');
 render(false);
 </script>
 </body>

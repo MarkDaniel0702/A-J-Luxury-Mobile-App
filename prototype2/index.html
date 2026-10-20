@@ -11,19 +11,19 @@
 /* Prototype 2 "Classic Boutique": white, black, hairlines, light uppercase Jost. Bottom tab bar, grid shopping, step-by-step consign form.
    No A&J website images, logo or text assets. Pictures are generated placeholders (shared/core.js). */
 :root{--ink:#1b1b1b;--mute:#6f6c66;--line:#e8e5df;--surf:#f5f3ef;--err:#b3261e;--ok:#2e6b3a;--sw:1.5;
- --font:"Jost","Avenir Next","Century Gothic","Segoe UI",system-ui,sans-serif;--stage:#e4e1da;--bg:#fff;--sbc:#111;--hbc:#111;--capc:#78746c}
+ --font:"Jost","Avenir Next","Century Gothic","Segoe UI",system-ui,sans-serif;--fg:#000;--card:#fff;--field:#cfcbc3;--stage:#e4e1da;--bg:#fff;--sbc:#111;--hbc:#111;--capc:#78746c}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 body{font:400 15px/1.5 var(--font);color:var(--ink)}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
-:focus-visible{outline:2px solid #000;outline-offset:2px}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 .i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;flex:none}
 .i.s{width:18px;height:18px}
 
 #app{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat);background:var(--bg)}
-main{flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+main{flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 main:focus-visible{outline:0}
 main::-webkit-scrollbar{display:none}
 .top{display:grid;grid-template-columns:56px 1fr 56px;align-items:center;min-height:56px;border-bottom:1px solid var(--line)}
@@ -31,22 +31,22 @@ main::-webkit-scrollbar{display:none}
 .tt{text-align:center;font-size:15px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tt.wm{font-size:26px;font-weight:300;letter-spacing:8px;padding-left:8px}
 .ib{position:relative;width:48px;height:48px;margin:0 4px;display:grid;place-items:center;background:none;border:0;border-radius:50%;cursor:pointer}
-.ib:active{background:#0001}
-.dot{position:absolute;top:8px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#000;color:#fff;font-size:10px;line-height:17px;text-align:center}
+.ib:active{background:#8882}
+.dot{position:absolute;top:8px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--fg);color:var(--card);font-size:10px;line-height:17px;text-align:center}
 #gb{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surf);padding:2px 16px;font-size:12px;color:var(--mute)}
-#gb button{background:none;border:0;font-weight:600;color:#000;text-decoration:underline;cursor:pointer;min-height:36px}
-.nav{display:flex;border-top:1px solid var(--line);padding-bottom:var(--sab);background:#fff}
+#gb button{background:none;border:0;font-weight:600;color:var(--fg);text-decoration:underline;cursor:pointer;min-height:36px}
+.nav{display:flex;border-top:1px solid var(--line);padding-bottom:var(--sab);background:var(--card)}
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 8px;font-size:11px;letter-spacing:.5px;color:var(--mute)}
-.nav a[aria-current]{color:#000;font-weight:600}
+.nav a[aria-current]{color:var(--fg);font-weight:600}
 .nav a[aria-current] .i{stroke-width:2}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border:1px solid #000;background:#000;color:#fff;font-weight:500;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
-.btn.o{background:#fff;color:#000}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border:1px solid var(--fg);background:var(--fg);color:var(--card);font-weight:500;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
+.btn.o{background:var(--card);color:var(--fg)}
 .btn.blk{display:flex;width:100%}
 .btn.sm{min-height:40px;padding:0 16px;font-size:12px}
 .btn:active{opacity:.8}
 .btn[disabled]{opacity:.4;cursor:default}
-.lnk{background:none;border:0;text-decoration:underline;color:#000;cursor:pointer}
+.lnk{background:none;border:0;text-decoration:underline;color:var(--fg);cursor:pointer}
 
 /* Forms */
 .login,.formpage{padding:24px}
@@ -56,7 +56,7 @@ main::-webkit-scrollbar{display:none}
 .brand span{font-size:12px;letter-spacing:4px;color:var(--mute);text-transform:uppercase}
 .fld{display:block;margin-bottom:14px;position:relative}
 .fld>span{display:block;font-size:12px;letter-spacing:.5px;color:var(--mute);margin-bottom:4px}
-input[type=email],input[type=password],input[type=search],input[type=text],input[type=tel],input[type=number],select,textarea{width:100%;min-height:48px;padding:10px 12px;border:1px solid #cfcbc3;border-radius:2px;background:#fff;font-size:16px}
+input[type=email],input[type=password],input[type=search],input[type=text],input[type=tel],input[type=number],select,textarea{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--field);border-radius:2px;background:var(--card);font-size:16px}
 textarea{min-height:88px;resize:none}
 [aria-invalid=true]{border-color:var(--err)!important}
 .err{display:block;min-height:0;font-size:12px;color:var(--err);margin-top:3px}
@@ -65,16 +65,16 @@ textarea{min-height:88px;resize:none}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .fine{margin-top:16px;font-size:13px;color:var(--mute);text-align:center}
 .chk{display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:14px}
-.chk input{width:22px;height:22px;margin-top:1px;accent-color:#000;flex:none}
+.chk input{width:22px;height:22px;margin-top:1px;accent-color:var(--fg);flex:none}
 .opts{display:grid;gap:8px;margin-bottom:14px}
-.opt{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid #cfcbc3;cursor:pointer}
-.opt:has(input:checked){border-color:#000;background:var(--surf)}
-.opt input{accent-color:#000;width:20px;height:20px}
+.opt{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--field);cursor:pointer}
+.opt:has(input:checked){border-color:var(--fg);background:var(--surf)}
+.opt input{accent-color:var(--fg);width:20px;height:20px}
 .opt small{display:block;color:var(--mute);font-size:12px;line-height:1.3}
 .sw{position:relative;width:48px;height:28px;flex:none}
-.sw input{appearance:none;width:48px;height:28px;border-radius:14px;background:#cfcbc3;cursor:pointer;transition:background .2s}
-.sw input:checked{background:#000}
-.sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none}
+.sw input{appearance:none;width:48px;height:28px;border-radius:14px;background:var(--field);cursor:pointer;transition:background .2s}
+.sw input:checked{background:var(--fg)}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:var(--card);transition:transform .2s;pointer-events:none}
 .sw:has(input:checked)::after{transform:translateX(20px)}
 
 /* Home */
@@ -87,8 +87,8 @@ textarea{min-height:88px;resize:none}
 .slide h1{font-size:29px;font-weight:300;line-height:1.15;margin:6px 0 16px}
 .slide img{width:140px;height:140px;flex:none;margin-right:20px;border:1px solid #0002}
 .dots{display:flex;justify-content:center;gap:6px;padding:10px}
-.dots i{width:6px;height:6px;border-radius:50%;background:#cfcbc3}
-.dots i.on{background:#000;width:18px;border-radius:3px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--field)}
+.dots i.on{background:var(--fg);width:18px;border-radius:3px}
 .sec{display:flex;justify-content:space-between;align-items:baseline;padding:26px 16px 10px}
 .sec h2{font-size:20px;font-weight:300;letter-spacing:1px;text-transform:uppercase}
 .sec a{font-size:13px;text-decoration:underline;color:var(--mute)}
@@ -107,7 +107,7 @@ textarea{min-height:88px;resize:none}
 .help p{flex:1;font-size:14px}
 .steps{padding:0 16px;list-style:none;counter-reset:s}
 .steps li{counter-increment:s;display:flex;gap:12px;padding:8px 0}
-.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border:1px solid #000;border-radius:50%;display:grid;place-items:center;font-size:12px}
+.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border:1px solid var(--fg);border-radius:50%;display:grid;place-items:center;font-size:12px}
 .foot{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;padding:28px 16px 8px;font-size:13px}
 .foot a{text-decoration:underline;color:var(--mute)}
 .note{margin:16px;padding:12px;background:var(--surf);font-size:12px;color:var(--mute)}
@@ -118,18 +118,18 @@ textarea{min-height:88px;resize:none}
 .card .b{margin-top:8px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
 .card .t{font-size:14px;font-weight:300;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .card .pr{font-weight:500}
-.badge{position:absolute;left:6px;top:6px;padding:1px 7px;background:#fff;font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.badge{position:absolute;left:6px;top:6px;padding:1px 7px;background:var(--card);font-size:10px;letter-spacing:1px;text-transform:uppercase}
 .heart{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;cursor:pointer}
 .card .heart{position:absolute;top:0;right:0}
-.card .heart .i{background:#fffd;border-radius:50%;padding:4px;width:30px;height:30px}
+.card .heart .i{background:var(--card);border-radius:50%;padding:4px;width:30px;height:30px}
 .heart.on .i{fill:currentColor}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 12px;padding:16px}
 .tool{display:flex;gap:8px;padding:12px 16px 0}
 .tool select{width:auto;padding:0 8px}
-.tool .ib{margin:0;width:48px;border:1px solid #cfcbc3;border-radius:2px;flex:none}
+.tool .ib{margin:0;width:48px;border:1px solid var(--field);border-radius:2px;flex:none}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 0;scrollbar-width:none}
-.chip{flex:none;display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border:1px solid #cfcbc3;border-radius:20px;background:#fff;cursor:pointer;white-space:nowrap;font-size:14px}
-.chip[aria-pressed=true],.chip[aria-current]{background:#000;color:#fff;border-color:#000}
+.chip{flex:none;display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border:1px solid var(--field);border-radius:20px;background:var(--card);cursor:pointer;white-space:nowrap;font-size:14px}
+.chip[aria-pressed=true],.chip[aria-current]{background:var(--fg);color:var(--card);border-color:var(--fg)}
 .cnt{padding:12px 16px 0;color:var(--mute);font-size:13px}
 .empty{padding:48px 24px;text-align:center;color:var(--mute)}
 .empty .i{width:40px;height:40px;margin:0 auto 12px;stroke-width:1}
@@ -144,7 +144,7 @@ textarea{min-height:88px;resize:none}
 .thumbs button{flex:none;width:52px;height:52px;padding:0;border:1px solid var(--line);background:none;cursor:pointer}
 .thumbs img{width:100%;height:100%;object-fit:cover}
 .pad{padding:16px}
-.tag{display:inline-block;border:1px solid #000;padding:2px 8px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
+.tag{display:inline-block;border:1px solid var(--fg);padding:2px 8px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
 .pbrand{margin-top:8px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
 .pt{font-size:23px;font-weight:300;line-height:1.25;margin:4px 0 8px}
 .price{font-size:21px;font-weight:500}
@@ -158,7 +158,7 @@ details[open] summary .i{transform:rotate(180deg)}
 .dbody{padding:0 16px 16px;color:var(--mute)}
 .dbody p+p{margin-top:8px}
 .dbody a{text-decoration:underline;color:var(--ink)}
-.buy{position:sticky;bottom:0;display:flex;gap:8px;align-items:center;padding:10px 12px;background:#fff;border-top:1px solid var(--line)}
+.buy{position:sticky;bottom:0;display:flex;gap:8px;align-items:center;padding:10px 12px;background:var(--card);border-top:1px solid var(--line)}
 .buy .btn{flex:1;padding:0 8px}
 .buy .btn.o{flex:0 0 auto;padding:0 14px}
 
@@ -167,14 +167,14 @@ details[open] summary .i{transform:rotate(180deg)}
 .log{flex:1;padding:16px;display:flex;flex-direction:column;gap:10px}
 .m{max-width:86%;padding:10px 14px;border-radius:14px;white-space:pre-line;line-height:1.45}
 .m.bot{align-self:flex-start;background:var(--surf);border-bottom-left-radius:3px}
-.m.me{align-self:flex-end;background:#000;color:#fff;border-bottom-right-radius:3px}
+.m.me{align-self:flex-end;background:var(--fg);color:var(--card);border-bottom-right-radius:3px}
 .m small{display:block;margin-top:6px;color:var(--mute);font-size:11px;line-height:1.3}
 .m .btn{margin-top:10px;white-space:normal}
 .typing i{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:#9a968e;animation:b 1s infinite}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
 @keyframes b{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
-.qs{position:sticky;bottom:64px;display:flex;gap:8px;overflow-x:auto;padding:8px 16px;background:linear-gradient(#fff0,#fff 30%);scrollbar-width:none}
-.send{position:sticky;bottom:0;display:flex;gap:8px;padding:8px 12px;background:#fff;border-top:1px solid var(--line)}
+.qs{position:sticky;bottom:64px;display:flex;gap:8px;overflow-x:auto;padding:8px 16px;background:linear-gradient(transparent,var(--card) 30%);scrollbar-width:none}
+.send{position:sticky;bottom:0;display:flex;gap:8px;padding:8px 12px;background:var(--card);border-top:1px solid var(--line)}
 .send input{flex:1;border-radius:24px}
 .send .btn{padding:0;width:48px;border-radius:50%}
 
@@ -185,7 +185,7 @@ details[open] summary .i{transform:rotate(180deg)}
 .lr small{color:var(--mute)}
 .lh{padding:20px 16px 6px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
 .me{display:flex;align-items:center;gap:14px;padding:20px 16px}
-.av{width:56px;height:56px;border-radius:50%;background:#000;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:300}
+.av{width:56px;height:56px;border-radius:50%;background:var(--fg);color:var(--card);display:grid;place-items:center;font-size:22px;font-weight:300}
 .me b{display:block;font-size:18px;font-weight:400}
 .me small{color:var(--mute)}
 .item{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -193,16 +193,16 @@ details[open] summary .i{transform:rotate(180deg)}
 .item div{flex:1;min-width:0}
 .item b{display:block;font-weight:400;font-size:14px;line-height:1.3}
 .item small{color:var(--mute)}
-.pill{display:inline-block;margin-top:4px;padding:1px 10px;border:1px solid #000;border-radius:12px;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.pill{display:inline-block;margin-top:4px;padding:1px 10px;border:1px solid var(--fg);border-radius:12px;font-size:11px;letter-spacing:1px;text-transform:uppercase}
 .tl{list-style:none;margin:8px 0;padding-left:4px}
 .tl li{position:relative;padding:0 0 18px 30px;color:var(--mute)}
-.tl li::before{content:"";position:absolute;left:0;top:3px;width:14px;height:14px;border-radius:50%;border:1px solid #9a968e;background:#fff}
+.tl li::before{content:"";position:absolute;left:0;top:3px;width:14px;height:14px;border-radius:50%;border:1px solid #9a968e;background:var(--card)}
 .tl li::after{content:"";position:absolute;left:7px;top:20px;bottom:-1px;width:1px;background:var(--line)}
 .tl li:last-child::after{display:none}
 .tl li.on{color:var(--ink);font-weight:500}
-.tl li.on::before{background:#000;border-color:#000}
+.tl li.on::before{background:var(--fg);border-color:var(--fg)}
 .hero2{text-align:center;padding:28px 24px 8px}
-.hero2 .ok{width:56px;height:56px;margin:0 auto 12px;border-radius:50%;background:#000;color:#fff;display:grid;place-items:center}
+.hero2 .ok{width:56px;height:56px;margin:0 auto 12px;border-radius:50%;background:var(--fg);color:var(--card);display:grid;place-items:center}
 .hero2 h1{font-size:24px;font-weight:300}
 .hero2 p{color:var(--mute);margin-top:4px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;padding:12px 16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:16px 0}
@@ -221,21 +221,21 @@ details[open] summary .i{transform:rotate(180deg)}
 /* Consign wizard */
 .prog{display:flex;gap:4px;padding:16px 16px 0}
 .prog i{flex:1;height:3px;background:var(--line)}
-.prog i.on{background:#000}
+.prog i.on{background:var(--fg)}
 .stp{padding:8px 16px 0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
 .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
-.slot{position:relative;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;border:1px dashed #9a968e;background:#fff;font-size:11px;line-height:1.2;text-align:center;cursor:pointer;overflow:hidden}
+.slot{position:relative;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;border:1px dashed #9a968e;background:var(--card);font-size:11px;line-height:1.2;text-align:center;cursor:pointer;overflow:hidden}
 .slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .slot em{position:absolute;left:0;right:0;bottom:0;padding:2px;background:#000b;color:#fff;font-style:normal}
-.slot.on{border-style:solid;border-color:#000}
+.slot.on{border-style:solid;border-color:var(--fg)}
 .slot b{font-weight:500;color:var(--err)}
-.wiz{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 12px;background:#fff;border-top:1px solid var(--line)}
+.wiz{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 12px;background:var(--card);border-top:1px solid var(--line)}
 .wiz .btn{flex:1}
 
 /* Sheet + toast */
 .sheet{position:absolute;inset:0;z-index:50;display:flex;align-items:flex-end}
 .scrim{position:absolute;inset:0;background:#0008}
-.panel{position:relative;width:100%;max-height:88%;overflow-y:auto;padding:24px 16px calc(20px + var(--sab));background:#fff;border-radius:18px 18px 0 0;display:grid;gap:8px}
+.panel{position:relative;width:100%;max-height:88%;overflow-y:auto;padding:24px 16px calc(20px + var(--sab));background:var(--card);border-radius:18px 18px 0 0;display:grid;gap:8px}
 .panel h2{font-size:19px;font-weight:400}
 .panel p{color:var(--mute);margin-bottom:8px}
 .panel.lb{height:100%;max-height:none;border-radius:0;background:#000;padding:var(--sat) 0 var(--sab);align-content:center}
@@ -243,8 +243,36 @@ details[open] summary .i{transform:rotate(180deg)}
 .lb img{width:100%;aspect-ratio:1;object-fit:cover}
 .lb p{color:#ccc;text-align:center;font-size:13px}
 .grpt{display:flex;flex-wrap:wrap;gap:8px}
-.toast{position:absolute;left:16px;right:16px;bottom:calc(var(--sab) + 70px);z-index:60;padding:12px 16px;background:var(--ink);color:#fff;font-size:14px;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast{position:absolute;left:16px;right:16px;bottom:calc(var(--sab) + 70px);z-index:60;padding:12px 16px;background:var(--ink);color:var(--card);font-size:14px;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .toast.on{opacity:1}
+
+/* Motion, tap feedback, swipe affordances, intro */
+main>*{animation:in .3s cubic-bezier(.2,.7,.2,1) both}
+main.still>*{animation:none}
+main.bwd>*{animation-name:inb}
+@keyframes in{from{opacity:0;transform:translateX(16px)}}
+@keyframes inb{from{opacity:0;transform:translateX(-16px)}}
+.card>a,.tile,.trust a,.help,.chip,.item,.thumbs button{transition:transform .15s}
+.card>a:active,.tile:active,.trust a:active,.help:active,.chip:active,.item:active,.thumbs button:active{transform:scale(.97)}
+.lr:active{opacity:.6}
+.nav{position:relative;z-index:5}
+.nav a{position:relative}
+.nav a::before{content:"";position:absolute;top:-1px;left:50%;width:0;height:2px;background:var(--fg);transition:left .25s,width .25s}
+.nav a[aria-current]::before{left:25%;width:50%}
+.panel:not(.lb)::before{content:"";justify-self:center;width:36px;height:4px;margin:-12px 0 4px;border-radius:2px;background:var(--field)}
+.lb .snap>*{width:100%}
+.intro{height:100%;display:flex;flex-direction:column}
+.intro .snap{flex:1}
+.intro section{width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px 36px;text-align:center}
+.intro img{width:230px;height:230px;margin-bottom:32px;border:1px solid var(--line)}
+.intro h1{font-size:28px;font-weight:300;line-height:1.2;letter-spacing:.5px;margin-bottom:10px}
+.intro p{color:var(--mute)}
+.ibar{display:flex;justify-content:space-between;align-items:center;padding:4px 24px 20px}
+
+/* Dark mode (Account > Dark mode) */
+.screen.dark{--ink:#ece8e1;--mute:#a29e96;--line:#2e2c29;--surf:#1d1c1a;--bg:#121211;--fg:#f3efe8;--card:#121211;--field:#4b4842;--err:#f2867b;--ok:#7fc08c;
+ --sbc:#f3efe8;--hbc:#f3efe8;--gbg:#1d1c1a;--gfg:#f3efe8;color:var(--ink);color-scheme:dark}
+.dark .band{background:var(--surf)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -257,12 +285,12 @@ details[open] summary .i{transform:rotate(180deg)}
     <div id="gb" hidden><span>Guest mode · view only</span><button data-act="login">Log in</button></div>
     <main id="main" tabindex="-1"></main>
     <nav class="nav" id="nav" aria-label="Primary" hidden></nav>
-    <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
+    <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true" data-dismiss="close" data-dir="down"></div></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
    </div>
   </div>
  </div>
- <div class="cap"><b>Prototype 2 · Classic Boutique</b>Log in with any email and password, or continue as guest. Nothing is sent or saved.</div>
+ <div class="cap"><b>Prototype 2 · Classic Boutique</b>Log in with any email and password, or continue as guest. Nothing is sent or saved. Drag with the mouse to swipe.</div>
 </div>
 
 <script src="../shared/core.js"></script>
@@ -307,6 +335,11 @@ const gateView = what => `<div class="gate">${ic('lock')}<h1>Log in to ${esc(wha
   <button class="btn" data-act="login">Log in</button><br><a class="lnk" href="#/home">Keep browsing</a></div>`;
 
 /* ---------- views: auth ---------- */
+function vWelcome() {
+  return `<div class="intro"><div class="snap" id="intro" data-dots="ind">${AJ.INTRO.map(([t, s, c], k) => `<section><img src="${AJ.art(c, k * 5 + 1, {cap: false})}" alt=""><h1>${t}</h1><p>${s}</p></section>`).join('')}</div>
+  <div class="dots" id="ind">${AJ.INTRO.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div>
+  <div class="ibar"><a class="lnk" href="#/login">Skip</a><button class="btn" id="inext" data-act="inext">Next</button></div></div>`;
+}
 function vLogin() {
   return `<div class="login"><div class="brand"><b>A&amp;J</b><span>Luxury · Buy &amp; Consign</span></div>
   <form id="loginform" novalidate>
@@ -317,7 +350,7 @@ function vLogin() {
   <div class="or">or</div>
   <button class="btn o blk" data-act="guest">Continue as guest (view only)</button>
   <p class="fine">No account? <a class="lnk" href="#/signup">Create one</a></p>
-  <p class="fine" style="font-size:12px">Prototype: any email and password works.</p></div>`;
+  <p class="fine" style="font-size:12px">Prototype: any email and password works. <a class="lnk" href="#/welcome">View intro</a></p></div>`;
 }
 function vSignup() {
   return `<div class="formpage"><a class="lnk" href="#/login" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:12px">${ic('back', 's')} Back to log in</a>
@@ -369,7 +402,7 @@ function vShop(arg) {
    <select id="sort" aria-label="Sort"><option value="featured">Featured</option><option value="asc" ${sort === 'asc' ? 'selected' : ''}>Price ↑</option><option value="desc" ${sort === 'desc' ? 'selected' : ''}>Price ↓</option></select>
    <button class="ib" data-act="filters" aria-label="Filters">${ic('filter')}${nFilters() ? `<span class="dot">${nFilters()}</span>` : ''}</button></div>
   <div class="chips">${[['all', 'All'], ...CATS].map(([c, l]) => `<a class="chip" href="#/shop/${c}" ${cat === c ? 'aria-current="true"' : ''}>${l}</a>`).join('')}</div>
-  <div id="list">${list()}</div>`;
+  <div id="list" data-swipe="swcat">${list()}</div>`;
 }
 function filterSheet() {
   const n = filtered().length, pr = [['any', 'Any price'], ['lo', 'Under ₱30,000'], ['mid', '₱30,000 – ₱100,000'], ['hi', 'Over ₱100,000']];
@@ -505,6 +538,7 @@ function vAccount() {
     : `<div class="me"><div class="av">${esc(u.name[0].toUpperCase())}</div><div><b>${esc(u.name)}</b><small>${esc(u.email)}</small></div></div>
      <div class="lh">My A&amp;J</div><div class="list">${r('heart', 'Wishlist', '#/wishlist', S.wish.size + ' saved')}${r('mail', 'My inquiries', '#/inquiries', S.inq.length + ' sent')}${r('box', 'My consignments', '#/consignments', S.con.length + ' requests')}${r('settings', 'Profile &amp; settings', '#/settings')}</div>`)
     + `<div class="lh">Support</div><div class="list">${r('chat', 'Help assistant', '#/chat')}${r('info', 'FAQs', '#/faqs')}${r('pin', 'Visit us &amp; contact', '#/contact')}</div>
+    <div class="lh">Display</div><div class="list"><label class="lr" style="cursor:pointer">${ic('eye')}<span>Dark mode</span><span class="sw"><input type="checkbox" id="dark" ${$('#screen').classList.contains('dark') ? 'checked' : ''}></span></label></div>
     <div class="lh">Policies</div><div class="list">${r('shield', 'Authenticity', '#/info/authenticity')}${r('truck', 'Shipping &amp; delivery', '#/info/shipping')}${r('doc', 'Terms of service', '#/info/terms')}${r('lock', 'Privacy notice', '#/info/privacy')}</div>
     ${g ? '' : '<div class="pad"><button class="btn o blk" data-act="logout">Log out</button></div>'}<div style="height:8px"></div>`;
 }
@@ -535,7 +569,7 @@ function vInfo(id) {
 /* ---------- router ---------- */
 const NAV = [['home', 'Home', 'home'], ['shop', 'Shop', 'grid'], ['consign', 'Consign', 'tag'], ['chat', 'Help', 'chat'], ['account', 'Account', 'user']];
 const R = {
-  login: {bare: 1, view: vLogin}, signup: {bare: 1, view: vSignup}, forgot: {bare: 1, view: vForgot},
+  welcome: {bare: 1, view: vWelcome}, login: {bare: 1, view: vLogin}, signup: {bare: 1, view: vSignup}, forgot: {bare: 1, view: vForgot},
   home: {nav: 'home', wm: 1, view: vHome},
   shop: {nav: 'shop', title: 'Shop', view: vShop},
   p: {nav: 'shop', back: 1, up: '#/shop', title: 'Item', view: vProduct},
@@ -554,14 +588,14 @@ const R = {
   contact: {nav: 'account', back: 1, up: '#/account', title: 'Visit us & contact', view: vContact},
   info: {back: 1, up: '#/home', title: 'Information', view: vInfo}
 };
-let depth = 0, first = true; // depth = screens opened in-app, so Back can use history only when there is something to go back to
+let depth = 0, first = true, backward = false; // depth = screens opened in-app, so Back can use history only when there is something to go back to
 const redirect = h => { history.replaceState(null, '', h); render(false); };
-const refresh = (keep = true) => { const t = $('#main').scrollTop; render(false); if (keep) $('#main').scrollTop = t; };
+const refresh = (keep = true) => { const t = $('#main').scrollTop; render(false); if (keep) { $('#main').scrollTop = t; $('#main').classList.add('still'); } }; // in-place updates keep scroll and skip the entry animation
 function render(nav = true) {
   const {name, args} = AJ.route();
   const r = name || 'login', a = args[0] || '';
-  if (!S.user && !['login', 'signup', 'forgot', 'info'].includes(r)) return redirect('#/login');
-  if (S.user && r === 'login') return redirect('#/home');
+  if (!S.user && !['welcome', 'login', 'signup', 'forgot', 'info'].includes(r)) return redirect('#/login');
+  if (S.user && (r === 'login' || r === 'welcome')) return redirect('#/home');
   const d = R[r] || R.home;
   if (nav && !first) depth++; first = false;
   closeSheet();
@@ -574,6 +608,7 @@ function render(nav = true) {
     <div>${S.user ? `<a class="ib" href="#/wishlist" aria-label="Wishlist">${ic('heart')}${S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''}</a>` : ''}</div>`;
   $('#nav').innerHTML = NAV.map(([n, l, i]) => `<a href="#/${n}" ${n === d.nav ? 'aria-current="page"' : ''}>${ic(i)}${l}</a>`).join('');
   const m = $('#main');
+  m.classList.remove('still'); m.classList.toggle('bwd', backward); backward = false;
   m.innerHTML = isGuest() && MEMBER.includes(r) ? gateView({wishlist: 'see your wishlist', inquire: 'send an inquiry', consignform: 'start a consignment', settings: 'edit your profile'}[r] || 'see this page') : d.view(a);
   m.scrollTop = r === 'chat' ? 1e6 : 0;
   m.focus({preventScroll: true});
@@ -584,10 +619,10 @@ const go = h => { location.hash = h; };
 function resetWizard() { Object.keys(D).filter(k => /^(c[a-z]+|inc_.*|mode)$/.test(k)).forEach(k => delete D[k]); W = {step: 0, photos: new Set()}; }
 const ACT = {
   login() { S.user = null; go('#/login'); },
-  guest() { S.user = 'guest'; go('#/home'); },
+  guest() { S.user = 'guest'; AJ.skeleton(); go('#/home'); },
   logout() { S.user = null; S.wish.clear(); S.inq.length = S.con.length = 0; for (const k in D) delete D[k]; resetWizard(); go('#/login'); },
   close: closeSheet,
-  back() { const r = R[AJ.route().name]; if (depth > 0) { depth -= 2; history.back(); } else go(r?.up || '#/home'); }, // -2 then the hashchange render adds 1
+  back() { const r = R[AJ.route().name]; backward = true; if (depth > 0) { depth -= 2; history.back(); } else go(r?.up || '#/home'); }, // -2 then the hashchange render adds 1
   eye(el) { const inp = el.parentElement.querySelector('input'), show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; el.innerHTML = ic(show ? 'eyeoff' : 'eye'); el.setAttribute('aria-label', show ? 'Hide password' : 'Show password'); },
   clearsent() { delete D.sent; },
   clearmsg() { delete D.msent; D.mtext = ''; },
@@ -596,7 +631,7 @@ const ACT = {
     if (gate('save items')) return;
     const id = el.dataset.id; S.wish.has(id) ? S.wish.delete(id) : S.wish.add(id);
     $$(`.heart[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', S.wish.has(id)); b.setAttribute('aria-pressed', S.wish.has(id)); });
-    toast(S.wish.has(id) ? 'Added to wishlist' : 'Removed from wishlist');
+    toast(S.wish.has(id) ? 'Added to wishlist' : 'Removed from wishlist'); if (S.wish.has(id)) AJ.pop(el);
     const a = $('#top a[href="#/wishlist"]'); a.innerHTML = ic('heart') + (S.wish.size ? `<span class="dot">${S.wish.size}</span>` : '');
     if (AJ.route().name === 'wishlist') refresh();
   },
@@ -609,7 +644,17 @@ const ACT = {
   fdone() { closeSheet(); refresh(false); },
   clear() { q = ''; F.brands.clear(); F.cond = F.price = 'any'; refresh(false); },
   thumb(el) { const g = $('#gal'); g.scrollTo({left: el.dataset.i * g.clientWidth, behavior: 'smooth'}); },
-  zoom(el) { const p = item(AJ.route().args[0]), v = p.views[el.dataset.i]; openSheet(`<button class="ib x" data-act="close" aria-label="Close">${ic('close')}</button><img src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"><p>${v} · ${+el.dataset.i + 1} of ${p.views.length}</p>`, 'lb'); },
+  zoom(el) { // full-screen viewer: swipe between photos, double-tap or pinch to zoom, swipe down to close
+    const p = item(AJ.route().args[0]), n = p.views.length;
+    openSheet(`<button class="ib x" data-act="close" aria-label="Close">${ic('close')}</button><div class="snap" id="lbs">${p.views.map((v, i) => `<div><div style="overflow:hidden"><img class="zoomable" src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"></div><p>${v} · ${i + 1} of ${n}</p></div>`).join('')}</div>
+     <p>Swipe for more · double-tap to zoom · swipe down to close</p>`, 'lb');
+    const s = $('#lbs'); s.scrollLeft = el.dataset.i * s.clientWidth;
+  },
+  inext() { const s = $('#intro'), i = Math.round(s.scrollLeft / s.clientWidth); i < s.children.length - 1 ? s.scrollTo({left: (i + 1) * s.clientWidth, behavior: 'smooth'}) : go('#/login'); },
+  swcat(el, d) { // swipe the shop list to the next / previous category
+    const L = ['all', ...CATS.map(c => c[0])], n = L[L.indexOf(cat) + d]; if (!n) return false;
+    redirect('#/shop/' + n); $('#main').classList.add('still'); AJ.center($('.chips [aria-current]'));
+  },
   slot(el) { const i = +el.dataset.i; W.photos.has(i) ? W.photos.delete(i) : W.photos.add(i); refresh(); $(`.slot[data-i="${i}"]`)?.focus({preventScroll: true}); },
   wback() { W.step--; refresh(false); }
 };
@@ -620,6 +665,7 @@ document.addEventListener('input', e => {
   if (t.id === 'sort') { sort = t.value; $('#list').innerHTML = list(); }
   if (t.id === 'fq') $('#fl').innerHTML = faqList(t.value);
   if (t.name === 'ccat' && AJ.route().name === 'consignform') D.ccat = t.value;
+  if (t.id === 'dark') $('#screen').classList.toggle('dark', t.checked);
 });
 document.addEventListener('submit', e => {
   e.preventDefault();
@@ -628,7 +674,7 @@ document.addEventListener('submit', e => {
   if (id === 'loginform') {
     if (!validate(f, {email: emailRule, pw: req('Enter your password.')})) return;
     const n = D.email.split('@')[0].replace(/[._-]+/g, ' ');
-    S.user = {name: n.replace(/\b\w/g, c => c.toUpperCase()), email: D.email.trim(), mobile: ''}; delete D.pw; go('#/home');
+    S.user = {name: n.replace(/\b\w/g, c => c.toUpperCase()), email: D.email.trim(), mobile: ''}; delete D.pw; AJ.skeleton(); go('#/home');
   }
   if (id === 'signupform') {
     if (!validate(f, {name: req('Enter your name.'), email: emailRule, mobile: mobileRule,
@@ -667,9 +713,15 @@ document.addEventListener('scroll', e => { // gallery / hero dots
   const el = e.target; if (!el.dataset?.dots) return;
   const i = Math.round(el.scrollLeft / el.clientWidth);
   $$(`#${el.dataset.dots} i`).forEach((d, k) => d.classList.toggle('on', k === i));
+  if (el.id === 'intro') $('#inext').textContent = i === el.children.length - 1 ? 'Get started' : 'Next';
 }, true);
+AJ.gestures({ // swipe: back from the left edge, pull down to refresh lists, sheets and photo viewer drag down to close
+  act: (n, el, d) => ACT[n]?.(el, d),
+  edge: () => { const r = AJ.route().name; return R[r]?.back ? ACT.back : ['signup', 'forgot'].includes(r) ? () => go('#/login') : null; },
+  pull: () => ['home', 'shop', 'wishlist', 'inquiries', 'consignments'].includes(AJ.route().name) ? () => refresh() : null
+});
 addEventListener('hashchange', () => render());
-if (!location.hash) history.replaceState(null, '', '#/login');
+if (!location.hash) history.replaceState(null, '', '#/welcome');
 render(false);
 </script>
 </body>

@@ -132,7 +132,18 @@ The same six drawings are styled three ways, one per prototype: soft tint with t
 
 **Display:** each prototype shows inside a phone frame. The frame scales to the size of the browser window, so the whole phone is visible with no page scrolling. I checked window sizes from 1024×600 to 3840×1900, including 1920×957 and 1366×625 (a 1080p screen and a laptop screen with browser toolbars). **Monitor 1's resolution was left blank in the brief**, so the frame fits whatever the window is. On a window narrower than 520px the frame is dropped and the app fills the screen.
 
-**All three have:** a login screen first (any email and password works; sign-up and forgot-password screens included), a **guest, view-only** option, an FAQ chatbot, and navigation where every button leads to a working screen. Guests can browse, search, read FAQs and use the chatbot. Saving, inquiring, booking and consigning ask them to log in. The chatbot covers how to buy, consignment, selling for cash, payout, shipping, payment, layaway, authenticity, returns, condition ratings, the showroom, what guests can do, and "talk to a person". **It never says whether an item is authentic or fake.**
+**All three have:** a short three-slide intro, then a login screen (any email and password works; sign-up and forgot-password screens included), a **guest, view-only** option, an FAQ chatbot, and navigation where every button leads to a working screen. Guests can browse, search, read FAQs and use the chatbot. Saving, inquiring, booking and consigning ask them to log in. The chatbot covers how to buy, consignment, selling for cash, payout, shipping, payment, layaway, authenticity, returns, condition ratings, the showroom, what guests can do, and "talk to a person". **It never says whether an item is authentic or fake.**
+
+**Swiping (all three):** works by dragging with a mouse on a computer, or with a finger on a touchscreen.
+- Photo galleries, the home carousel, the intro and the photo viewer move one picture at a time and snap into place. A quick flick, or a drag past a fifth of the width, turns the page.
+- Rows of cards and chips scroll sideways. With a mouse they keep gliding briefly after you let go, like on a phone.
+- Swipe the list left or right to change: the shop category (Prototypes 2 and 4), the collection tab All / Brand new / Pre-loved (Prototype 3), Home between Buy and Consign (Prototype 4), and the My activity tabs (Prototype 4).
+- Swipe right from the left edge of the screen to go back. In Prototype 4's consign flow it goes back one question.
+- Drag down to close bottom sheets, the photo viewer and Prototype 3's concierge chat. Swipe Prototype 3's menu to the left to close it.
+- Pull down at the top of Home, shop and saved-item lists to refresh. It shows loading placeholders, then "Up to date". The sample data does not change.
+- Photo viewer: double-tap or double-click to zoom, pinch on a touchscreen, or Ctrl + scroll wheel (or trackpad pinch) on a computer, then drag to look around.
+
+**Also added:** loading placeholders when you first enter and when you refresh, tap feedback on cards and buttons, a heart "pop" when you save an item, smoother screen changes in Prototype 2, active-tab markers on the tab bars of Prototypes 2 and 4, and a Dark mode switch in Prototype 2 (Account > Display). The intro can be skipped, and "View intro" on the login screen shows it again.
 
 | | Prototype 2 · Classic Boutique | Prototype 3 · Noir Salon | Prototype 4 · Bloom |
 |---|---|---|---|
@@ -141,7 +152,7 @@ The same six drawings are styled three ways, one per prototype: soft tint with t
 | **Chatbot** | "Help" tab, tap-to-ask chips | Floating Concierge button on every screen; answers add next-step buttons | "Ava" tab, guided topic menu, helpful / not helpful buttons |
 | **Consign** | 4-step form (item, photos, details, hand-over) | One-page appraisal request | One question per screen with big tiles |
 | **After you act** | Inquiry and consignment status pages | One "My requests" inbox for inquiries, viewings and appraisals | "My activity" with a progress tracker, plus notifications |
-| **Own features** | Filter sheet (brand, condition, price), swipe gallery with zoom, searchable FAQs, profile settings | Collections, brand directory, search, showroom **viewing booking** (day, time of day, pieces), authenticity guide, saved pieces | Buy / Consign switch, swipe-to-**Discover** cards, **layaway planner** and per-item estimate, price-slider filter, SMS-style sign-up code (any 4 digits), notifications |
+| **Own features** | Filter sheet (brand, condition, price), swipe gallery with zoom, searchable FAQs, profile settings, dark mode | Collections, brand directory, search, showroom **viewing booking** (day, time of day, pieces), authenticity guide, saved pieces | Buy / Consign switch, swipe-to-**Discover** cards, **layaway planner** and per-item estimate, price-slider filter, SMS-style sign-up code (any 4 digits), notifications |
 
 **Sample data to know about:** items, brands, titles and prices are invented (24 listings). Prototype 4 shows one consignment labeled **SAMPLE** so the tracker has a mid-journey example. Layaway figures use the 30% down payment and equal monthly payments from A&J's site. No interest is added because the site gives no rate.
 
@@ -150,4 +161,5 @@ The same six drawings are styled three ways, one per prototype: soft tint with t
 - No commission or fee amounts are shown, because A&J has not provided them. Policy text (shipping, returns, consignment terms) is paraphrased from A&J's public site and **not yet confirmed by A&J**. The shipping-fee conflict is flagged in the chatbot answer.
 - Showroom address, hours, phone numbers and social accounts are placeholders marked "to be confirmed by A&J". Terms and Privacy pages are placeholders.
 - The chatbot matches keywords against fixed answers. It is not an AI model and gives a fallback reply to questions outside the FAQ.
-- Tested in Chromium only (automated checks of every screen and flow). Not yet tried on Safari, Firefox or a real phone.
+- Tested in Chromium only: automated checks of every screen and flow, plus every swipe tested with a mouse drag and with simulated touch. Not yet tried on Safari, Firefox or a real phone.
+- Dark mode is in Prototype 2 only. Prototype 3 is already dark, and Prototype 4's bright colours are its identity.

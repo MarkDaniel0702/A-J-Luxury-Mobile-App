@@ -29,7 +29,7 @@ i{font-style:italic}
 #app{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat);background:var(--bg);overflow:hidden}
 #app::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.09;mix-blend-mode:overlay;
  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-main{position:relative;flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+main{position:relative;flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 main::-webkit-scrollbar{display:none}
 main:focus-visible{outline:0}
 main>*{animation:up .55s cubic-bezier(.2,.7,.2,1) both}
@@ -314,6 +314,22 @@ details[open] summary .i{transform:rotate(180deg)}
 .gate h1{font:500 30px/1.1 var(--disp);margin:14px 0 8px}
 .gate p{color:var(--mute);margin-bottom:22px}
 .gate .btn{margin-top:10px}
+/* Swipe affordances, tap feedback, intro */
+:root{--gbg:#131315;--gfg:#c9a96a}
+.panel:not(.lb)::before{content:"";justify-self:center;width:36px;height:2px;margin:-16px 0 6px;background:var(--line)}
+.cpanel::before{content:"";position:absolute;top:5px;left:50%;width:36px;height:2px;margin-left:-18px;background:var(--line)}
+.lb .snap>*{width:100%}
+.btn:active{transform:scale(.98)}
+.pc img,.mini img,.col img,.crow img{transition:opacity .2s}
+.pc a:active img,.mini:active img,.col:active img,.crow:active img{opacity:.7}
+.chip:active,.std a:active,.az a:active,.req:active,.dl:active,.brands a:active{opacity:.6}
+.intro{min-height:100%;display:flex;flex-direction:column;padding-bottom:18px}
+.intro .snap{flex:1}
+.intro section{width:100%;display:flex;flex-direction:column;justify-content:center;padding:28px 32px 6px}
+.intro img{width:100%;height:300px;object-fit:cover;border:1px solid var(--line);margin-bottom:26px}
+.intro .h2{margin:8px 0 10px}
+.intro p{color:var(--mute)}
+.ibar{display:flex;justify-content:space-between;align-items:center;padding:4px 28px 0}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -327,20 +343,20 @@ details[open] summary .i{transform:rotate(180deg)}
     <main id="main" tabindex="-1"></main>
     <div class="dock" id="dock" hidden></div>
     <button class="fab" id="fab" data-act="concierge" aria-label="Open the concierge chat" hidden><svg class="i"><use href="#i-chat"/></svg></button>
-    <div class="drawer" id="drawer" aria-hidden="true"><div class="scrim" data-act="dclose"></div><nav class="dp" id="dp" aria-label="Main menu"></nav></div>
+    <div class="drawer" id="drawer" aria-hidden="true"><div class="scrim" data-act="dclose"></div><nav class="dp" id="dp" aria-label="Main menu" data-dismiss="dclose" data-dir="left"></nav></div>
     <div class="csheet" id="cs" hidden><div class="scrim" data-act="cclose"></div>
-     <section class="cpanel" role="dialog" aria-modal="true" aria-label="Concierge chat">
+     <section class="cpanel" role="dialog" aria-modal="true" aria-label="Concierge chat" data-dismiss="cclose" data-dir="down">
       <header><div><small>Concierge</small><b>FAQ assistant</b></div><button class="ib" data-act="cclose" aria-label="Close chat"><svg class="i"><use href="#i-close"/></svg></button></header>
       <div class="clog" id="log" aria-live="polite"></div>
       <div class="qs" id="qs"></div>
       <form class="send" id="chatform"><input type="text" id="msg" placeholder="Ask a question…" aria-label="Message" autocomplete="off"><button class="btn f" aria-label="Send"><svg class="i"><use href="#i-send"/></svg></button></form>
      </section></div>
-    <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
+    <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true" data-dismiss="close" data-dir="down"></div></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
    </div>
   </div>
  </div>
- <div class="cap"><b>Prototype 3 · Noir Salon</b>Log in with any email and password, or browse as a guest. Nothing is sent or saved.</div>
+ <div class="cap"><b>Prototype 3 · Noir Salon</b>Log in with any email and password, or browse as a guest. Nothing is sent or saved. Drag with the mouse to swipe.</div>
 </div>
 
 <script src="../shared/core.js"></script>
@@ -390,6 +406,11 @@ function buildDrawer() {
 }
 
 /* ---------- views: auth ---------- */
+function vWelcome() {
+  return `<div class="intro lat"><div class="snap" id="intro" data-dots="ind">${AJ.INTRO.map(([t, s, c], k) => `<section><img src="${AJ.art(c, k * 5 + 1, {s: 'noir', cap: false})}" alt=""><div class="eyebrow">A&amp;J Luxury · ${k + 1} of ${AJ.INTRO.length}</div><h1 class="h2">${t}</h1><p>${s}</p></section>`).join('')}</div>
+  <div class="dots" id="ind">${AJ.INTRO.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div>
+  <div class="ibar"><a class="lnk" href="#/login">Skip</a><button class="btn f" id="inext" data-act="inext">Next</button></div></div>`;
+}
 const eye = `<button type="button" class="eye" data-act="eye" aria-label="Show password">${ic('eye')}</button>`;
 function vLogin() {
   return `<div class="login lat"><div class="glow"></div><div class="eyebrow">Buy · Consign · Authenticated</div><h1 class="logo">A&amp;J</h1><p>Luxury, <i>carefully</i> curated.</p>
@@ -398,7 +419,7 @@ function vLogin() {
    <button class="btn f blk" type="submit">Enter</button></form>
   <p class="fine"><a href="#/forgot">Forgot password?</a></p><div class="or">or</div>
   <button class="btn blk" data-act="guest">Browse as a guest</button>
-  <p class="fine">New here? <a href="#/join">Create an account</a></p><p class="fine" style="font-size:11px">Prototype: any email and password works.</p></div>`;
+  <p class="fine">New here? <a href="#/join">Create an account</a></p><p class="fine" style="font-size:11px">Prototype: any email and password works. <a href="#/welcome">View intro</a></p></div>`;
 }
 function vJoin() {
   return `<div class="formpage"><a class="back" href="#/login">${ic('back', 's')} Back</a><div class="eyebrow">Join A&amp;J</div><h1 class="h2" style="margin:6px 0 20px">Create your <i>account</i></h1>
@@ -454,7 +475,7 @@ function vCollection(arg) {
   <div class="bar" style="margin-top:12px">${[['all', 'All'], ['new', 'Brand new'], ['pre', 'Pre-loved']].map(([v, l]) => `<button class="chip" data-act="tab" data-v="${v}" aria-pressed="${tab === v}">${l}</button>`).join('')}</div>
   <div class="bar"><select id="bsel" aria-label="Brand"><option value="all">All brands</option>${brands.map(b => `<option ${bsel === b ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select>
    <select id="sort" aria-label="Sort"><option value="featured">Featured</option><option value="asc" ${sort === 'asc' ? 'selected' : ''}>Price ↑</option><option value="desc" ${sort === 'desc' ? 'selected' : ''}>Price ↓</option></select></div>
-  <div id="list" data-cat="${cat}">${plist(cat)}</div>`;
+  <div id="list" data-cat="${cat}" data-swipe="swtab">${plist(cat)}</div>`;
 }
 function vBrands() {
   const g = {}; BRANDS.forEach(b => (g[b[0].toUpperCase()] ||= []).push(b));
@@ -652,7 +673,7 @@ function say(text, id) {
 
 /* ---------- router ---------- */
 const R = {
-  login: {bare: 1, view: vLogin}, join: {bare: 1, view: vJoin}, forgot: {bare: 1, view: vForgot},
+  welcome: {bare: 1, view: vWelcome}, login: {bare: 1, view: vLogin}, join: {bare: 1, view: vJoin}, forgot: {bare: 1, view: vForgot},
   home: {top: 1, wm: 1, view: vHome}, collections: {top: 1, title: 'Collections', view: vCollections},
   collection: {title: 'Collection', up: '#/collections', view: vCollection}, brands: {top: 1, title: 'Brands', view: vBrands}, brand: {title: 'Brand', up: '#/brands', view: vBrand},
   search: {title: 'Search', up: '#/home', view: vSearch}, p: {title: 'Piece', up: '#/collections', view: vProduct, dock: dockProduct},
@@ -668,8 +689,8 @@ const redirect = h => { history.replaceState(null, '', h); render(false); };
 const refresh = (keep = true) => { const t = $('#main').scrollTop; render(false); if (keep) { $('#main').scrollTop = t; $('#main').classList.add('still'); } }; // in-place updates keep scroll and skip the entry animation
 function render(nav = true) {
   const {name, args} = AJ.route(), r = name || 'login', a = args[0] || '';
-  if (!S.user && !['login', 'join', 'forgot', 'info'].includes(r)) return redirect('#/login');
-  if (S.user && r === 'login') return redirect('#/home');
+  if (!S.user && !['welcome', 'login', 'join', 'forgot', 'info'].includes(r)) return redirect('#/login');
+  if (S.user && (r === 'login' || r === 'welcome')) return redirect('#/home');
   const d = R[r] || R.home;
   if (nav && !first) depth++; first = false;
   closeSheet(); drawer(false); $('#cs').hidden = true;
@@ -696,7 +717,7 @@ const WIZ = /^(c[a-z]+|inc_.*|photos)$/;
 function resetWizard() { Object.keys(D).filter(k => WIZ.test(k)).forEach(k => delete D[k]); W = {photos: new Set()}; }
 const ACT = {
   login() { S.user = null; go('#/login'); },
-  guest() { S.user = 'guest'; go('#/home'); },
+  guest() { S.user = 'guest'; AJ.skeleton(); go('#/home'); },
   logout() { S.user = null; S.wish.clear(); S.req.length = 0; for (const k in D) delete D[k]; resetWizard(); go('#/login'); },
   close: closeSheet, dopen() { buildDrawer(); drawer(true); $('#dp button')?.focus(); }, dclose() { drawer(false); },
   concierge() { closeSheet(); openChat(); }, cclose() { $('#cs').hidden = true; },
@@ -709,7 +730,7 @@ const ACT = {
     if (gate('save pieces')) return;
     const id = el.dataset.id; S.wish.has(id) ? S.wish.delete(id) : S.wish.add(id);
     $$(`.heart[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', S.wish.has(id)); b.setAttribute('aria-pressed', S.wish.has(id)); });
-    toast(S.wish.has(id) ? 'Saved' : 'Removed from saved');
+    toast(S.wish.has(id) ? 'Saved' : 'Removed from saved'); if (S.wish.has(id)) AJ.pop(el);
     $('#top a[href="#/saved"]').innerHTML = ic('heart') + (S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''); buildDrawer();
     if (AJ.route().name === 'saved') refresh();
   },
@@ -717,7 +738,14 @@ const ACT = {
   tab(el) { tab = el.dataset.v; refresh(); },
   reset() { tab = 'all'; bsel = 'all'; refresh(false); },
   sq(el) { sq = el.dataset.t; $('#sq').value = sq; $('#sres').innerHTML = results(sq); },
-  zoom(el) { const p = item(AJ.route().args[0]), v = p.views[el.dataset.i]; openSheet(`<button class="ib x" data-act="close" aria-label="Close">${ic('close')}</button><img src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"><p>${v} · ${+el.dataset.i + 1} / ${p.views.length}</p>`, 'lb'); },
+  zoom(el) { // full-screen viewer: swipe between photos, double-tap or pinch to zoom, swipe down to close
+    const p = item(AJ.route().args[0]), n = p.views.length;
+    openSheet(`<button class="ib x" data-act="close" aria-label="Close">${ic('close')}</button><div class="snap" id="lbs">${p.views.map((v, i) => `<div><div style="overflow:hidden"><img class="zoomable" src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"></div><p>${v} · ${i + 1} / ${n}</p></div>`).join('')}</div>
+     <p style="color:var(--mute);text-transform:none;letter-spacing:.3px;font-size:12px">Swipe for more · double-tap to zoom · swipe down to close</p>`, 'lb');
+    const s = $('#lbs'); s.scrollLeft = el.dataset.i * s.clientWidth;
+  },
+  inext() { const s = $('#intro'), i = Math.round(s.scrollLeft / s.clientWidth); i < s.children.length - 1 ? s.scrollTo({left: (i + 1) * s.clientWidth, behavior: 'smooth'}) : go('#/login'); },
+  swtab(el, d) { const L = ['all', 'new', 'pre'], n = L[L.indexOf(tab) + d]; if (!n) return false; tab = n; refresh(); }, // swipe a collection between All / Brand new / Pre-loved
   pick(el) { const {k, v} = el.dataset; D[k] = v; $$(`[data-act=pick][data-k="${k}"]`).forEach(b => b.setAttribute('aria-pressed', b === el)); $(`[data-for="${k}"]`)?.replaceChildren(); },
   tgl(el) { const k = el.dataset.k; D[k] = !D[k]; el.setAttribute('aria-pressed', !!D[k]); },
   slot(el) { const i = +el.dataset.i; W.photos.has(i) ? W.photos.delete(i) : W.photos.add(i); refresh(); $(`.slot[data-i="${i}"]`)?.focus({preventScroll: true}); }
@@ -737,7 +765,7 @@ document.addEventListener('submit', e => {
   if (id === 'loginform') {
     if (!validate(f, {email: emailRule, pw: req('Enter your password.')})) return;
     const n = D.email.split('@')[0].replace(/[._-]+/g, ' ');
-    S.user = {name: n.replace(/\b\w/g, c => c.toUpperCase()), email: D.email.trim(), mobile: ''}; delete D.pw; go('#/home');
+    S.user = {name: n.replace(/\b\w/g, c => c.toUpperCase()), email: D.email.trim(), mobile: ''}; delete D.pw; AJ.skeleton(); go('#/home');
   }
   if (id === 'joinform') {
     if (!validate(f, {name: req('Enter your name.'), email: emailRule, mobile: AJ.mobileRule, pw: [v => v.length >= 8, 'Use at least 8 characters.'], terms: ticked('Please agree to continue.')})) return;
@@ -782,9 +810,15 @@ document.addEventListener('scroll', e => { // gallery dots + counter, and the co
   const i = Math.round(el.scrollLeft / el.clientWidth);
   $$(`#${el.dataset.dots} i`).forEach((d, k) => d.classList.toggle('on', k === i));
   const n = $('#gdn'); if (n) n.textContent = `${i + 1} / ${el.children.length}`;
+  if (el.id === 'intro') $('#inext').textContent = i === el.children.length - 1 ? 'Get started' : 'Next';
 }, true);
+AJ.gestures({ // swipe: back from the left edge, pull down to refresh lists, menu / concierge / sheets drag to close
+  act: (n, el, d) => ACT[n]?.(el, d),
+  edge: () => { const r = AJ.route().name, d = R[r] || R.home; if (d.bare) return ['join', 'forgot'].includes(r) ? () => go('#/login') : null; return !d.top || (depth > 0 && r !== 'home') ? ACT.back : null; },
+  pull: () => ['home', 'collections', 'collection', 'brand', 'saved', 'requests'].includes(AJ.route().name) ? () => refresh() : null
+});
 addEventListener('hashchange', () => render());
-if (!location.hash) history.replaceState(null, '', '#/login');
+if (!location.hash) history.replaceState(null, '', '#/welcome');
 render(false);
 </script>
 </body>

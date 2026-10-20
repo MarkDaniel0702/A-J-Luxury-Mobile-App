@@ -68,6 +68,7 @@ const AJ = (() => {
     doc: '<path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/>',
     image: '<rect x="3" y="5" width="18" height="14"/><circle cx="9" cy="10" r="1.500"/><path d="M21 16l-5-5-8 8"/>',
     swap: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+    refresh: '<path d="M20 12a8 8 0 1 1-2.400-5.700"/><path d="M20 4v5h-5"/>',
     settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>'
   };
   const sprite = '<svg width="0" height="0" style="position:absolute" aria-hidden="true">' + Object.entries(I).map(([k, v]) => `<symbol id="i-${k}" viewBox="0 0 24 24">${v}</symbol>`).join('') + '</svg>';
@@ -254,11 +255,197 @@ const AJ = (() => {
     if (first) (root.querySelector(`[name="${first.dataset?.for ?? ''}"]`) || first).focus?.({preventScroll: true});
     return !first;
   }
-  const SB = '<div class="island"></div><div class="status"><span>9:41</span><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.500" width="3" height="6.500" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg viewBox="0 0 17 12"><path d="M8.500 2.500c2.300 0 4.400.9 6 2.400l1.200-1.300A10.600 10.600 0 0 0 8.500.7 10.600 10.600 0 0 0 1.300 3.600L2.500 4.900a8.800 8.800 0 0 1 6-2.400zm0 3.700c1.300 0 2.500.5 3.400 1.300l1.200-1.300a7.100 7.100 0 0 0-9.200 0l1.200 1.300c.9-.8 2.100-1.300 3.400-1.300zm0 3.600l1.800-1.900a2.600 2.600 0 0 0-3.600 0z"/></svg><svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="22" height="11" rx="3.200" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="19" height="8" rx="2"/><rect x="24" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="homebar"></div>';
+
+  /* ---------- gestures: one recognizer for mouse (pointer events) and touch (touch events).
+     Touch keeps the browser's own scrolling; the mouse gets drag-to-scroll with momentum and snapping, so swiping also works on a desktop.
+     Markup hooks: [data-swipe=act] pages left/right (act gets d: 1 = next, -1 = previous, and returns false at the end of the list),
+     [data-dismiss=act][data-dir=down|left] drags to close, img.zoomable zooms (double-tap or double-click, pinch, ctrl+wheel) and pans when zoomed,
+     [data-nogesture] opts out (a widget with its own drag). Prototype hooks (gestures()): act(name, el, d), edge() -> back function or null,
+     pull() -> refresh function or null. ---------- */
+  let G = null, O = {}, E, P, anim = 0, stop = null, quiet = 0, tap = null;
+  const scr = () => $('.screen');
+  const scale = () => { const s = scr(); return s.getBoundingClientRect().width / s.offsetWidth || 1; };
+  const buzz = () => navigator.vibrate?.(8);
+  const scrolls = (el, ax) => /auto|scroll/.test(getComputedStyle(el)[ax === 'x' ? 'overflowX' : 'overflowY'])
+    && (ax === 'x' ? el.scrollWidth - el.clientWidth : el.scrollHeight - el.clientHeight) > 1;
+  const scroller = (el, ax) => { for (; el && !el.classList.contains('screen'); el = el.parentElement) if (scrolls(el, ax)) return el; return null; };
+  const atTop = (el, lim) => { for (; el; el = el.parentElement) { if (el.scrollTop > 0) return false; if (el === lim) return true; } return true; };
+  function settle(el) { el.style.transition = 'transform .28s cubic-bezier(.2,.8,.2,1),opacity .28s'; el.style.transform = el.style.opacity = ''; setTimeout(() => el.style.transition = '', 300); }
+  function animate(tick, done) { // tick(ms since last frame) -> true while running; a new touch stops it early (done still runs)
+    let last = performance.now();
+    stop = () => { cancelAnimationFrame(anim); stop = null; done(); };
+    const f = now => { const on = tick(now - last); last = now; on ? anim = requestAnimationFrame(f) : stop(); };
+    anim = requestAnimationFrame(f);
+  }
+  const glide = (el, p, to, done) => { const from = el[p]; let t = 0; animate(dt => { t = Math.min(1, t + dt / 320); el[p] = from + (to - from) * (1 - (1 - t) ** 3); return t < 1; }, done); };
+  const coast = (el, p, v, done) => {
+    let pos = el[p]; const max = p === 'scrollTop' ? el.scrollHeight - el.clientHeight : el.scrollWidth - el.clientWidth;
+    animate(dt => { pos = Math.max(0, Math.min(max, pos + v * dt)); v *= .95 ** (dt / 16); el[p] = pos; return Math.abs(v) > .02 && pos > 0 && pos < max; }, done);
+  };
+  const snapPoints = (el, k) => { const r = el.getBoundingClientRect(), pad = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0, max = el.scrollWidth - el.clientWidth;
+    return [...el.children].map(c => Math.max(0, Math.min(max, (c.getBoundingClientRect().left - r.left) / k + el.scrollLeft - pad))); };
+  function setZoom(z, s, x, y) {
+    const mx = z.offsetWidth * (s - 1) / 2, my = z.offsetHeight * (s - 1) / 2;
+    z._z = {s, x: Math.max(-mx, Math.min(mx, x)), y: Math.max(-my, Math.min(my, y))};
+    z.style.transform = s > 1 ? `translate(${z._z.x}px,${z._z.y}px) scale(${s})` : '';
+    z.classList.toggle('zoomed', s > 1);
+  }
+  function zoomAt(z, cx, cy) { // zoom in on the tapped point, or back out
+    const r = z.getBoundingClientRect(), k = scale(), s = z._z?.s > 1 ? 1 : 2.5;
+    z.style.transition = 'transform .3s cubic-bezier(.2,.8,.2,1)';
+    setZoom(z, s, -(cx - r.left - r.width / 2) / k * (s - 1), -(cy - r.top - r.height / 2) / k * (s - 1));
+  }
+  function start(x, y, t, touch) {
+    stop?.();
+    if (!t.closest || t.closest('input,select,textarea,[data-nogesture]')) { G = null; return; }
+    const k = scale(), z = t.closest('.zoomable');
+    G = {x0: x, y0: y, x, y, t, touch, k, h: [[performance.now(), x, y]], edge: (x - scr().getBoundingClientRect().left) / k < 24 && !t.closest('[data-dismiss],.scrim'), z: z?._z?.s > 1 ? z : null};
+  }
+  function grab(el, p) { G.el = el; G.p = p; G.s0 = el[p]; G.snap = getComputedStyle(el).scrollSnapType !== 'none'; el.style.scrollSnapType = 'none'; return 'scroll'; }
+  function decide(dx, dy) { // what this drag is: scroll, swipe, edge (back), dismiss, pull (refresh), pan (zoomed image) or native (leave it to the browser)
+    const t = G.t; let el;
+    G.ax = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    if (G.z) { G.el = G.z; G.zx = G.z._z.x; G.zy = G.z._z.y; G.z.style.transition = 'none'; return 'pan'; }
+    if (G.ax === 'x') {
+      if (G.edge && dx > 0 && (G.fn = O.edge?.())) return 'edge';
+      if ((el = t.closest('[data-dismiss][data-dir=left]')) && dx < 0) { G.el = el; return 'dismiss'; }
+      if ((el = scroller(t, 'x'))) return G.touch && getComputedStyle(el).scrollSnapType === 'none' ? 'native' : grab(el, 'scrollLeft'); // snap carousels are paged here for touch too
+      if ((el = t.closest('[data-swipe]'))) { G.el = el; return 'swipe'; }
+    } else {
+      if ((el = t.closest('[data-dismiss][data-dir=down]')) && dy > 0 && atTop(t, el)) { G.el = el; return 'dismiss'; }
+      if ((el = t.closest('main')) && dy > 0 && el.scrollTop <= 0 && (G.fn = O.pull?.())) {
+        G.el = el; P.style.top = (el.getBoundingClientRect().top - scr().getBoundingClientRect().top) / G.k + 'px'; return 'pull';
+      }
+      if ((el = scroller(t, 'y')) && !G.touch) return grab(el, 'scrollTop');
+    }
+    return 'native';
+  }
+  const STEP = {
+    scroll(dx, dy) { G.el[G.p] = G.s0 - (G.p === 'scrollLeft' ? dx : dy); },
+    pan(dx, dy) { setZoom(G.el, G.el._z.s, G.zx + dx, G.zy + dy); },
+    edge(dx) {
+      const p = Math.min(1, dx / 100);
+      E.style.transition = 'none'; E.style.opacity = p; E.style.transform = `translateX(${p * 60 - 54}px) scale(${.6 + .4 * p})`; E.classList.toggle('go', p >= 1);
+      $('main').style.transform = `translateX(${Math.min(dx, 140) * .15}px)`;
+    },
+    dismiss(dx, dy) { G.el.style.transition = 'none'; G.el.style.transform = G.ax === 'y' ? `translateY(${Math.max(0, dy)}px)` : `translateX(${Math.min(0, dx)}px)`; },
+    swipe(dx) { G.el.style.transition = 'none'; G.el.style.transform = `translateX(${dx * .4}px)`; G.el.style.opacity = 1 - Math.min(.5, Math.abs(dx) / 500); },
+    pull(dx, dy) {
+      const p = Math.min(110, Math.max(0, dy) * .5);
+      P.style.transition = 'none'; P.style.opacity = Math.min(1, p / 50); P.style.transform = `translateY(${p - 30}px) rotate(${p * 4}deg)`; P.classList.toggle('go', p >= 64);
+      G.el.style.transform = `translateY(${p * .6}px)`;
+    }
+  };
+  const END = {
+    scroll(g, dx, dy, vx, vy) {
+      const el = g.el, v = -(g.p === 'scrollLeft' ? vx : vy), done = () => el.style.scrollSnapType = '';
+      if (!g.snap) return coast(el, g.p, v, done);
+      // a flick, or a drag past 20% of the width, turns the page that way; otherwise snap to the nearest card
+      const at = el[g.p], pts = snapPoints(el, g.k), moved = at - g.s0, near = pts.reduce((a, b) => Math.abs(b - at) < Math.abs(a - at) ? b : a, 0);
+      const dir = Math.abs(v) > .25 ? Math.sign(v) : Math.abs(moved) > Math.min(80, el.clientWidth * .2) ? Math.sign(moved) : 0;
+      glide(el, g.p, (dir > 0 ? pts.find(p => p >= at - 1) : dir < 0 ? [...pts].reverse().find(p => p <= at + 1) : near) ?? near, done);
+    },
+    edge(g, dx, dy, vx) {
+      E.style.transition = 'opacity .2s'; E.style.opacity = 0; E.classList.remove('go'); settle($('main'));
+      if (dx > 100 || (vx > .5 && dx > 40)) { buzz(); g.fn(); }
+    },
+    dismiss(g, dx, dy, vx, vy) {
+      const el = g.el, down = g.ax === 'y', dist = down ? dy : -dx, v = down ? vy : -vx;
+      if (dist < (down ? el.offsetHeight : el.offsetWidth) * .3 && !(v > .5 && dist > 30)) return settle(el);
+      buzz(); el.style.transition = 'transform .22s ease-in'; el.style.transform = down ? 'translateY(100%)' : 'translateX(-100%)';
+      setTimeout(() => { O.act(el.dataset.dismiss, el); el.style.transition = el.style.transform = ''; }, 220);
+    },
+    swipe(g, dx, dy, vx) {
+      const el = g.el, d = dx < 0 ? 1 : -1;
+      if (!(Math.abs(dx) > 70 || (Math.abs(vx) > .4 && Math.abs(dx) > 25)) || O.act(el.dataset.swipe, el, d) === false) return settle(el);
+      buzz(); el.style.transform = el.style.opacity = '';
+      $(`[data-swipe="${el.dataset.swipe}"]`)?.animate([{transform: `translateX(${d * 60}px)`, opacity: 0}, {transform: 'none', opacity: 1}], {duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)'});
+    },
+    pull(g) {
+      const m = g.el;
+      if (!P.classList.contains('go')) { P.style.transition = 'opacity .2s'; P.style.opacity = 0; return settle(m); }
+      buzz(); P.classList.add('spin'); P.style.transition = m.style.transition = 'transform .2s'; P.style.transform = 'translateY(14px)'; m.style.transform = 'translateY(56px)'; skeleton(900);
+      setTimeout(() => { g.fn(); P.classList.remove('spin', 'go'); P.style.opacity = 0; settle(m); toast('Up to date'); }, 900);
+    },
+    pan() {},
+    pinch(g) { if (g.el._z.s < 1.1) { g.el.style.transition = 'transform .25s'; setZoom(g.el, 1, 0, 0); } }
+  };
+  function move(x, y, e) {
+    if (!G || G.mode === 'pinch') return;
+    const now = performance.now(), dx = (x - G.x0) / G.k, dy = (y - G.y0) / G.k;
+    G.x = x; G.y = y; G.h.push([now, x, y]); while (G.h.length > 2 && now - G.h[0][0] > 100) G.h.shift();
+    if (!G.mode) {
+      if (Math.hypot(dx, dy) < 6) return;
+      G.mode = decide(dx, dy);
+      if (G.mode === 'native') { G = null; return; }
+      if (!G.touch) { scr().classList.add('dragging'); getSelection()?.removeAllRanges(); }
+    }
+    if (e.cancelable) e.preventDefault();
+    STEP[G.mode](dx, dy);
+  }
+  function end() {
+    const g = G; G = null; if (!g) return;
+    scr().classList.remove('dragging');
+    if (g.mode === 'pinch') return END.pinch(g);
+    const now = performance.now(); while (g.h.length > 1 && now - g.h[0][0] > 100) g.h.shift();
+    const dt = Math.max(16, now - g.h[0][0]), vx = (g.x - g.h[0][1]) / g.k / dt, vy = (g.y - g.h[0][2]) / g.k / dt;
+    if (!g.mode) { // a tap: two quick taps on a zoomable image zoom it
+      const z = g.t.closest('.zoomable');
+      if (z && tap && now - tap.t < 320 && Math.hypot(g.x - tap.x, g.y - tap.y) < 30) { tap = null; return zoomAt(z, g.x, g.y); }
+      tap = {t: now, x: g.x, y: g.y}; return;
+    }
+    if (!g.touch) quiet = now + 400; // swallow the click that follows a mouse drag
+    END[g.mode](g, (g.x - g.x0) / g.k, (g.y - g.y0) / g.k, vx, vy);
+  }
+  const span = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  function pinch(e) {
+    const z = e.target.closest?.('.zoomable'); if (!z || e.touches.length !== 2) { G = null; return; }
+    z.style.transition = 'none'; G = {mode: 'pinch', el: z, d0: span(e.touches), c: z._z || {s: 1, x: 0, y: 0}};
+  }
+  function zoomBy(z, c, s) { s = Math.max(1, Math.min(4, s)); setZoom(z, s, c.x * s / c.s, c.y * s / c.s); }
+  function gestures(o) {
+    O = o; const s = scr();
+    addEventListener('hashchange', () => stop?.()); // momentum never carries over to the next screen
+    s.insertAdjacentHTML('beforeend', `<div class="g-edge" aria-hidden="true">${ic('back')}</div><div class="g-pull" aria-hidden="true">${ic('refresh')}</div>`);
+    E = $('.g-edge', s); P = $('.g-pull', s);
+    const mv = e => move(e.clientX, e.clientY, e);
+    const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); end(); };
+    s.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button) return;
+      start(e.clientX, e.clientY, e.target, false);
+      if (G) { addEventListener('pointermove', mv); addEventListener('pointerup', up); addEventListener('pointercancel', up); }
+    });
+    s.addEventListener('touchstart', e => { const t = e.touches; t.length === 1 ? start(t[0].clientX, t[0].clientY, e.target, true) : pinch(e); }, {passive: true});
+    s.addEventListener('touchmove', e => {
+      const t = e.touches;
+      if (G?.mode === 'pinch') { if (t.length > 1) { e.preventDefault(); zoomBy(G.el, G.c, G.c.s * span(t) / G.d0); } return; }
+      if (t.length === 1) move(t[0].clientX, t[0].clientY, e);
+    }, {passive: false});
+    s.addEventListener('touchend', e => { if (!e.touches.length) end(); });
+    s.addEventListener('touchcancel', end);
+    s.addEventListener('click', e => { if (performance.now() < quiet) { e.preventDefault(); e.stopPropagation(); quiet = 0; } }, true);
+    s.addEventListener('dragstart', e => e.preventDefault()); // no ghost-image drag of pictures and links
+    s.addEventListener('wheel', e => { // trackpad pinch / ctrl+wheel zoom on a zoomable image
+      const z = e.ctrlKey && e.target.closest?.('.zoomable'); if (!z) return;
+      e.preventDefault(); z.style.transition = 'none'; const c = z._z || {s: 1, x: 0, y: 0}; zoomBy(z, c, c.s * Math.exp(-e.deltaY / 200));
+    }, {passive: false});
+  }
+  function skeleton(ms = 700) { const s = scr(); s.classList.add('sk'); clearTimeout(skeleton.t); skeleton.t = setTimeout(() => s.classList.remove('sk'), ms); }
+  const pop = el => el?.animate([{transform: 'scale(1)'}, {transform: 'scale(1.35)'}, {transform: 'scale(1)'}], {duration: 380, easing: 'ease-out'});
+  function center(el) { // scroll a chip row so the given chip sits in the middle
+    if (!el) return; const r = el.parentElement, a = r.getBoundingClientRect(), b = el.getBoundingClientRect();
+    r.scrollTo({left: r.scrollLeft + (b.left - a.left - (a.width - b.width) / 2) / scale(), behavior: 'smooth'});
+  }
+  // first-run intro slides; each prototype draws them in its own style
+  const INTRO = [['Luxury, checked and graded', 'Pre-loved and brand-new pieces. Every listing shows its condition, inclusions and flaws.', 'bags'],
+    ['Consign with ease', 'Send photos and details, hand the piece over, and get paid after it sells.', 'watches'],
+    ['Help when you need it', 'Ask the FAQ assistant about buying, shipping, payment or consigning.', 'jewelry']];
+
+  const SB ='<div class="island"></div><div class="status"><span>9:41</span><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.500" width="3" height="6.500" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg viewBox="0 0 17 12"><path d="M8.500 2.500c2.300 0 4.400.9 6 2.400l1.200-1.300A10.600 10.600 0 0 0 8.500.7 10.600 10.600 0 0 0 1.300 3.600L2.500 4.900a8.800 8.800 0 0 1 6-2.400zm0 3.700c1.300 0 2.500.5 3.400 1.300l1.200-1.300a7.100 7.100 0 0 0-9.200 0l1.200 1.300c.9-.8 2.100-1.300 3.400-1.300zm0 3.600l1.800-1.900a2.600 2.600 0 0 0-3.600 0z"/></svg><svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="22" height="11" rx="3.200" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="19" height="8" rx="2"/><rect x="24" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="homebar"></div>';
   document.body.insertAdjacentHTML('afterbegin', sprite);
   $$('.screen').forEach(s => s.insertAdjacentHTML('afterbegin', SB));
   fit();
 
   return {$, $$, esc, peso, fmtDate, isEmail, isMobile, ref, S, isGuest, D, req, ticked, mobileRule, emailRule, validate, fld, sel, chk, ic, CATS, catName, ITEMS, BRANDS, item, pic, art, PHOTO_SLOTS,
-    FAQ, faq, CHIPS, GREETING, reply, paras, info, CONTACT, toast, route};
+    FAQ, faq, CHIPS, GREETING, reply, paras, info, CONTACT, toast, route, gestures, skeleton, pop, center, INTRO};
 })();
