@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en-PH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0c">
+<title>A&amp;J Luxury · Prototype 3 · Noir Salon</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="../shared/phone.css">
+<style>
+/* Prototype 3 "Noir Salon": dark, champagne gold, serif display type, editorial one-column layout.
+   Navigation is a slide-out drawer (no tab bar) plus a floating Concierge chat button on every screen.
+   Own features: Collections, Brand directory, showroom Viewing booking, Authenticity guide, one-page appraisal request, Saved pieces, Requests inbox.
+   No A&J website images, logo or text assets. Pictures are generated placeholders (shared/core.js). */
+:root{color-scheme:dark;--bg:#0b0b0c;--bg2:#131315;--bg3:#1c1c1f;--ink:#efe8da;--mute:#a39d90;--gold:#c9a96a;--gold2:#e6d09f;--line:rgba(201,169,106,.24);--err:#ee8a79;--sw:1.1;
+ --disp:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;--ui:"Hanken Grotesk","Avenir Next","Segoe UI",system-ui,sans-serif;
+ --stage:radial-gradient(circle at 50% 38%,#26221b 0,#0a0a0a 64%);--bg:#0b0b0c;--sbc:#efe8da;--hbc:#efe8da;--capc:#867f71;--capb:#e2d7bd}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{font:300 15px/1.55 var(--ui);color:var(--ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+i{font-style:italic}
+:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+.i{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;flex:none}
+.i.s{width:17px;height:17px}
+
+#app{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat);background:var(--bg);overflow:hidden}
+#app::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.09;mix-blend-mode:overlay;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main{position:relative;flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+main::-webkit-scrollbar{display:none}
+main:focus-visible{outline:0}
+main>*{animation:up .55s cubic-bezier(.2,.7,.2,1) both}
+main.still>*{animation:none}
+main>:nth-child(2){animation-delay:.07s}main>:nth-child(3){animation-delay:.14s}main>:nth-child(4){animation-delay:.21s}main>:nth-child(n+5){animation-delay:.28s}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.lat{background:repeating-linear-gradient(45deg,transparent 0 11px,rgba(201,169,106,.06) 11px 12px),repeating-linear-gradient(-45deg,transparent 0 11px,rgba(201,169,106,.06) 11px 12px)}
+.eyebrow{font:500 11px/1.3 var(--ui);letter-spacing:3.4px;text-transform:uppercase;color:var(--gold)}
+.h1{font:500 42px/1.02 var(--disp);letter-spacing:-.3px}
+.h2{font:500 31px/1.08 var(--disp)}
+.h1 i,.h2 i,.disp i{color:var(--gold2)}
+.dm{display:inline-block;width:7px;height:7px;border:1px solid var(--gold);transform:rotate(45deg);flex:none}
+.orn{display:flex;align-items:center;gap:12px;margin:0 24px}
+.orn::before,.orn::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* bars */
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:56px;border-bottom:1px solid var(--line);background:var(--bg);position:relative;z-index:3}
+.top.bare{display:none}
+.top .l,.top .r{display:flex;align-items:center}
+.top .r{justify-content:flex-end}
+.wm{font:500 26px/1 var(--disp);letter-spacing:8px;padding-left:8px}
+.tt{font:500 12px/1 var(--ui);letter-spacing:3.2px;text-transform:uppercase;max-width:176px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{position:relative;width:46px;height:48px;margin:0 2px;display:grid;place-items:center;background:none;border:0;color:var(--ink);cursor:pointer}
+.ib:active{color:var(--gold)}
+.dot{position:absolute;top:6px;right:4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--gold);color:#000;font:600 10px/16px var(--ui);text-align:center}
+#gb{display:flex;align-items:center;justify-content:center;gap:10px;padding:4px 16px;border-bottom:1px solid var(--line);font:400 11px var(--ui);letter-spacing:1.6px;text-transform:uppercase;color:var(--mute);position:relative;z-index:3}
+#gb button{background:none;border:0;color:var(--gold);letter-spacing:1.6px;text-transform:uppercase;font:500 11px var(--ui);text-decoration:underline;cursor:pointer;min-height:32px}
+.dock{position:relative;z-index:3;display:flex;gap:8px;align-items:center;padding:10px 14px calc(10px + var(--sab));background:var(--bg2);border-top:1px solid var(--line)}
+.dock .btn{flex:1;padding:0 6px}
+.fab{position:absolute;right:16px;bottom:calc(var(--sab) + 14px);z-index:30;width:56px;height:56px;border-radius:50%;background:var(--bg);color:var(--gold);border:1px solid var(--gold);cursor:pointer;display:grid;place-items:center;box-shadow:0 10px 30px #000a;transition:bottom .25s}
+.fab::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--gold);opacity:0;animation:ring 3.2s ease-out infinite}
+@keyframes ring{0%{opacity:.5;transform:scale(.9)}100%{opacity:0;transform:scale(1.35)}}
+.fab.lift{bottom:calc(var(--sab) + 82px)}
+
+/* buttons + forms */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 24px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font:500 12px var(--ui);letter-spacing:2.6px;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
+.btn:hover{background:#c9a96a22}
+.btn.f{background:var(--gold);color:#0b0b0c}
+.btn.f:hover{background:var(--gold2)}
+.btn.blk{display:flex;width:100%}
+.btn.sm{min-height:40px;padding:0 16px;font-size:11px}
+.btn[disabled]{opacity:.4}
+.lnk{background:none;border:0;color:var(--gold2);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.fld{display:block;margin-bottom:18px;position:relative}
+.fld>span{display:block;font:500 11px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--mute)}
+input[type=email],input[type=password],input[type=search],input[type=text],input[type=tel],select,textarea{width:100%;min-height:46px;padding:10px 0;border:0;border-bottom:1px solid #efe8da4d;border-radius:0;background:transparent;font-size:17px;font-family:var(--ui);font-weight:300;color:var(--ink)}
+input::placeholder,textarea::placeholder{color:#efe8da55}
+input:focus,select:focus,textarea:focus{outline:0;border-bottom-color:var(--gold)}
+select option{background:#131315}
+textarea{min-height:76px;resize:none}
+[aria-invalid=true]{border-bottom-color:var(--err)!important}
+.err{display:block;font-size:12px;color:var(--err);margin-top:3px}
+.err:empty{display:none}
+.eye{position:absolute;right:0;bottom:2px;width:44px;height:44px;display:grid;place-items:center;border:0;background:none;color:var(--mute);cursor:pointer}
+.chk{display:flex;gap:12px;align-items:flex-start;padding:6px 0;font-size:14px;color:var(--ink)}
+.chk input{appearance:none;flex:none;width:22px;height:22px;margin-top:1px;border:1px solid var(--gold);background:transparent;cursor:pointer;display:grid;place-items:center}
+.chk input:checked{background:var(--gold)}
+.chk input:checked::after{content:"";width:6px;height:11px;border:solid #000;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.chip{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border:1px solid var(--line);background:transparent;color:var(--ink);font:400 12px var(--ui);letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed=true],.chip[aria-current]{background:var(--gold);border-color:var(--gold);color:#000;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 18px}
+.lab{display:block;font:500 11px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--mute);margin-top:6px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);margin:8px 0 18px}
+.seg .chip{border:0;justify-content:center;padding:0 6px;min-height:46px}
+.sw{position:relative;width:46px;height:26px;flex:none}
+.sw input{appearance:none;width:46px;height:26px;border:1px solid var(--gold);background:transparent;border-radius:13px;cursor:pointer}
+.sw input:checked{background:var(--gold)}
+.sw::after{content:"";position:absolute;left:4px;top:4px;width:16px;height:16px;border-radius:50%;background:var(--gold);transition:transform .2s;pointer-events:none}
+.sw:has(input:checked)::after{transform:translateX(20px);background:#000}
+
+/* login */
+.login{position:relative;min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:calc(var(--sat) + 8px) 28px 28px}
+.login .glow{position:absolute;left:50%;top:-80px;width:420px;height:420px;margin-left:-210px;background:radial-gradient(closest-side,#c9a96a40,transparent);pointer-events:none}
+.login>*{position:relative}
+.logo{font:500 84px/1 var(--disp);letter-spacing:12px;padding-left:12px;text-align:center;margin:10px 0 0;text-shadow:0 0 40px #c9a96a40}
+.logo+p{text-align:center;font:italic 400 21px var(--disp);color:var(--gold2);margin:4px 0 32px}
+.login .eyebrow{text-align:center}
+.or{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--mute);font:400 11px var(--ui);letter-spacing:3px;text-transform:uppercase}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.fine{margin-top:16px;text-align:center;font-size:13px;color:var(--mute)}
+.fine a{color:var(--gold2);text-decoration:underline;text-underline-offset:3px}
+.formpage{padding:24px}
+.back{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--gold2);font:500 11px var(--ui);letter-spacing:2.4px;text-transform:uppercase}
+
+/* home */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero img{width:100%;height:330px;object-fit:cover;object-position:50% 38%;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+.hero .ht{position:relative;margin:-56px 24px 0;padding-bottom:30px}
+.hero p{margin:10px 0 18px;color:var(--ink);opacity:.8}
+.rowb{display:flex;gap:10px}
+.rowb .btn{flex:1;padding:0 10px}
+.sec{display:flex;justify-content:space-between;align-items:flex-end;padding:38px 24px 14px}
+.sec a{font:500 11px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold2);border-bottom:1px solid var(--gold);padding-bottom:2px}
+.cols{gap:12px;padding:0 24px 4px;scroll-padding-left:24px}
+.col{position:relative;width:214px;height:292px;overflow:hidden;border:1px solid var(--line)}
+.col img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.col::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0000 40%,#000c)}
+.col div{position:absolute;left:16px;right:16px;bottom:14px;z-index:1}
+.col small{font:500 10px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold)}
+.col b{display:block;font:italic 500 26px/1.05 var(--disp);color:var(--ink)}
+.stag{display:grid;grid-template-columns:1fr 1fr;gap:20px 14px;padding:0 24px 40px}
+.stag>:nth-child(even){transform:translateY(34px)}
+.mini{position:relative;display:block;min-width:0}
+.mini img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--line)}
+.mini .b{margin-top:8px;font:500 10px var(--ui);letter-spacing:2.2px;text-transform:uppercase;color:var(--gold)}
+.mini .t{font:500 17px/1.2 var(--disp);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mini .pr{font:400 14px var(--ui);color:var(--mute)}
+.brands{padding:0 24px;font:italic 400 30px/1.5 var(--disp)}
+.brands a{color:var(--ink)}
+.brands a:hover{color:var(--gold2)}
+.brands .dm{margin:0 12px 4px}
+.band{position:relative;margin:40px 0 0;padding:44px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background-color:var(--bg2);overflow:hidden}
+.band p{margin:10px 0 20px;color:var(--mute)}
+.std{display:grid;gap:0;padding:0 24px}
+.std a{display:flex;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.std .i{color:var(--gold);width:28px;height:28px}
+.std b{display:block;font:500 20px var(--disp)}
+.std small{color:var(--mute);font-size:13px;line-height:1.35;display:block}
+.foot{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;padding:36px 24px 12px;font:400 11px var(--ui);letter-spacing:2.2px;text-transform:uppercase}
+.foot a{color:var(--mute)}
+.note{margin:16px 24px 28px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--mute);text-align:center}
+
+/* collections, lists */
+.chead{padding:30px 24px 8px}
+.chead p{margin-top:8px;color:var(--mute)}
+.crow{position:relative;display:block;height:150px;margin:0 24px 14px;overflow:hidden;border:1px solid var(--line)}
+.crow{background:var(--bg2)}
+.crow img{position:absolute;top:0;bottom:0;right:0;width:54%;height:100%;object-fit:cover}
+.crow::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--bg2) 42%,#0000 64%)}
+.crow div{position:absolute;left:18px;top:50%;transform:translateY(-50%);z-index:1;max-width:52%}
+.crow b{display:block;font:italic 500 28px/1.05 var(--disp)}
+.crow small{display:block;color:var(--mute);font-size:12px;line-height:1.35;margin-top:4px}
+.bar{display:flex;gap:8px;align-items:center;padding:6px 24px 4px;overflow-x:auto;scrollbar-width:none}
+.bar select{width:auto;min-width:120px;font-size:13px;letter-spacing:1px;text-transform:uppercase}
+.cnt{padding:12px 24px 0;color:var(--mute);font-size:13px}
+.plist{display:grid;gap:30px;padding:18px 24px 30px}
+.pc{position:relative}
+.pc img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--line)}
+.pc .meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:10px}
+.pc .b{font:500 10px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold)}
+.pc .t{font:500 23px/1.12 var(--disp);margin-top:2px}
+.pc .pr{font:500 22px var(--disp);white-space:nowrap}
+.pc .cd{margin-top:4px;color:var(--mute);font-size:13px}
+.heart{position:absolute;top:8px;right:8px;width:44px;height:44px;display:grid;place-items:center;border:0;background:#0b0b0c99;color:var(--ink);border-radius:50%;cursor:pointer;backdrop-filter:blur(4px)}
+.heart.on{color:var(--gold)}.heart.on .i{fill:currentColor}
+.badge{position:absolute;left:0;top:14px;padding:3px 12px;background:var(--gold);color:#000;font:600 10px var(--ui);letter-spacing:2px;text-transform:uppercase}
+.empty{padding:56px 28px;text-align:center;color:var(--mute)}
+.empty .i{width:38px;height:38px;color:var(--gold);margin:0 auto 14px;stroke-width:.9}
+.empty .btn{margin-top:18px}
+.az{padding:0 24px}
+.az h3{font:500 13px var(--ui);letter-spacing:3px;color:var(--gold);padding:22px 0 6px;border-bottom:1px solid var(--line)}
+.az a{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid #efe8da14;font:500 24px var(--disp)}
+.az small{color:var(--mute);font:300 12px var(--ui)}
+
+/* product */
+.gal{position:relative;border-bottom:1px solid var(--line)}
+.gal .snap>*{width:100%}
+.snap{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.snap::-webkit-scrollbar{display:none}
+.snap>*{flex:none;scroll-snap-align:start}
+.gal img{width:100%;aspect-ratio:1;object-fit:cover;cursor:zoom-in}
+.gcount{position:absolute;left:14px;top:12px;padding:3px 10px;background:#0b0b0cc0;font:500 11px var(--ui);letter-spacing:2px;color:var(--gold2)}
+.dots{display:flex;justify-content:center;gap:8px;padding:12px}
+.dots i{width:7px;height:7px;border:1px solid var(--gold);transform:rotate(45deg)}
+.dots i.on{background:var(--gold)}
+.pinfo{padding:6px 24px 8px}
+.pinfo .h2{margin:4px 0 8px}
+.ppr{font:500 28px var(--disp);color:var(--gold2)}
+.check{margin:20px 24px;padding:18px;border:1px solid var(--line);background:var(--bg2)}
+.check h3{font:500 11px var(--ui);letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:0 18px}
+.kv dt,.kv dd{padding:9px 0;border-bottom:1px solid #efe8da14}
+.kv dt{color:var(--mute);font-size:13px}
+.kv dd{text-align:right}
+.kv.free{margin:0 24px}
+details{border-top:1px solid var(--line);margin:0 24px}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{display:flex;justify-content:space-between;align-items:center;min-height:56px;font:500 21px var(--disp);cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+details[open] summary .i{transform:rotate(180deg)}
+.dbody{padding:0 0 18px;color:var(--mute)}
+.dbody p+p{margin-top:8px}
+.dbody a{color:var(--gold2);text-decoration:underline;text-underline-offset:3px}
+.row{display:flex;gap:14px;overflow-x:auto;padding:0 24px 6px;scrollbar-width:none}
+.row .mini{flex:0 0 150px}
+
+/* chat concierge */
+.csheet{position:absolute;inset:0;z-index:60;display:flex;align-items:flex-end}
+.csheet .scrim{position:absolute;inset:0;background:#000b;animation:fade .25s both}
+.cpanel{position:relative;width:100%;height:84%;display:flex;flex-direction:column;background:var(--bg2);border-top:1px solid var(--gold);animation:slide .35s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fade{from{opacity:0}}
+@keyframes slide{from{transform:translateY(100%)}}
+.cpanel header{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px 22px;border-bottom:1px solid var(--line)}
+.cpanel header small{display:block;font:500 10px var(--ui);letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+.cpanel header b{font:italic 500 24px/1 var(--disp)}
+.clog{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;scrollbar-width:none}
+.m{max-width:88%;padding:12px 15px;white-space:pre-line;line-height:1.5;font-size:15px}
+.m.bot{align-self:flex-start;background:var(--bg3);border-left:2px solid var(--gold)}
+.m.me{align-self:flex-end;background:var(--gold);color:#000}
+.m small{display:block;margin-top:8px;color:var(--mute);font-size:11px;line-height:1.3;white-space:normal}
+.m .btn{margin-top:12px;white-space:normal;text-align:center}
+.typing i{display:inline-block;width:6px;height:6px;margin:0 3px;background:var(--gold);transform:rotate(45deg);animation:b 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.qs{display:flex;gap:8px;overflow-x:auto;padding:4px 20px 10px;scrollbar-width:none}
+.qs .chip{min-height:36px;font-size:11px}
+.send{display:flex;gap:10px;padding:10px 16px calc(12px + var(--sab));border-top:1px solid var(--line);align-items:flex-end}
+.send input{flex:1;border-bottom-color:var(--line);padding:8px 0}
+.send .btn{width:50px;padding:0;min-height:46px}
+
+/* drawer */
+.drawer{position:absolute;inset:0;z-index:70;visibility:hidden;transition:visibility 0s .35s}
+.drawer.on{visibility:visible;transition:none}
+.drawer .scrim{position:absolute;inset:0;background:#000c;opacity:0;transition:opacity .3s}
+.drawer.on .scrim{opacity:1}
+.dp{position:absolute;left:0;top:0;bottom:0;width:86%;display:flex;flex-direction:column;background:var(--bg2);border-right:1px solid var(--gold);padding:calc(var(--sat) + 10px) 26px calc(var(--sab) + 18px);overflow-y:auto;scrollbar-width:none;transform:translateX(-103%);transition:transform .38s cubic-bezier(.2,.8,.2,1)}
+.drawer.on .dp{transform:none}
+.dp .dh{display:flex;justify-content:space-between;align-items:center;margin:0 -12px 6px 0}
+.dp .who{padding:4px 0 12px;border-bottom:1px solid var(--line)}
+.dp .who b{display:block;font:italic 500 26px/1.1 var(--disp)}
+.dl{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;border-bottom:1px solid #efe8da14;font:500 27px/1.15 var(--disp)}
+.dl small{font:500 11px var(--ui);color:var(--gold);letter-spacing:1px}
+.dl[aria-current]{color:var(--gold2);font-style:italic}
+.dsub{display:flex;flex-wrap:wrap;gap:6px 18px;padding:18px 0 14px;font:500 11px var(--ui);letter-spacing:2.2px;text-transform:uppercase;color:var(--mute)}
+.dp .btn{margin-top:auto}
+
+/* sheet + toast */
+.sheet{position:absolute;inset:0;z-index:80;display:flex;align-items:flex-end}
+.scrim{position:absolute;inset:0;background:#000b}
+.panel{position:relative;width:100%;max-height:90%;overflow-y:auto;padding:28px 24px calc(22px + var(--sab));background:var(--bg2);border-top:1px solid var(--gold);display:grid;gap:10px;animation:slide .3s both}
+.panel h2{font:500 28px/1.1 var(--disp)}
+.panel p{color:var(--mute);margin-bottom:6px}
+.panel.lb{height:100%;max-height:none;border:0;background:#000;padding:var(--sat) 0 var(--sab);align-content:center}
+.lb .x{position:absolute;top:calc(var(--sat) + 4px);right:8px;z-index:2}
+.lb img{width:100%;aspect-ratio:1;object-fit:cover}
+.lb p{text-align:center;font:500 11px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold)}
+.toast{position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 92px);z-index:90;padding:13px 18px;background:var(--gold);color:#000;font:500 13px var(--ui);letter-spacing:.6px;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.on{opacity:1}
+
+/* requests, timelines, days */
+.req{display:block;padding:16px 24px;border-bottom:1px solid var(--line)}
+.req small{font:500 10px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold)}
+.req b{display:block;font:500 22px/1.15 var(--disp)}
+.req .sub{color:var(--mute);font-size:13px}
+.pill{display:inline-block;margin-top:6px;padding:1px 12px;border:1px solid var(--gold);font:500 10px/18px var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--gold2)}
+.tl{list-style:none;padding:6px 0 0 4px}
+.tl li{position:relative;padding:0 0 20px 32px;color:var(--mute)}
+.tl li::before{content:"";position:absolute;left:0;top:6px;width:9px;height:9px;border:1px solid var(--gold);transform:rotate(45deg);background:var(--bg)}
+.tl li::after{content:"";position:absolute;left:4px;top:20px;bottom:-4px;width:1px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl li.on{color:var(--ink)}
+.tl li.on::before{background:var(--gold)}
+.ok{text-align:center;padding:34px 24px 10px}
+.ok .dmb{width:62px;height:62px;margin:0 auto 18px;border:1px solid var(--gold);transform:rotate(45deg);display:grid;place-items:center}
+.ok .dmb .i{transform:rotate(-45deg);color:var(--gold)}
+.ok p{color:var(--mute);margin-top:6px}
+.pad{padding:20px 24px}
+.days{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:6px -24px 8px;padding-left:24px;padding-right:24px;scrollbar-width:none}
+.day{flex:none;width:64px;padding:10px 0;border:1px solid var(--line);background:transparent;text-align:center;cursor:pointer}
+.day small{display:block;font:500 10px var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
+.day b{display:block;font:500 26px/1.1 var(--disp)}
+.day[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#000}
+.day[aria-pressed=true] small{color:#000}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.slot{position:relative;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px dashed #c9a96a88;background:transparent;color:var(--mute);font:400 12px var(--ui);letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;overflow:hidden}
+.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slot em{position:absolute;left:0;right:0;bottom:0;padding:3px;background:#000b;font-style:normal;color:var(--gold2);text-align:center}
+.slot.on{border-style:solid;border-color:var(--gold)}
+.slot b{font-weight:500;color:var(--gold);font-size:10px}
+.num{font:italic 500 44px/1 var(--disp);color:var(--gold);width:46px;flex:none}
+.jstep{display:flex;gap:14px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.jstep b{display:block;font:500 21px/1.2 var(--disp)}
+.jstep span{color:var(--mute);font-size:14px}
+.info{padding:8px 24px 28px}
+.info h3{font:500 11px var(--ui);letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:22px 0 6px}
+.info p{margin-top:10px;color:#efe8dacc}
+.info ul{margin:8px 0 0 20px;color:#efe8dacc}
+.info a{color:var(--gold2);text-decoration:underline;text-underline-offset:3px}
+.pend{padding:11px 14px;border:1px solid var(--line);background:var(--bg2);color:var(--mute)!important;font-size:12px}
+.gate{padding:70px 28px;text-align:center}
+.gate .i{width:36px;height:36px;color:var(--gold);stroke-width:.9}
+.gate h1{font:500 30px/1.1 var(--disp);margin:14px 0 8px}
+.gate p{color:var(--mute);margin-bottom:22px}
+.gate .btn{margin-top:10px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="stage">
+ <div class="phone">
+  <div class="screen" id="screen">
+   <div id="app">
+    <header class="top" id="top"></header>
+    <div id="gb" hidden><span>Guest · view only</span><button data-act="login">Log in</button></div>
+    <main id="main" tabindex="-1"></main>
+    <div class="dock" id="dock" hidden></div>
+    <button class="fab" id="fab" data-act="concierge" aria-label="Open the concierge chat" hidden><svg class="i"><use href="#i-chat"/></svg></button>
+    <div class="drawer" id="drawer" aria-hidden="true"><div class="scrim" data-act="dclose"></div><nav class="dp" id="dp" aria-label="Main menu"></nav></div>
+    <div class="csheet" id="cs" hidden><div class="scrim" data-act="cclose"></div>
+     <section class="cpanel" role="dialog" aria-modal="true" aria-label="Concierge chat">
+      <header><div><small>Concierge</small><b>FAQ assistant</b></div><button class="ib" data-act="cclose" aria-label="Close chat"><svg class="i"><use href="#i-close"/></svg></button></header>
+      <div class="clog" id="log" aria-live="polite"></div>
+      <div class="qs" id="qs"></div>
+      <form class="send" id="chatform"><input type="text" id="msg" placeholder="Ask a question…" aria-label="Message" autocomplete="off"><button class="btn f" aria-label="Send"><svg class="i"><use href="#i-send"/></svg></button></form>
+     </section></div>
+    <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+   </div>
+  </div>
+ </div>
+ <div class="cap"><b>Prototype 3 · Noir Salon</b>Log in with any email and password, or browse as a guest. Nothing is sent or saved.</div>
+</div>
+
+<script src="../shared/core.js"></script>
+<script>
+const {$, $$, esc, peso, ic, S, ITEMS, CATS, BRANDS, isGuest, toast, pic, item, catName, D, req, ticked, mobileRule, emailRule, validate, fld, sel, chk} = AJ;
+const art = (p, v, cap) => pic(p, 'noir', v, cap);
+const COL = {bags: ['The Bag Edit', 'Top-handles, totes and chain bags'], watches: ['Timepieces', 'Steel, gold-tone and automatics'], jewelry: ['Jewelry', 'Rings, pearls and chains'],
+  shoes: ['Footwear', 'Flats, pumps, loafers and sneakers'], wallets: ['Small Leather Goods', 'Wallets, card holders and chains'], accessories: ['Finishing Touches', 'Scarves, shawls, belts and eyewear']};
+const colOf = c => c === 'all' ? ['All pieces', 'Every piece currently listed'] : COL[c];
+const enc = encodeURIComponent;
+let sort = 'featured', tab = 'all', bsel = 'all', sq = '';
+let W = {photos: new Set()};
+S.msgs.push({who: 'bot', text: AJ.GREETING});
+const MEMBER = 'saved inquire viewing requests request consignform settings'.split(' ');
+const count = c => ITEMS.filter(p => p.cat === c).length;
+
+/* ---------- pieces ---------- */
+const heartBtn = id => `<button class="heart ${S.wish.has(id) ? 'on' : ''}" data-act="wish" data-id="${id}" aria-pressed="${S.wish.has(id)}" aria-label="Save piece">${ic('heart')}</button>`;
+const pcard = p => `<article class="pc"><a href="#/p/${p.id}"><img loading="lazy" src="${art(p)}" alt="${esc(p.title)} (placeholder image)">${p.isNew ? '<span class="badge">New</span>' : ''}
+  <div class="meta"><div><div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div></div><div class="pr">${peso(p.price)}</div></div>
+  <div class="cd">${p.isNew ? 'Brand new' : 'Pre-loved · ' + esc(p.rank)} · ${esc(p.inc)}</div></a>${heartBtn(p.id)}</article>`;
+const mini = p => `<a class="mini" href="#/p/${p.id}"><img loading="lazy" src="${art(p, 'Front', false)}" alt="${esc(p.title)} (placeholder image)"><div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div><div class="pr">${peso(p.price)}</div></a>`;
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const pick = (k, v, label) => `<button type="button" class="chip" data-act="pick" data-k="${k}" data-v="${esc(v)}" aria-pressed="${D[k] === v}">${label ?? esc(v)}</button>`;
+const tgl = (k, label) => `<button type="button" class="chip" data-act="tgl" data-k="${k}" aria-pressed="${!!D[k]}">${label}</button>`;
+
+/* ---------- overlays ---------- */
+function openSheet(html, cls = '') { $('#panel').className = 'panel ' + cls; $('#panel').innerHTML = html; $('#sheet').hidden = false; $('#panel').querySelector('button,a')?.focus({preventScroll: true}); }
+const closeSheet = () => $('#sheet').hidden = true;
+function gate(what) {
+  if (!isGuest()) return false;
+  openSheet(`<h2>Log in to ${esc(what)}</h2><p>Guest mode is view only. Log in or create an account to continue.</p><button class="btn f blk" data-act="login">Log in</button><button class="btn blk" data-act="close">Keep browsing</button>`);
+  return true;
+}
+const gateView = what => `<div class="gate">${ic('lock')}<h1>Log in to ${esc(what)}</h1><p>You’re browsing as a guest. Guests can browse, search, read the guides and use the concierge.</p>
+  <button class="btn f" data-act="login">Log in</button><br><a class="lnk" href="#/home">Keep browsing</a></div>`;
+const drawer = on => { $('#drawer').classList.toggle('on', on); $('#drawer').setAttribute('aria-hidden', !on); };
+function buildDrawer() {
+  const u = S.user, here = AJ.route().name;
+  const L = (h, t, n, small = '') => `<a class="dl" href="#/${h}" ${here === n ? 'aria-current="page"' : ''}>${t}${small ? `<small>${small}</small>` : ''}</a>`;
+  $('#dp').innerHTML = `<div class="dh"><span class="eyebrow">A&amp;J Luxury</span><button class="ib" data-act="dclose" aria-label="Close menu">${ic('close')}</button></div>
+   <div class="who"><small class="lab" style="margin:0 0 2px">${isGuest() ? 'Browsing as' : 'Signed in'}</small><b>${u ? (isGuest() ? 'Guest' : esc(u.name)) : ''}</b></div>
+   ${L('home', 'Home', 'home')}${L('collections', 'Collections', 'collections')}${L('brands', 'Brands', 'brands')}${L('consign', 'Consign with us', 'consign')}${L('viewing', 'Book a viewing', 'viewing')}${L('authenticity', 'Authenticity', 'authenticity')}
+   ${L('saved', 'Saved', 'saved', S.wish.size || '')}${L('requests', 'My requests', 'requests', S.req.length || '')}
+   <div class="dsub"><a href="#/faqs">FAQs</a><a href="#/contact">Contact</a><a href="#/settings">Profile</a><a href="#/info/terms">Terms</a><a href="#/info/privacy">Privacy</a></div>
+   <button class="btn blk" data-act="${isGuest() ? 'login' : 'logout'}">${isGuest() ? 'Log in' : 'Log out'}</button>`;
+}
+
+/* ---------- views: auth ---------- */
+const eye = `<button type="button" class="eye" data-act="eye" aria-label="Show password">${ic('eye')}</button>`;
+function vLogin() {
+  return `<div class="login lat"><div class="glow"></div><div class="eyebrow">Buy · Consign · Authenticated</div><h1 class="logo">A&amp;J</h1><p>Luxury, <i>carefully</i> curated.</p>
+  <form id="loginform" novalidate>${fld('Email', 'email', {type: 'email', ac: 'email'})}
+   <label class="fld"><span>Password</span><input type="password" name="pw" autocomplete="current-password" value="${esc(D.pw || '')}">${eye}<small class="err" data-for="pw"></small></label>
+   <button class="btn f blk" type="submit">Enter</button></form>
+  <p class="fine"><a href="#/forgot">Forgot password?</a></p><div class="or">or</div>
+  <button class="btn blk" data-act="guest">Browse as a guest</button>
+  <p class="fine">New here? <a href="#/join">Create an account</a></p><p class="fine" style="font-size:11px">Prototype: any email and password works.</p></div>`;
+}
+function vJoin() {
+  return `<div class="formpage"><a class="back" href="#/login">${ic('back', 's')} Back</a><div class="eyebrow">Join A&amp;J</div><h1 class="h2" style="margin:6px 0 20px">Create your <i>account</i></h1>
+  <form id="joinform" novalidate>${fld('Full name', 'name', {ac: 'name'})}${fld('Email', 'email', {type: 'email', ac: 'email'})}${fld('Mobile number', 'mobile', {type: 'tel', ac: 'tel', ph: '09XX XXX XXXX'})}
+   <label class="fld"><span>Password (8+ characters)</span><input type="password" name="pw" autocomplete="new-password" value="${esc(D.pw || '')}">${eye}<small class="err" data-for="pw"></small></label>
+   <span class="lab">I’m interested in</span><div class="chips">${CATS.map(([c, l]) => tgl('int_' + c, l)).join('')}</div>
+   ${chk('terms', 'I agree to the <a class="lnk" href="#/info/terms">Terms</a> and <a class="lnk" href="#/info/privacy">Privacy notice</a>.', '<small class="err" data-for="terms"></small>')}
+   <button class="btn f blk" type="submit" style="margin-top:14px">Create account</button></form></div>`;
+}
+function vForgot() {
+  return `<div class="formpage"><a class="back" href="#/login">${ic('back', 's')} Back</a><div class="eyebrow">Account</div><h1 class="h2" style="margin:6px 0 14px">Reset <i>password</i></h1>
+  ${D.sent ? `<p>If an account exists for <b>${esc(D.email)}</b>, a reset link would be sent. In this prototype, no email is sent.</p><a class="btn f blk" style="margin-top:22px" href="#/login" data-act="clearsent">Back to log in</a>`
+  : `<p style="color:var(--mute);margin-bottom:18px">Enter your email and we’ll send a reset link.</p><form id="forgotform" novalidate>${fld('Email', 'email', {type: 'email', ac: 'email'})}<button class="btn f blk" type="submit">Send reset link</button></form>`}</div>`;
+}
+
+/* ---------- views: browse ---------- */
+function vHome() {
+  const ji = [...ITEMS].reverse().slice(0, 4);
+  return `<section class="hero"><img src="${art(ITEMS[5], 'Front', false)}" alt=""><div class="ht"><div class="eyebrow">Authenticated luxury</div><h1 class="h1" style="margin-top:8px">Pieces worth<br><i>passing on.</i></h1>
+   <p>Pre-loved and brand-new, checked and graded.</p><div class="rowb"><a class="btn f" href="#/collections">Explore</a><a class="btn" href="#/consign">Consign</a></div></div></section>
+  <div class="sec"><h2 class="h2">Collections</h2><a href="#/collections">View all</a></div>
+  <div class="snap cols">${CATS.map(([c], i) => `<a class="col" href="#/collection/${c}"><img src="${art(ITEMS[i * 4 + 1], 'Front', false)}" alt=""><div><small>${count(c)} pieces</small><b>${COL[c][0]}</b></div></a>`).join('')}</div>
+  <div class="sec"><h2 class="h2">Just <i>in</i></h2><a href="#/collection/all">Shop all</a></div>
+  <div class="stag">${ji.map(mini).join('')}</div>
+  <div class="sec" style="padding-top:44px"><h2 class="h2">The <i>houses</i></h2><a href="#/brands">All brands</a></div>
+  <div class="brands">${BRANDS.map(b => `<a href="#/brand/${enc(b)}">${esc(b)}</a>`).join('<i class="dm"></i>')}</div>
+  <section class="band lat"><div class="eyebrow">Consignment</div><h2 class="h2" style="margin-top:8px">Have a piece to <i>pass on?</i></h2><p>Our concierge guides you from first photos to payout.</p><a class="btn f" href="#/consign">Consign with us</a></section>
+  <div class="sec"><h2 class="h2">The A&amp;J <i>standard</i></h2></div>
+  <div class="std"><a href="#/authenticity">${ic('shield')}<div><b>Authenticity</b><small>What every listing shows, and what we can’t promise here</small></div></a>
+   <a href="#/info/shipping">${ic('truck')}<div><b>Nationwide delivery</b><small>Same-day in Metro Manila before the cut-off</small></div></a>
+   <a href="#/info/layaway">${ic('card')}<div><b>Layaway</b><small>30% down, balance in equal monthly payments</small></div></a></div>
+  <section class="band" style="margin-top:34px"><div class="eyebrow">Showroom</div><h2 class="h2" style="margin-top:8px">See it <i>in person</i></h2><p>Request a private viewing of the pieces you love.</p><a class="btn" href="#/viewing">Book a viewing</a></section>
+  <div class="foot"><a href="#/faqs">FAQs</a><a href="#/contact">Contact</a><a href="#/info/terms">Terms</a><a href="#/info/privacy">Privacy</a></div>
+  <p class="note">Prototype: pieces, prices and pictures are made-up samples. Pictures are generated placeholders, not photos.</p>`;
+}
+function vCollections() {
+  return `<div class="chead"><div class="eyebrow">Browse</div><h1 class="h1" style="margin-top:6px">The <i>collections</i></h1></div><div style="height:16px"></div>
+  ${CATS.map(([c], i) => `<a class="crow" href="#/collection/${c}"><img src="${art(ITEMS[i * 4 + 2], 'Front', false)}" alt=""><div><b>${COL[c][0]}</b><small>${COL[c][1]} · ${count(c)} pieces</small></div></a>`).join('')}
+  <a class="crow" href="#/collection/all"><img src="${art(ITEMS[9], 'Detail', false)}" alt=""><div><b>All pieces</b><small>Every piece currently listed · ${ITEMS.length} pieces</small></div></a><div style="height:20px"></div>`;
+}
+function plist(cat) {
+  let l = ITEMS.filter(p => (cat === 'all' || p.cat === cat) && (tab === 'all' || (tab === 'new') === p.isNew) && (bsel === 'all' || p.brand === bsel));
+  if (sort === 'asc') l = [...l].sort((a, b) => a.price - b.price);
+  if (sort === 'desc') l = [...l].sort((a, b) => b.price - a.price);
+  return `<p class="cnt">${l.length} piece${l.length === 1 ? '' : 's'}</p>` + (l.length ? `<div class="plist">${l.map(pcard).join('')}</div>`
+    : `<div class="empty">${ic('gem')}<p>No pieces match.<br>Try another brand or condition.</p><button class="btn" data-act="reset">Reset filters</button></div>`);
+}
+function vCollection(arg) {
+  const cat = arg === 'all' || COL[arg] ? arg : 'all', [name, desc] = colOf(cat);
+  const brands = [...new Set(ITEMS.filter(p => cat === 'all' || p.cat === cat).map(p => p.brand))].sort();
+  if (bsel !== 'all' && !brands.includes(bsel)) bsel = 'all';
+  return `<div class="chead"><div class="eyebrow">${cat === 'all' ? 'Shop' : 'Collection'}</div><h1 class="h1" style="margin-top:6px">${esc(name)}</h1><p>${desc}</p></div>
+  <div class="bar" style="margin-top:12px">${[['all', 'All'], ['new', 'Brand new'], ['pre', 'Pre-loved']].map(([v, l]) => `<button class="chip" data-act="tab" data-v="${v}" aria-pressed="${tab === v}">${l}</button>`).join('')}</div>
+  <div class="bar"><select id="bsel" aria-label="Brand"><option value="all">All brands</option>${brands.map(b => `<option ${bsel === b ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select>
+   <select id="sort" aria-label="Sort"><option value="featured">Featured</option><option value="asc" ${sort === 'asc' ? 'selected' : ''}>Price ↑</option><option value="desc" ${sort === 'desc' ? 'selected' : ''}>Price ↓</option></select></div>
+  <div id="list" data-cat="${cat}">${plist(cat)}</div>`;
+}
+function vBrands() {
+  const g = {}; BRANDS.forEach(b => (g[b[0].toUpperCase()] ||= []).push(b));
+  return `<div class="chead"><div class="eyebrow">Directory</div><h1 class="h1" style="margin-top:6px">The <i>houses</i></h1><p>${BRANDS.length} brands in this sample catalogue.</p></div>
+  <div class="az">${Object.keys(g).sort().map(k => `<h3>${k}</h3>${g[k].map(b => `<a href="#/brand/${enc(b)}">${esc(b)}<small>${ITEMS.filter(p => p.brand === b).length} pieces</small></a>`).join('')}`).join('')}</div><div style="height:24px"></div>`;
+}
+function vBrand(name) {
+  const l = ITEMS.filter(p => p.brand === name);
+  if (!l.length) return `<div class="empty">${ic('search')}<p>Brand not found.</p><a class="btn" href="#/brands">All brands</a></div>`;
+  return `<div class="chead"><div class="eyebrow">The house of</div><h1 class="h1" style="margin-top:6px">${esc(name)}</h1><p>${l.length} piece${l.length === 1 ? '' : 's'} · invented sample brand</p></div><div class="plist">${l.map(pcard).join('')}</div>`;
+}
+const results = t => {
+  const w = t.toLowerCase().split(/\s+/).filter(Boolean);
+  const l = w.length ? ITEMS.filter(p => w.every(x => (p.brand + ' ' + p.title + ' ' + catName(p.cat) + ' ' + p.color + ' ' + (p.isNew ? 'brand new' : 'pre-loved')).toLowerCase().includes(x))) : [];
+  if (!w.length) return `<p class="cnt">Try a brand, a category or a colour.</p>`;
+  return l.length ? `<p class="cnt">${l.length} result${l.length === 1 ? '' : 's'}</p><div class="plist" style="gap:22px">${l.map(p => `<a class="req" style="display:flex;gap:14px;padding:0;border:0" href="#/p/${p.id}"><img src="${art(p, 'Front', false)}" alt="" style="width:78px;height:78px;object-fit:cover;border:1px solid var(--line)"><div><small>${esc(p.brand)}</small><b style="font-size:20px">${esc(p.title)}</b><span class="sub">${peso(p.price)}</span></div></a>`).join('')}</div>`
+    : `<div class="empty">${ic('search')}<p>No pieces found for “${esc(t)}”.</p></div>`;
+};
+function vSearch() {
+  return `<div style="padding:18px 24px 0"><input type="search" id="sq" placeholder="Search brand, item or colour" aria-label="Search" value="${esc(sq)}" autocomplete="off">
+  <div class="chips" style="margin-top:14px">${['Bags', 'Watches', 'Lumière', 'Brand new', 'Black', 'Gold'].map(t => `<button class="chip" data-act="sq" data-t="${t}">${t}</button>`).join('')}</div></div><div id="sres">${results(sq)}</div>`;
+}
+function vProduct(id) {
+  const p = item(id); if (!p) return `<div class="empty">${ic('search')}<p>Piece not found.</p><a class="btn" href="#/collections">Collections</a></div>`;
+  const more = ITEMS.filter(x => (x.cat === p.cat || x.brand === p.brand) && x.id !== p.id).slice(0, 5);
+  return `<div class="gal"><div class="snap" id="gal" data-dots="gd">${p.views.map((v, i) => `<div><img src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)" data-act="zoom" data-i="${i}"></div>`).join('')}</div>
+   <span class="gcount" id="gdn">1 / ${p.views.length}</span>${heartBtn(p.id)}</div>
+  <div class="dots" id="gd">${p.views.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>
+  <div class="pinfo"><div class="eyebrow">${esc(p.brand)}</div><h1 class="h2">${esc(p.title)}</h1><div class="ppr">${peso(p.price)}</div></div>
+  <section class="check"><h3>${ic('shield', 's')} The A&amp;J check</h3><dl class="kv"><dt>Condition</dt><dd>${esc(p.rank)}</dd><dt>Inclusions</dt><dd>${esc(p.inc)}</dd><dt>Flaws</dt><dd>${esc(p.flaw)}</dd></dl>
+   <p style="margin-top:12px;font-size:13px;color:var(--mute)">A&amp;J says every piece is authentic. <a class="lnk" href="#/authenticity">About authenticity</a></p></section>
+  <dl class="kv free"><dt>Category</dt><dd>${catName(p.cat)}</dd><dt>Colour</dt><dd>${esc(p.color)}</dd><dt>Material</dt><dd>${esc(p.mat)}</dd><dt>Size</dt><dd>${esc(p.size)}</dd></dl>
+  <div style="height:22px"></div>
+  <details><summary>Delivery &amp; payment${ic('down')}</summary><div class="dbody"><p>Nationwide delivery. Pay by bank transfer, GCash, card (+4%) or cash on pick-up.</p><p><a href="#/info/shipping">Shipping</a> · <a href="#/info/payment">Payment</a> · <a href="#/info/layaway">Layaway</a></p></div></details>
+  <details><summary>Returns${ic('down')}</summary><div class="dbody"><p>All sales are final. Exchange only for undeclared flaws or missing inclusions.</p><p><a href="#/info/returns">Return policy</a></p></div></details>
+  <details><summary>About this listing${ic('down')}</summary><div class="dbody"><p>Sample listing for the prototype. Real listings will carry A&amp;J’s own photos, description and condition notes.</p></div></details>
+  <div class="sec" style="padding-top:34px"><h2 class="h2">You may <i>also love</i></h2></div><div class="row">${more.map(mini).join('')}</div><div style="height:30px"></div>`;
+}
+const dockProduct = id => `<a class="btn" href="#/viewing?item=${id}">Showroom visit</a><button class="btn f" data-act="inquire" data-id="${id}">Inquire</button>`;
+function vInquire(id) {
+  const p = item(id); if (!p) return vProduct(id);
+  if (D.iname === undefined) { D.iname = S.user.name; D.imobile = S.user.mobile || ''; }
+  D.icontact ||= 'Viber';
+  return `<a class="req" href="#/p/${p.id}" style="display:flex;gap:14px;align-items:center"><img src="${art(p, 'Front', false)}" alt="" style="width:84px;height:84px;object-fit:cover;border:1px solid var(--line)"><div><small>${esc(p.brand)}</small><b>${esc(p.title)}</b><span class="sub">${peso(p.price)}</span></div></a>
+  <form class="formpage" id="inqform" data-id="${p.id}" novalidate><p style="color:var(--mute);margin-bottom:18px">The A&amp;J team will confirm the piece is available and send payment details.</p>
+   ${fld('Your name', 'iname', {ac: 'name'})}${fld('Mobile number', 'imobile', {type: 'tel', ph: '09XX XXX XXXX'})}
+   <span class="lab">Contact me through</span><div class="chips">${['Viber', 'WhatsApp', 'Messenger', 'Instagram', 'Phone call'].map(v => pick('icontact', v)).join('')}</div>
+   ${sel('Payment method', 'ipay', ['Bank transfer', 'GCash', 'Credit card (+4% fee)', 'Cash on delivery (Metro Manila)', 'Cash on pick-up', 'Layaway'])}
+   ${fld('Message (optional)', 'inote', {area: 1, ph: 'Anything you’d like to ask?'})}<button class="btn f blk" type="submit">Send inquiry</button></form>`;
+}
+function vSaved() {
+  const l = ITEMS.filter(p => S.wish.has(p.id));
+  return `<div class="chead"><div class="eyebrow">Your wish list</div><h1 class="h1" style="margin-top:6px"><i>Saved</i></h1></div>` + (l.length
+    ? `<div class="plist">${l.map(pcard).join('')}</div><div class="pad" style="padding-top:0"><a class="btn f blk" href="#/viewing?items=${l.map(p => p.id).join(',')}">Request a viewing of these pieces</a></div>`
+    : `<div class="empty">${ic('heart')}<p>Nothing saved yet.<br>Tap the heart on a piece to keep it here.</p><a class="btn" href="#/collections">Browse collections</a></div>`);
+}
+
+/* ---------- requests: inquiries, viewings and appraisals share one inbox ---------- */
+const STEPS = {Inquiry: ['Inquiry received', 'A&J replies', 'Payment', 'Delivery or pick-up'], Viewing: ['Viewing requested', 'A&J confirms the time', 'Showroom visit'], Appraisal: ['Submitted', 'Received', 'Authenticated', 'Listed', 'Sold', 'Paid out']};
+function addReq(type, title, sub, rows, extra = {}) {
+  const r = {ref: AJ.ref({Inquiry: 'INQ', Viewing: 'VWG', Appraisal: 'APR'}[type]), type, title, sub, rows, date: AJ.fmtDate(new Date()), status: type === 'Viewing' ? 'Requested' : type === 'Appraisal' ? 'Submitted' : 'Received', ...extra};
+  S.req.unshift(r); return r;
+}
+function vRequests() {
+  return `<div class="chead"><div class="eyebrow">Inbox</div><h1 class="h1" style="margin-top:6px">My <i>requests</i></h1></div>` + (S.req.length
+    ? S.req.map(r => `<a class="req" href="#/request/${r.ref}"><small>${r.type} · ${r.date} · ${r.ref}</small><b>${esc(r.title)}</b><span class="sub">${esc(r.sub)}</span><br><span class="pill">${r.status}</span></a>`).join('')
+    : `<div class="empty">${ic('mail')}<p>No requests yet.<br>Inquiries, viewings and appraisals appear here.</p><a class="btn" href="#/collections">Browse collections</a></div>`);
+}
+function vRequest(ref) {
+  const r = S.req.find(x => x.ref === ref); if (!r) return `<div class="empty">${ic('search')}<p>Request not found.</p><a class="btn" href="#/requests">My requests</a></div>`;
+  const fresh = AJ.route().q.has('new'), msg = {Inquiry: 'Inquiry sent', Viewing: 'Viewing requested', Appraisal: 'Appraisal requested'}[r.type];
+  return `${fresh ? `<div class="ok"><div class="dmb">${ic('check')}</div><h1 class="h2">${msg}</h1><p>Reference ${r.ref}</p></div>` : ''}
+  <div class="pad"><div class="eyebrow">${r.type}</div><h2 class="h2" style="margin:4px 0 14px">${esc(r.title)}</h2>
+  <dl class="kv"><dt>Reference</dt><dd>${r.ref}</dd><dt>Sent</dt><dd>${r.date}</dd>${r.rows.filter(x => x[1]).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+  <h3 class="lab" style="margin-top:22px">Progress</h3><ol class="tl">${STEPS[r.type].map((s, i) => `<li class="${i === 0 ? 'on' : ''}">${s}</li>`).join('')}</ol>
+  <p style="font-size:13px;color:var(--mute);margin-bottom:18px">Prototype: in the real app the A&amp;J team would update this status and reply by your chosen channel.${r.type === 'Viewing' ? ' Showroom address and hours are still to be confirmed by A&amp;J.' : ''}</p>
+  <button class="btn f blk" data-act="concierge">Ask the concierge</button><a class="btn blk" style="margin-top:10px" href="#/requests">All my requests</a></div>`;
+}
+
+/* ---------- viewing booking ---------- */
+const DAYS = Array.from({length: 14}, (_, i) => { const d = new Date(); d.setDate(d.getDate() + i + 1); return d; });
+const TIMES = ['Morning', 'Afternoon', 'Early evening'];
+function vViewing() {
+  const {q: Q} = AJ.route(), key = location.hash;
+  if (D._vkey !== key) { // arriving from a different link: reset the chosen pieces
+    D._vkey = key; Object.keys(D).filter(k => k.startsWith('vp_')).forEach(k => delete D[k]);
+    const ids = (Q.get('items') || Q.get('item') || '').split(',').filter(Boolean); ids.forEach(i => D['vp_' + i] = true);
+  }
+  if (D.vname === undefined) { D.vname = S.user.name; D.vmobile = S.user.mobile || ''; }
+  const cand = ITEMS.filter(p => S.wish.has(p.id) || D['vp_' + p.id] !== undefined);
+  D.vparty ||= '1';
+  return `<div class="chead"><div class="eyebrow">Showroom</div><h1 class="h1" style="margin-top:6px">Book a <i>viewing</i></h1><p>Choose a day and time of day. The A&amp;J team confirms the exact time.</p></div>
+  <form class="formpage" id="viewform" novalidate>
+   <span class="lab">Day</span><div class="days" role="group" aria-label="Day">${DAYS.map(d => `<button type="button" class="day" data-act="pick" data-k="vdate" data-v="${iso(d)}" aria-pressed="${D.vdate === iso(d)}"><small>${AJ.fmtDate(d, {weekday: 'short'})}</small><b>${d.getDate()}</b><small>${AJ.fmtDate(d, {month: 'short'})}</small></button>`).join('')}</div>
+   <small class="err" data-for="vdate"></small>
+   <span class="lab">Time of day</span><div class="seg" role="group" aria-label="Time of day">${TIMES.map(t => pick('vtime', t)).join('')}</div><small class="err" data-for="vtime" style="margin-top:-12px"></small>
+   <span class="lab">Pieces you’d like to see</span>
+   ${cand.length ? `<div class="chips">${cand.map(p => tgl('vp_' + p.id, esc(p.brand + ' · ' + p.title.split(' ').slice(0, 3).join(' ')))).join('')}</div>` : `<p style="color:var(--mute);font-size:14px;margin:6px 0 14px">No pieces chosen. Save pieces with the heart, or open a piece and tap “Showroom visit”. You can also describe what you’d like to see below.</p>`}
+   ${sel('Guests', 'vparty', ['1', '2', '3', '4'])}${fld('Your name', 'vname', {ac: 'name'})}${fld('Mobile number', 'vmobile', {type: 'tel', ph: '09XX XXX XXXX'})}
+   ${fld('Note (optional)', 'vnote', {area: 1, ph: 'Anything else you’d like us to prepare?'})}
+   <p style="font-size:12px;color:var(--mute);margin-bottom:16px">Showroom address and opening hours are still to be confirmed by A&amp;J. Your request is not a confirmed booking.</p>
+   <button class="btn f blk" type="submit">Request viewing</button></form>`;
+}
+
+/* ---------- consign ---------- */
+function vConsign() {
+  const st = [['Send photos and details', 'Use the appraisal request. A&J reviews the piece first.'], ['Hand it over', 'Drop off at the showroom, or ship via Grab, Lalamove or LBC.'], ['Authenticated and listed', 'A&J authenticates the piece and lists it with photos.'], ['You get paid', 'After the buyer receives it: cash, deposit or in-store credit.']];
+  return `<div class="chead"><div class="eyebrow">Consignment</div><h1 class="h1" style="margin-top:6px">Consign with <i>a concierge</i></h1><p>Let A&amp;J sell your authentic luxury pieces.</p></div>
+  <div style="height:14px"></div>${st.map(([t, s], i) => `<div class="jstep"><div class="num">${i + 1}</div><div><b>${t}</b><span>${s}</span></div></div>`).join('')}
+  <div class="sec"><h2 class="h2">The <i>terms</i></h2></div>
+  <dl class="kv free"><dt>Period</dt><dd>1 to 5 months</dd><dt>Pull-out fee</dt><dd>₱2,000 per item, before 1 month</dd><dt>Pull-out notice</dt><dd>At least 1 business day</dd><dt>Accepted</dt><dd>Authentic, excellent condition or better</dd></dl>
+  <p class="note" style="margin-top:14px;text-align:left;border:0;padding:0">Paraphrased from A&amp;J’s public website. Not yet confirmed by A&amp;J.</p>
+  <div class="pad"><a class="btn f blk" href="#/consignform">Request an appraisal</a><button class="btn blk" style="margin-top:10px" data-act="askc">Ask the concierge about consigning</button><a class="lnk" href="#/info/consignment" style="display:block;text-align:center;margin-top:16px">Full consignment terms</a></div>`;
+}
+function vConsignForm() {
+  if (D.cmobile === undefined) D.cmobile = S.user.mobile || '';
+  D.cmode ||= 'Consign'; D.chand ||= 'Drop off'; D.ccontact ||= 'Viber';
+  const incl = ['Box', 'Dustbag', 'Receipt', 'Authenticity card', 'Warranty card', 'Strap', 'Papers'];
+  const sl = AJ.PHOTO_SLOTS, vw = ['Front', 'Back', 'Detail', 'Detail', 'Detail', 'Detail', 'Detail', 'Detail', 'Flaw close-up', 'Inclusions'];
+  const catKey = CATS.find(c => c[1] === D.ccat)?.[0] || 'bags';
+  return `<div class="chead"><div class="eyebrow">Consignment</div><h1 class="h1" style="margin-top:6px">Appraisal <i>request</i></h1></div>
+  <form class="formpage" id="conform" novalidate>
+   <div class="eyebrow" style="margin-bottom:6px">I · The piece</div><div class="seg">${['Consign', 'Sell to A&J'].map(v => pick('cmode', v)).join('')}</div>
+   <span class="lab">Category</span><div class="chips">${CATS.map(([, l]) => pick('ccat', l)).join('')}</div><small class="err" data-for="ccat" style="margin-top:-14px"></small>
+   ${fld('Brand', 'cbrand', {ph: 'e.g. brand name'})}${fld('Item name or model', 'cname', {ph: 'e.g. Top-handle bag in black'})}
+   <span class="lab">Condition</span><div class="chips">${['Brand new', 'Excellent', 'Good', 'Fair'].map(v => pick('ccond', v)).join('')}</div><small class="err" data-for="ccond" style="margin-top:-14px"></small>
+   ${fld('Expected price in ₱ (optional)', 'cprice', {mode: 'numeric', ph: 'e.g. 85000'})}
+   <div class="eyebrow" style="margin:26px 0 6px">II · Photographs</div><p style="color:var(--mute);font-size:14px">Plain background, good lighting, no filters. Tap a frame to add a sample photo. Front, Back and Serial / date code are required.</p>
+   <div class="slots">${sl.map((o, i) => { const on = W.photos.has(i); return `<button type="button" class="slot ${on ? 'on' : ''}" data-act="slot" data-i="${i}" aria-pressed="${on}">${on ? `<img src="${AJ.art(catKey, 3, {s: 'noir', v: vw[i], cap: false})}" alt=""><em>${o.label} ✓</em>` : `${ic('camera')}${o.label}${o.req ? '<b>Required</b>' : ''}`}</button>`; }).join('')}</div>
+   <small class="err" data-for="photos"></small><p style="font-size:12px;color:var(--mute)">${W.photos.size} of 10 added · Prototype: no real photo is uploaded.</p>
+   <div class="eyebrow" style="margin:26px 0 6px">III · Provenance</div><span class="lab">Inclusions</span><div class="chips">${incl.map(x => tgl('inc_' + x, x)).join('')}</div>
+   ${fld('Flaws or wear (optional)', 'cflaws', {area: 1, ph: 'Scratches, stains, odor, repairs…'})}${fld('Where and when bought (optional)', 'cbought', {ph: 'e.g. boutique, 2022'})}
+   ${chk('cown', 'I confirm this piece is mine, legally acquired and free of any lien.', '<small class="err" data-for="cown"></small>')}
+   <div class="eyebrow" style="margin:26px 0 6px">IV · Hand-over</div><div class="seg">${['Drop off', 'Ship it'].map(v => pick('chand', v)).join('')}</div>
+   ${fld('Mobile number', 'cmobile', {type: 'tel', ph: '09XX XXX XXXX'})}<span class="lab">Contact me through</span><div class="chips">${['Viber', 'WhatsApp', 'Phone call', 'Email'].map(v => pick('ccontact', v)).join('')}</div>
+   ${chk('cterms', 'I have read the <a class="lnk" href="#/info/consignment">consignment terms</a> (1–5 months, ₱2,000 pull-out fee). Final terms are set by A&amp;J.', '<small class="err" data-for="cterms"></small>')}
+   <div style="height:10px"></div></form>`;
+}
+
+/* ---------- guides, support, account ---------- */
+function vAuth() {
+  const rows = [['Condition rank', 'Each piece shows a rank out of 10, or “Brand New”.'], ['Inclusions', 'Box, dustbag, papers and extras are listed.'], ['Flaws', 'Any wear is described and shown in a close-up photo.'], ['Photographs', 'Several angles, so you can look closely before you inquire.']];
+  return `<div class="chead"><div class="eyebrow">The guide</div><h1 class="h1" style="margin-top:6px">On <i>authenticity</i></h1><p>A&amp;J says it sells only authentic pieces, judged by its own experts.</p></div><div style="height:14px"></div>
+  <div class="eyebrow" style="padding:0 24px 4px">What every listing shows</div>${rows.map(([t, s]) => `<div class="jstep"><span class="dm" style="margin-top:9px"></span><div><b>${t}</b><span>${s}</span></div></div>`).join('')}
+  <div class="check"><h3>${ic('info', 's')} What this app can’t tell you</h3><p style="font-size:14px;color:var(--mute)">Neither this app nor the concierge can confirm whether a specific piece is authentic or fake. That decision belongs to A&amp;J’s human experts. Ask the team about any piece you’re considering.</p></div>
+  <p class="note" style="text-align:left;border:0;padding:0 24px;margin:0 0 20px">A&amp;J’s step-by-step authentication process and any certificates are still pending from A&amp;J, so they are not described here.</p>
+  <div class="pad" style="padding-top:0"><button class="btn f blk" data-act="askauth">Ask the concierge</button><a class="btn blk" style="margin-top:10px" href="#/collections">Browse pieces</a></div>`;
+}
+function vFaqs() {
+  return `<div class="chead"><div class="eyebrow">Support</div><h1 class="h1" style="margin-top:6px">Your <i>questions</i></h1></div><div style="padding:8px 24px 0"><input type="search" id="fq" placeholder="Search the FAQs" aria-label="Search FAQs"></div><div id="fl" style="margin-top:12px">${faqList('')}</div>
+  <div class="pad"><button class="btn f blk" data-act="concierge">Still stuck? Ask the concierge</button></div>`;
+}
+const faqList = t => { const l = AJ.FAQ.filter(f => (f.q + f.a).toLowerCase().includes(t.toLowerCase())); return l.length ? l.map(f => `<details><summary>${esc(f.q)}${ic('down')}</summary><div class="dbody">${AJ.paras(f.a)}</div></details>`).join('') : `<div class="empty">No FAQ matches that. Try the concierge.</div>`; };
+function vContact() {
+  if (D.msent) return `<div class="ok"><div class="dmb">${ic('check')}</div><h1 class="h2">Message sent</h1><p>The team would reply by your chosen channel. Prototype: nothing was sent.</p></div><div class="pad"><a class="btn f blk" href="#/home" data-act="clearmsg">Back to home</a></div>`;
+  return `<div class="chead"><div class="eyebrow">Showroom &amp; contact</div><h1 class="h1" style="margin-top:6px">Visit <i>us</i></h1></div>
+  <p class="pend" style="margin:16px 24px 0;padding:11px 14px">Contact details are still to be provided by A&amp;J.</p>
+  <dl class="kv free" style="margin-top:8px">${AJ.CONTACT.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+  <div class="pad"><a class="btn blk" href="#/viewing">Book a viewing</a></div>
+  <form class="formpage" id="msgform" novalidate style="padding-top:0"><div class="eyebrow" style="margin-bottom:10px">Message the team</div>${sel('Topic', 'mtopic', ['Buying', 'Consigning', 'Showroom visit', 'Something else'])}
+  ${isGuest() ? fld('Your email', 'memail', {type: 'email'}) : ''}${fld('Message', 'mtext', {area: 1, ph: 'How can we help?'})}<button class="btn f blk" type="submit">Send message</button></form>`;
+}
+function vSettings() {
+  const u = S.user; if (D.sname === undefined) { D.sname = u.name; D.smobile = u.mobile; }
+  const tg = (n, l, on = true) => `<label class="chk" style="justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #efe8da14"><span>${l}</span><span class="sw"><input type="checkbox" name="${n}" ${D[n] ?? on ? 'checked' : ''}></span></label>`;
+  return `<div class="chead"><div class="eyebrow">Account</div><h1 class="h1" style="margin-top:6px">Your <i>profile</i></h1></div>
+  <form class="formpage" id="setform" novalidate>${fld('Full name', 'sname')}<label class="fld"><span>Email</span><input type="email" value="${esc(u.email)}" disabled></label>${fld('Mobile number', 'smobile', {type: 'tel', ph: '09XX XXX XXXX'})}
+  <span class="lab">Interests</span><div class="chips">${CATS.map(([c, l]) => tgl('int_' + c, l)).join('')}</div>
+  <span class="lab" style="margin-bottom:4px">Notifications</span>${tg('n1', 'Replies to my requests')}${tg('n2', 'Consignment updates')}${tg('n3', 'New arrivals', false)}
+  <button class="btn f blk" style="margin-top:22px" type="submit">Save changes</button><button class="btn blk" style="margin-top:10px" type="button" data-act="logout">Log out</button></form>`;
+}
+function vInfo(id) {
+  const i = AJ.info(id); if (!i) return `<div class="empty">${ic('info')}<p>Page not found.</p><a class="btn" href="#/home">Home</a></div>`;
+  return `<div class="chead"><div class="eyebrow">Information</div><h1 class="h1" style="margin-top:6px">${esc(i.t)}</h1></div><div class="info">${i.html}<p><button class="lnk" data-act="concierge">Ask the concierge about this</button></p></div>`;
+}
+
+/* ---------- concierge chat ---------- */
+const ACTIONS = {human: ['See contact details', '#/contact'], showroom: ['Book a viewing', '#/viewing'], consign: ['Request an appraisal', '#/consignform'], sell: ['Request an appraisal', '#/consignform'],
+  authentic: ['Read the authenticity guide', '#/authenticity'], layaway: ['Layaway terms', '#/info/layaway'], buy: ['Browse collections', '#/collections'], shipping: ['Shipping details', '#/info/shipping'],
+  returns: ['Return policy', '#/info/returns'], payment: ['Payment options', '#/info/payment']};
+const bubble = m => m.typing ? '<div class="m bot typing" aria-label="Typing"><i></i><i></i><i></i></div>'
+  : `<div class="m ${m.who}">${esc(m.text)}${m.who === 'bot' && m.topic !== 'hi' && m.topic !== 'thanks' ? '<small>Concierge · FAQ answers based on A&amp;J’s public policies, to be confirmed by A&amp;J</small>' : ''}${ACTIONS[m.topic] ? `<a class="btn sm" href="${ACTIONS[m.topic][1]}">${ACTIONS[m.topic][0]}</a>` : ''}</div>`;
+const drawLog = () => { $('#log').innerHTML = S.msgs.map(bubble).join(''); $('#log').scrollTop = 1e6; };
+function openChat(id) {
+  drawer(false); $('#qs').innerHTML = AJ.CHIPS.map(c => `<button class="chip" data-act="ask" data-id="${c}">${esc(AJ.faq(c).q)}</button>`).join('');
+  $('#cs').hidden = false; drawLog(); id ? ACT.ask({dataset: {id}}) : $('#msg').focus();
+}
+function say(text, id) {
+  S.msgs.push({who: 'me', text}, {typing: 1}); drawLog();
+  setTimeout(() => {
+    S.msgs.pop(); const f = id && AJ.faq(id);
+    S.msgs.push({who: 'bot', ...(f ? {text: f.a, topic: f.id} : AJ.reply(text))}); drawLog();
+  }, 650);
+}
+
+/* ---------- router ---------- */
+const R = {
+  login: {bare: 1, view: vLogin}, join: {bare: 1, view: vJoin}, forgot: {bare: 1, view: vForgot},
+  home: {top: 1, wm: 1, view: vHome}, collections: {top: 1, title: 'Collections', view: vCollections},
+  collection: {title: 'Collection', up: '#/collections', view: vCollection}, brands: {top: 1, title: 'Brands', view: vBrands}, brand: {title: 'Brand', up: '#/brands', view: vBrand},
+  search: {title: 'Search', up: '#/home', view: vSearch}, p: {title: 'Piece', up: '#/collections', view: vProduct, dock: dockProduct},
+  inquire: {title: 'Inquire', up: '#/collections', view: vInquire}, viewing: {title: 'Viewing', up: '#/home', view: vViewing, dock: () => `<button class="btn f" form="viewform" type="submit">Request viewing</button>`},
+  saved: {top: 1, title: 'Saved', view: vSaved}, requests: {top: 1, title: 'My requests', view: vRequests}, request: {title: 'Request', up: '#/requests', view: vRequest},
+  consign: {top: 1, title: 'Consign', view: vConsign},
+  consignform: {title: 'Appraisal', up: '#/consign', view: vConsignForm, dock: () => `<button class="btn f" form="conform" type="submit">Submit for appraisal</button>`},
+  authenticity: {top: 1, title: 'Authenticity', view: vAuth}, faqs: {top: 1, title: 'FAQs', view: vFaqs}, contact: {top: 1, title: 'Contact', view: vContact},
+  settings: {title: 'Profile', up: '#/home', view: vSettings}, info: {title: 'Information', up: '#/home', view: vInfo}
+};
+let depth = 0, first = true;
+const redirect = h => { history.replaceState(null, '', h); render(false); };
+const refresh = (keep = true) => { const t = $('#main').scrollTop; render(false); if (keep) { $('#main').scrollTop = t; $('#main').classList.add('still'); } }; // in-place updates keep scroll and skip the entry animation
+function render(nav = true) {
+  const {name, args} = AJ.route(), r = name || 'login', a = args[0] || '';
+  if (!S.user && !['login', 'join', 'forgot', 'info'].includes(r)) return redirect('#/login');
+  if (S.user && r === 'login') return redirect('#/home');
+  const d = R[r] || R.home;
+  if (nav && !first) depth++; first = false;
+  closeSheet(); drawer(false); $('#cs').hidden = true;
+  const bare = !!d.bare, top = $('#top');
+  top.className = 'top' + (bare ? ' bare' : ''); $('#gb').hidden = !isGuest() || bare;
+  const title = r === 'info' ? (AJ.info(a)?.t || 'Information') : d.title;
+  top.innerHTML = bare ? '' : `<div class="l">${!d.top || (depth > 0 && r !== 'home') ? `<button class="ib" data-act="back" aria-label="Back">${ic('back')}</button>` : ''}${d.top ? `<button class="ib" data-act="dopen" aria-label="Open menu">${ic('menu')}</button>` : ''}</div>
+   ${d.wm ? '<div class="wm">A&amp;J</div>' : `<div class="tt">${esc(title || '')}</div>`}
+   <div class="r">${S.user ? `<a class="ib" href="#/search" aria-label="Search">${ic('search')}</a><a class="ib" href="#/saved" aria-label="Saved">${ic('heart')}${S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''}</a>` : ''}</div>`;
+  const m = $('#main'), dock = $('#dock');
+  m.classList.remove('still');
+  m.innerHTML = isGuest() && MEMBER.includes(r) ? gateView({saved: 'see your saved pieces', inquire: 'send an inquiry', viewing: 'book a viewing', requests: 'see your requests', request: 'see your requests', consignform: 'request an appraisal', settings: 'edit your profile'}[r]) : d.view(a);
+  const showDock = d.dock && !(isGuest() && MEMBER.includes(r));
+  dock.hidden = !showDock; dock.innerHTML = showDock ? d.dock(a) : '';
+  $('#fab').hidden = bare; $('#fab').classList.toggle('lift', !!showDock);
+  m.scrollTop = 0; m.focus({preventScroll: true});
+  if (r === 'search' && nav) $('#sq')?.focus();
+  buildDrawer();
+}
+
+/* ---------- events ---------- */
+const go = h => { location.hash = h; };
+const WIZ = /^(c[a-z]+|inc_.*|photos)$/;
+function resetWizard() { Object.keys(D).filter(k => WIZ.test(k)).forEach(k => delete D[k]); W = {photos: new Set()}; }
+const ACT = {
+  login() { S.user = null; go('#/login'); },
+  guest() { S.user = 'guest'; go('#/home'); },
+  logout() { S.user = null; S.wish.clear(); S.req.length = 0; for (const k in D) delete D[k]; resetWizard(); go('#/login'); },
+  close: closeSheet, dopen() { buildDrawer(); drawer(true); $('#dp button')?.focus(); }, dclose() { drawer(false); },
+  concierge() { closeSheet(); openChat(); }, cclose() { $('#cs').hidden = true; },
+  askc() { openChat('consign'); }, askauth() { openChat('authentic'); },
+  back() { const r = R[AJ.route().name]; if (depth > 0) { depth -= 2; history.back(); } else go(r?.up || '#/home'); },
+  eye(el) { const inp = el.parentElement.querySelector('input'), show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; el.innerHTML = ic(show ? 'eyeoff' : 'eye'); el.setAttribute('aria-label', show ? 'Hide password' : 'Show password'); },
+  clearsent() { delete D.sent; }, clearmsg() { delete D.msent; D.mtext = ''; },
+  ask(el) { const f = AJ.faq(el.dataset.id); say(f.q, f.id); },
+  wish(el) {
+    if (gate('save pieces')) return;
+    const id = el.dataset.id; S.wish.has(id) ? S.wish.delete(id) : S.wish.add(id);
+    $$(`.heart[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', S.wish.has(id)); b.setAttribute('aria-pressed', S.wish.has(id)); });
+    toast(S.wish.has(id) ? 'Saved' : 'Removed from saved');
+    $('#top a[href="#/saved"]').innerHTML = ic('heart') + (S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''); buildDrawer();
+    if (AJ.route().name === 'saved') refresh();
+  },
+  inquire(el) { if (!gate('send an inquiry')) go('#/inquire/' + el.dataset.id); },
+  tab(el) { tab = el.dataset.v; refresh(); },
+  reset() { tab = 'all'; bsel = 'all'; refresh(false); },
+  sq(el) { sq = el.dataset.t; $('#sq').value = sq; $('#sres').innerHTML = results(sq); },
+  zoom(el) { const p = item(AJ.route().args[0]), v = p.views[el.dataset.i]; openSheet(`<button class="ib x" data-act="close" aria-label="Close">${ic('close')}</button><img src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"><p>${v} · ${+el.dataset.i + 1} / ${p.views.length}</p>`, 'lb'); },
+  pick(el) { const {k, v} = el.dataset; D[k] = v; $$(`[data-act=pick][data-k="${k}"]`).forEach(b => b.setAttribute('aria-pressed', b === el)); $(`[data-for="${k}"]`)?.replaceChildren(); },
+  tgl(el) { const k = el.dataset.k; D[k] = !D[k]; el.setAttribute('aria-pressed', !!D[k]); },
+  slot(el) { const i = +el.dataset.i; W.photos.has(i) ? W.photos.delete(i) : W.photos.add(i); refresh(); $(`.slot[data-i="${i}"]`)?.focus({preventScroll: true}); }
+};
+document.addEventListener('click', e => { const el = e.target.closest('[data-act]'); if (el) ACT[el.dataset.act]?.(el); });
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'sort') { sort = t.value; $('#list').innerHTML = plist($('#list').dataset.cat); }
+  if (t.id === 'bsel') { bsel = t.value; $('#list').innerHTML = plist($('#list').dataset.cat); }
+  if (t.id === 'sq') { sq = t.value; $('#sres').innerHTML = results(sq); }
+  if (t.id === 'fq') $('#fl').innerHTML = faqList(t.value);
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target, id = f.id;
+  if (id === 'chatform') { const t = $('#msg').value.trim(); if (t) { $('#msg').value = ''; say(t); } return; }
+  if (id === 'loginform') {
+    if (!validate(f, {email: emailRule, pw: req('Enter your password.')})) return;
+    const n = D.email.split('@')[0].replace(/[._-]+/g, ' ');
+    S.user = {name: n.replace(/\b\w/g, c => c.toUpperCase()), email: D.email.trim(), mobile: ''}; delete D.pw; go('#/home');
+  }
+  if (id === 'joinform') {
+    if (!validate(f, {name: req('Enter your name.'), email: emailRule, mobile: AJ.mobileRule, pw: [v => v.length >= 8, 'Use at least 8 characters.'], terms: ticked('Please agree to continue.')})) return;
+    S.user = {name: D.name.trim(), email: D.email.trim(), mobile: D.mobile.trim()}; delete D.pw; delete D.terms; go('#/home'); toast('Welcome to A&J, ' + S.user.name.split(' ')[0]);
+  }
+  if (id === 'forgotform') { if (!validate(f, {email: emailRule})) return; D.sent = 1; refresh(false); }
+  if (id === 'inqform') {
+    if (!validate(f, {iname: req('Enter your name.'), imobile: mobileRule})) return;
+    const p = item(f.dataset.id);
+    const r = addReq('Inquiry', p.title, p.brand + ' · ' + peso(p.price), [['Piece', p.brand + ' ' + p.title], ['Contact via', D.icontact], ['Payment', D.ipay || 'Bank transfer'], ['Message', (D.inote || '').trim()]], {item: p.id});
+    delete D.inote; go('#/request/' + r.ref + '?new');
+  }
+  if (id === 'viewform') {
+    const ok = validate(f, {vdate: [v => !!v, 'Choose a day.'], vtime: [v => !!v, 'Choose a time of day.'], vname: req('Enter your name.'), vmobile: mobileRule});
+    if (!ok) return;
+    const ps = ITEMS.filter(p => D['vp_' + p.id]);
+    const r = addReq('Viewing', ps.length ? ps.map(p => p.title).slice(0, 2).join(', ') + (ps.length > 2 ? ` +${ps.length - 2} more` : '') : 'Showroom viewing', AJ.fmtDate(new Date(D.vdate + 'T00:00'), {weekday: 'long', month: 'long', day: 'numeric'}) + ' · ' + D.vtime,
+      [['Day', AJ.fmtDate(new Date(D.vdate + 'T00:00'), {weekday: 'long', month: 'long', day: 'numeric'})], ['Time of day', D.vtime], ['Guests', D.vparty], ['Pieces', ps.map(p => p.brand + ' ' + p.title).join('; ')], ['Note', (D.vnote || '').trim()]]);
+    D._vkey = null; delete D.vnote; go('#/request/' + r.ref + '?new');
+  }
+  if (id === 'setform') {
+    if (!validate(f, {sname: req('Enter your name.'), smobile: [v => !v || AJ.isMobile(v), mobileRule[1]]})) return;
+    S.user.name = D.sname.trim(); S.user.mobile = D.smobile.trim(); toast('Changes saved'); refresh();
+  }
+  if (id === 'msgform') {
+    const rules = {mtext: req('Write a short message.')}; if (isGuest()) rules.memail = emailRule;
+    if (!validate(f, rules)) return; D.msent = 1; refresh(false);
+  }
+  if (id === 'conform') {
+    const miss = AJ.PHOTO_SLOTS.filter((o, i) => o.req && !W.photos.has(i)).map(o => o.label);
+    const ok = validate(f, {ccat: req('Choose a category.'), cbrand: req('Enter the brand.'), cname: req('Enter the item name or model.'), ccond: req('Choose the condition.'),
+      cprice: [v => !v || /^\d[\d,]*$/.test(v.trim()), 'Use numbers only.'], cown: ticked('Please confirm ownership to continue.'), cmobile: mobileRule, cterms: ticked('Please accept the terms to submit.')});
+    if (miss.length) $('[data-for="photos"]').textContent = 'Still needed: ' + miss.join(', ') + '.';
+    if (!ok || miss.length) { if (miss.length && ok) $('[data-for="photos"]').scrollIntoView({block: 'center', behavior: 'smooth'}); return; }
+    const r = addReq('Appraisal', `${D.cbrand.trim()} ${D.cname.trim()}`, `${D.cmode} · ${D.ccond}`, [['Request', D.cmode], ['Category', D.ccat], ['Condition', D.ccond], ['Photos', W.photos.size + ' of 10'], ['Hand-over', D.chand], ['Expected price', D.cprice ? peso(+D.cprice.replace(/,/g, '')) : '']]);
+    resetWizard(); go('#/request/' + r.ref + '?new');
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); drawer(false); $('#cs').hidden = true; } });
+document.addEventListener('scroll', e => { // gallery dots + counter, and the collections row
+  const el = e.target; if (!el.dataset?.dots) return;
+  const i = Math.round(el.scrollLeft / el.clientWidth);
+  $$(`#${el.dataset.dots} i`).forEach((d, k) => d.classList.toggle('on', k === i));
+  const n = $('#gdn'); if (n) n.textContent = `${i + 1} / ${el.children.length}`;
+}, true);
+addEventListener('hashchange', () => render());
+if (!location.hash) history.replaceState(null, '', '#/login');
+render(false);
+</script>
+</body>
+</html>

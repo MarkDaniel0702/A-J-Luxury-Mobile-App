@@ -1,0 +1,26 @@
+/* Shared phone mockup for prototypes 2, 3 and 4.
+   The phone is a fixed 414x868 box (390x844 screen). core.js scales the whole box to fit the window (AJ.fit),
+   so the full phone is always visible with no page scroll, on any monitor. Under 520px wide the frame is dropped
+   and the app fills the screen like a real phone. Each prototype sets --stage, --bg, --sbc (status bar text) and --hbc (home bar). */
+html,body{height:100%;margin:0;overflow:hidden;background:var(--stage,#e8e6e1)}
+.stage{position:fixed;inset:0;overflow:hidden;background:var(--stage,#e8e6e1)}
+.phone{position:absolute;left:50%;top:50%;width:414px;height:868px;padding:12px;box-sizing:border-box;border-radius:64px;
+ background:#0c0c0e;transform:translate(-50%,-50%) scale(var(--s,1));
+ box-shadow:inset 0 0 0 2px #3b3b40,inset 0 0 0 4px #121214,0 0 0 1px #0005,0 40px 90px #0007}
+.phone::before{content:"";position:absolute;left:-4px;top:150px;width:4px;height:52px;border-radius:3px 0 0 3px;background:#26262a;box-shadow:0 72px 0 #26262a}
+.phone::after{content:"";position:absolute;right:-4px;top:210px;width:4px;height:96px;border-radius:0 3px 3px 0;background:#26262a}
+.screen{position:relative;width:390px;height:844px;border-radius:52px;overflow:hidden;background:var(--bg,#fff);isolation:isolate;--sat:54px;--sab:28px}
+.island{position:absolute;top:11px;left:50%;width:120px;height:34px;margin-left:-60px;border-radius:20px;background:#000;z-index:200;pointer-events:none}
+.status{position:absolute;top:0;left:0;right:0;height:54px;padding:17px 30px 0 36px;display:flex;justify-content:space-between;align-items:flex-start;
+ font:600 15px/20px system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--sbc,#000);z-index:190;pointer-events:none}
+.status span{display:flex;gap:6px;align-items:center;height:20px}
+.status svg{height:12px;width:auto;fill:currentColor}
+.homebar{position:absolute;bottom:8px;left:50%;width:136px;height:5px;margin-left:-68px;border-radius:3px;background:var(--hbc,#000);opacity:.8;z-index:200;pointer-events:none}
+.cap{position:fixed;left:24px;bottom:20px;max-width:230px;font:12px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--capc,#6b6b6b)}
+.cap b{display:block;font-size:13px;color:var(--capb,#222);letter-spacing:.3px}
+@media(max-width:1000px){.cap{display:none}}
+@media(max-width:519px){
+ .phone{left:0;top:0;width:100%;height:100%;padding:0;border-radius:0;box-shadow:none;transform:none;background:none}
+ .phone::before,.phone::after,.island,.status,.homebar,.cap{display:none}
+ .screen{width:100%;height:100%;border-radius:0;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
+}
