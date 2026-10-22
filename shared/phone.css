@@ -35,6 +35,23 @@ img.zoomable.zoomed{cursor:grab}
 .sk main img{object-position:-9999px 0;background:linear-gradient(100deg,var(--sk1,#8882) 40%,var(--sk2,#8884) 50%,var(--sk1,#8882) 60%) 0 0/300% 100%;animation:gsk 1.1s linear infinite}
 .sk main :is(.b,.t,.pr,.cd,.cnt){color:transparent!important;background:var(--sk1,#8882);border-radius:4px}
 @keyframes gsk{from{background-position:100% 0}to{background-position:0 0}}
+/* Admin report printout (AJ.printReport): the print dialog shows only this sheet, so "Save as PDF" gives a clean report. */
+#ajprint{display:none}
+@media print{
+ html,body{height:auto;overflow:visible;background:#fff}
+ .stage{display:none}
+ #ajprint{display:block;font:10px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;color:#000}
+ #ajprint h1{font-size:18px;margin:0 0 2px}
+ #ajprint>p{margin:0 0 10px;color:#444}
+ #ajprint dl{display:flex;flex-wrap:wrap;gap:6px 28px;margin:0 0 8px}
+ #ajprint dt{color:#555}#ajprint dd{margin:0;font-size:15px;font-weight:600}
+ #ajprint svg{display:block;width:100%;max-width:440px;height:auto;margin:6px 0 12px}
+ #ajprint .ch-b{fill:#444}#ajprint .ch-g{stroke:#ccc;stroke-width:1}#ajprint .ch-ax{font-size:9px;fill:#555}
+ #ajprint table{width:100%;border-collapse:collapse}
+ #ajprint th,#ajprint td{text-align:left;padding:3px 5px;border-bottom:1px solid #ddd;vertical-align:top}
+ #ajprint thead{display:table-header-group}
+ #ajprint tr{break-inside:avoid}
+}
 @media(max-width:519px){
  .phone{left:0;top:0;width:100%;height:100%;padding:0;border-radius:0;box-shadow:none;transform:none;background:none}
  .phone::before,.phone::after,.island,.status,.homebar,.cap{display:none}

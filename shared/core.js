@@ -69,7 +69,10 @@ const AJ = (() => {
     image: '<rect x="3" y="5" width="18" height="14"/><circle cx="9" cy="10" r="1.500"/><path d="M21 16l-5-5-8 8"/>',
     swap: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
     refresh: '<path d="M20 12a8 8 0 1 1-2.400-5.700"/><path d="M20 4v5h-5"/>',
-    settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>'
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>',
+    headset: '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><path d="M4 14h3v6H5a1 1 0 0 1-1-1zM20 14h-3v6h2a1 1 0 0 0 1-1z"/>',
+    chart: '<path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/>',
+    download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
   };
   const sprite = '<svg width="0" height="0" style="position:absolute" aria-hidden="true">' + Object.entries(I).map(([k, v]) => `<symbol id="i-${k}" viewBox="0 0 24 24">${v}</symbol>`).join('') + '</svg>';
   const ic = (n, c = '') => `<svg class="i ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
@@ -183,12 +186,14 @@ const AJ = (() => {
       a: 'Showroom visits are welcome. Message the team first so the items you want to see are on hand. Address and hours still need to be confirmed by A&J.'},
     {id: 'account', q: 'What can guests do?', k: ['guest', 'log in', 'login', 'account', 'sign up', 'signup', 'register', 'password'],
       a: 'Guests can browse, search, read the FAQs and use this assistant. To save items, send inquiries or start a consignment request, create a free account or log in.'},
+    {id: 'support', q: 'Help with an order or consignment', k: ['support', 'ticket', 'after-sales', 'after sales', 'complaint', 'problem with', 'issue with', 'damaged', 'not delivered', 'not arrived', "hasn't arrived", 'wrong item', 'track my'],
+      a: 'For a problem with an order, a return or refund request, an authenticity concern or an app problem, open a support ticket in Support. Link the order or consignment, describe the issue, and follow its status (Open, In progress, Resolved) there. The A&J team replies inside the ticket.'},
     {id: 'human', q: 'Talk to a person', k: ['person', 'human', 'agent', 'staff', 'someone', 'call me', 'phone', 'viber', 'whatsapp', 'contact', 'talk to', 'speak to', 'customer service'],
       human: true,
-      a: 'I can’t chat with the team from inside this prototype, but you can message them directly. The contact details are still to be provided by A&J.'}
+      a: 'I can pass you to a support agent. Tap “Talk to a support agent” to open a support ticket with this chat attached. The team replies in Support.\nYou can also message the team directly. Those contact details are still to be provided by A&J.'}
   ];
   const GREETING = 'Hi! I’m the A&J FAQ assistant (prototype). Ask me about buying, consigning, shipping, payment or authenticity.';
-  const FALLBACK = 'I’m not sure about that one. I can help with: how to buy, consignment, shipping, payment, layaway, authenticity, returns and the showroom.\nFor anything else, or a specific item, the A&J team can help directly.';
+  const FALLBACK = 'I’m not sure about that one. I can help with: how to buy, consignment, shipping, payment, layaway, authenticity, returns and the showroom.\nFor anything else, tap “Talk to a support agent” and the A&J team will reply in Support.';
   const KEYS = FAQ.map(f => ({f, re: f.k.map(k => [new RegExp('\\b' + k.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')), k.length])}));
   function reply(text) {
     const t = text.toLowerCase().replace(/[’]/g, "'");
@@ -200,7 +205,13 @@ const AJ = (() => {
     return {text: FALLBACK, topic: 'none'};
   }
   const faq = id => FAQ.find(f => f.id === id);
-  const CHIPS = ['buy', 'consign', 'shipping', 'payment', 'layaway', 'authentic', 'returns', 'showroom'];
+  // one answer for a typed question or a tapped topic; every answer is counted for the admin's chatbot analytics
+  const BOT = []; // {at, topic} asked in this session
+  function answer(text, id) {
+    const f = id && faq(id), r = f ? {text: f.a, topic: f.id, human: !!f.human} : reply(text);
+    BOT.push({at: new Date(), topic: r.topic}); return r;
+  }
+  const CHIPS = ['buy', 'consign', 'shipping', 'payment', 'layaway', 'authentic', 'returns', 'support', 'showroom'];
   const paras = s => s.split('\n').map(l => `<p>${esc(l)}</p>`).join('');
 
   /* ---------- information pages (policy text; pending items are flagged) ---------- */
@@ -439,7 +450,223 @@ const AJ = (() => {
   // first-run intro slides; each prototype draws them in its own style
   const INTRO = [['Luxury, checked and graded', 'Pre-loved and brand-new pieces. Every listing shows its condition, inclusions and flaws.', 'bags'],
     ['Consign with ease', 'Send photos and details, hand the piece over, and get paid after it sells.', 'watches'],
-    ['Help when you need it', 'Ask the FAQ assistant about buying, shipping, payment or consigning.', 'jewelry']];
+    ['Help when you need it', 'Ask the FAQ assistant, or open a support ticket after you buy or consign.', 'jewelry']];
+
+  /* ---------- after-sales support tickets ----------
+     Tickets live here, outside S, so log-out keeps them: a user submits one, the admin logs in on the same page and replies or changes
+     the status, and the user sees it after logging back in. Nothing is saved: everything resets when the page reloads. */
+  const DAY = 864e5, T0 = Date.now();
+  const TTYPES = [['order', 'Order issue', 'Order issue', 'Late, wrong or missing delivery, or a payment problem'], ['return', 'Return or refund request', 'Return / refund', 'Undeclared flaws, missing inclusions or an exchange'],
+    ['auth', 'Authenticity concern', 'Authenticity', 'A question about an item’s authenticity'], ['app', 'App problem', 'App problem', 'Something in the app isn’t working']]; // key, name, short name, hint
+  const ttype = k => TTYPES.find(x => x[0] === k) || TTYPES[0];
+  const TSTEPS = ['Open', 'In progress', 'Resolved'];
+  const AGENTS = ['Bea Santos', 'Paolo Reyes', 'Carla Mendoza', 'Migs Tan'];
+  const ADMIN = {email: 'admin@ajluxury.test', pw: 'Admin2026', name: 'Bea Santos'}; // sample staff login; a real app needs A&J's own staff accounts
+  const isAdmin = () => !!S.user?.admin;
+  const who = u => u?.email && u.email !== '—' ? u.email.trim().toLowerCase() : (u?.mobile || '').replace(/[\s-]/g, ''); // Prototype 4 can log in with a mobile number
+  const TK = []; let tseq = 1000;
+  const setStatus = (t, st, staff = true) => { // staff changes flag the ticket for the customer
+    if (st === t.st) return; t.st = st; t.up = new Date(); t.done = st === 'Resolved' ? t.up : null; if (staff) t.newU = true;
+    t.msgs.push({by: 'sys', text: 'Status changed to ' + st, at: t.up});
+  };
+  const assign = (t, a) => { t.agent = a || null; t.up = new Date(); t.msgs.push({by: 'sys', text: a ? 'Assigned to ' + a : 'Unassigned', at: t.up}); };
+  function post(t, by, text, name) { // a reply: the customer's reopens a resolved ticket, the agent's moves an open one to In progress
+    t.msgs.push({by, name, text, at: new Date()}); t.up = new Date();
+    if (by === 'user') { t.newA = true; if (t.st === 'Resolved') setStatus(t, 'Open', false); }
+    else { t.newU = true; t.agent ||= name; if (t.st === 'Open') setStatus(t, 'In progress'); }
+  }
+  function addTicket(u, {type, link, subj, text, chat}) {
+    const t = {ref: 'TKT-' + (++tseq), key: who(u), cust: {name: u.name, email: u.email !== '—' ? u.email : u.mobile, city: '—'}, type, subj, link: link || null,
+      ch: chat ? 'Chatbot' : 'Form', chat: chat || null, st: 'Open', agent: null, at: new Date(), msgs: [], newA: true};
+    t.up = t.at; t.msgs.push({by: 'user', name: u.name, text, at: t.at}); TK.unshift(t); return t;
+  }
+  const ticket = ref => TK.find(t => t.ref === ref);
+  const byUpdate = l => [...l].sort((a, b) => b.up - a.up);
+  const myTickets = u => (mine(u), byUpdate(TK.filter(t => t.key === who(u))));
+  // the admin's ticket queues, plus a search over reference, subject, customer and linked order
+  const QUEUES = [['active', 'Active'], ['unassigned', 'Unassigned'], ['mine', 'Mine'], ['Open', 'Open'], ['In progress', 'In progress'], ['Resolved', 'Resolved'], ['all', 'All']];
+  function queue(k, q = '') {
+    const w = q.toLowerCase().split(/\s+/).filter(Boolean), live = t => t.st !== 'Resolved';
+    return byUpdate(TK.filter(t => (k === 'all' || (k === 'active' ? live(t) : k === 'unassigned' ? live(t) && !t.agent : k === 'mine' ? live(t) && t.agent === ADMIN.name : t.st === k))
+      && w.every(x => [t.ref, t.subj, t.cust.name, t.cust.email, t.link?.ref].join(' ').toLowerCase().includes(x))));
+  }
+  // escalating from the FAQ chatbot: the last question becomes the subject and the recent chat is attached to the ticket
+  const lastAsked = () => (S.msgs.filter(m => m.who === 'me').at(-1)?.text || '').slice(0, 80);
+  const chatLog = () => S.msgs.filter(m => m.who && m.text).slice(-8).map(m => (m.who === 'me' ? 'You: ' : 'Assistant: ') + m.text.split('\n')[0].slice(0, 160));
+  // The logged-in customer's sample orders and consignments (fixed per email or mobile), so a ticket can be linked to one.
+  const MINE = {};
+  function mine(u) {
+    const k = who(u); if (MINE[k]) return MINE[k];
+    let h = [...k].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const next = () => (h = (h * 1103515245 + 12345) >>> 0) >>> 8;
+    const row = (kind, d, st) => { const p = ITEMS[next() % ITEMS.length]; return {kind, ref: (kind === 'Order' ? 'ORD-7' : 'CON-8') + String(next() % 10000).padStart(4, '0'), item: p.id, title: p.brand + ' ' + p.title, amount: p.price, at: new Date(T0 - d * DAY), status: st, sample: true}; };
+    const l = MINE[k] = [row('Order', 3, 'Shipped'), row('Order', 19, 'Delivered'), row('Order', 58, 'Delivered'), row('Consignment', 34, 'Listed'), row('Consignment', 96, 'Paid out')];
+    // one resolved sample ticket, so the history and status tracking have something to show
+    const o = l[2], at = new Date(T0 - 55 * DAY), t = {ref: 'TKT-' + (++tseq), key: k, cust: {name: u.name, email: u.email !== '—' ? u.email : u.mobile, city: '—'}, type: 'order', subj: 'Question about my delivery schedule',
+      link: o, ch: 'Form', chat: null, st: 'Resolved', agent: 'Carla Mendoza', at, up: new Date(+at + 6 * 36e5), done: new Date(+at + 6 * 36e5), sample: true, msgs: [
+        {by: 'user', name: u.name, text: 'Hi! Can the rider deliver my order on Saturday morning instead?', at},
+        {by: 'agent', name: 'Carla Mendoza', text: 'Hi! Yes, we moved the delivery to Saturday between 9 AM and 12 NN. The rider will message you before arriving.', at: new Date(+at + 2 * 36e5)},
+        {by: 'sys', text: 'Status changed to Resolved', at: new Date(+at + 6 * 36e5)}]};
+    TK.push(t); return l;
+  }
+
+  /* ---------- admin sample data: about a year of orders, consignment requests, sign-ups, tickets and chatbot questions ----------
+     Every name, order and number here is generated (example.com emails, invented brands), not A&J data. The generator is seeded,
+     so the numbers are the same on every load; dates count back from today, so "last 30 days" always has data. */
+  let sd = 7; const rnd = () => (sd = sd * 16807 % 2147483647) / 2147483647;
+  const rp = a => a[Math.floor(rnd() * a.length)];
+  const rw = (a, w) => { let x = rnd() * w.reduce((s, v) => s + v, 0); return a.find((_, i) => (x -= w[i]) < 0) ?? a.at(-1); };
+  const pois = l => { let k = 0, p = Math.exp(-l), s = p; const u = rnd(); while (u > s) { p *= l / ++k; s += p; } return k; };
+  const FIRST = 'Andrea Bianca Camille Danica Erika Francesca Gabrielle Hannah Isabel Jasmine Katrina Louise Mika Nicole Patricia Rafael Miguel Carlo Joaquin Enzo Marco Lorenzo Sofia Trisha Janelle Kevin'.split(' ');
+  const LAST = ['Santos', 'Reyes', 'Cruz', 'Bautista', 'Ocampo', 'Garcia', 'Mendoza', 'Torres', 'Aquino', 'Ramos', 'Villanueva', 'Castillo', 'Flores', 'Navarro', 'Dela Cruz', 'Gonzales', 'Lim', 'Tan', 'Uy', 'Co', 'Sy', 'Lopez', 'Del Rosario', 'Mercado'];
+  const CITY = ['Makati', 'Taguig', 'Quezon City', 'Pasig', 'Mandaluyong', 'Manila', 'Parañaque', 'Cebu City', 'Davao City', 'Iloilo City', 'Baguio', 'Angeles'];
+  const UTYPES = ['Buyer', 'Consignor', 'Buyer and consignor'];
+  const MODELS = {bags: ['Top-Handle Bag', 'Chain Shoulder Bag', 'Canvas Tote', 'Bucket Bag', 'Crossbody Bag', 'Flap Bag'], watches: ['Automatic 36mm', 'Chronograph 40mm', 'Dress Watch', 'Diver 41mm', 'Ladies Quartz Watch'],
+    jewelry: ['Solitaire Ring', 'Tennis Bracelet', 'Pearl Earrings', 'Pendant Necklace', 'Hoop Earrings'], shoes: ['Slingback Flats', 'Low-top Sneakers', 'Block-heel Pumps', 'Suede Loafers', 'Ankle Boots'],
+    wallets: ['Zip Wallet', 'Card Holder', 'Wallet on Chain', 'Bifold Wallet', 'Coin Purse'], accessories: ['Silk Scarf', 'Sunglasses', 'Leather Belt', 'Wool Shawl', 'Key Holder']};
+  const PRICE = {bags: [45, 260], watches: [40, 320], jewelry: [15, 160], shoes: [18, 55], wallets: [15, 95], accessories: [12, 45]}; // thousands of pesos
+  const COLOURS = ['Black', 'Cream', 'Tan', 'Burgundy', 'Navy', 'White', 'Gold', 'Silver', 'Rose', 'Olive'];
+  const person = () => { const f = rp(FIRST), l = rp(LAST); return {name: f + ' ' + l, email: (f + '.' + l.replace(/ /g, '')).toLowerCase() + '@example.com', city: rw(CITY, [16, 15, 14, 11, 7, 7, 6, 8, 6, 4, 3, 3])}; };
+  const piece = () => { const cat = rw(CATS.map(c => c[0]), [34, 14, 15, 12, 15, 10]), [lo, hi] = PRICE[cat];
+    return {cat, brand: rp(BRANDS), title: `${rp(MODELS[cat])} in ${rp(COLOURS)}`, amount: Math.round((lo + (hi - lo) * rnd() ** 1.8) * 2) * 500}; };
+  const TXT = { // [subject, customer message] per type, then the agent's first reply and the closing reply
+    order: [[['Item not delivered yet', 'My order still hasn’t arrived. Can you check where it is?'], ['Wrong delivery address', 'I entered the wrong address. Can the rider deliver to my office instead?'], ['Payment not reflected', 'I paid by bank transfer yesterday but the order still shows unpaid.'], ['Tracking link not working', 'The courier’s tracking link shows an error.']],
+      'Thanks for reaching out. I’m checking this with our logistics team and will update you today.', 'The courier confirmed the update and your order is on its way. Let us know if anything else comes up.'],
+    return: [[['Undeclared scratch on the item', 'There’s a scratch on the clasp that wasn’t in the listing photos.'], ['Missing dustbag', 'The listing said a dustbag was included but it wasn’t in the box.'], ['Request for exchange', 'Can I exchange this for a different size?'], ['Refund question', 'Is a refund possible if the item doesn’t fit?']],
+      'Sorry about this. Please send photos of the item with the security tag still on, so we can review it under our exchange policy.', 'We reviewed your request under our exchange policy and sent the next steps by your chosen contact channel.'],
+    auth: [[['Question about the authenticity card', 'The card looks different from the one I have for another bag. Can you explain?'], ['Serial code check', 'I want to confirm the serial code on my item matches your records.'], ['Request for a second inspection', 'Can your team re-inspect the stitching on my item?']],
+      'Thank you. I’ve passed this to our authentication team. They will review the item details and get back to you.', 'Our authentication team reviewed your concern and sent you a written explanation. Reply here if you have more questions.'],
+    app: [[['Can’t upload photos', 'The photo upload keeps failing in the consignment form.'], ['Sign-up code not received', 'I didn’t receive the SMS code when signing up.'], ['Wishlist not saving', 'Items I save disappear after I log out.'], ['App freezes on the inquiry form', 'The app freezes when I open the inquiry form.']],
+      'Thanks for reporting this. Which phone model and app version are you using?', 'We released a fix in the latest version. Please update the app and tell us if it happens again.']
+  };
+  const RESH = {order: [3, 40], return: [12, 110], auth: [20, 140], app: [1, 30]}; // hours to resolve, min and max
+  const USERS = [], ORD = [], CONS = [], BOTD = [];
+  for (let n = 0; n < 150; n++) USERS.push({...person(), at: new Date(T0 - (400 + rnd() * 500) * DAY), type: rw(UTYPES, [62, 14, 24])}); // joined before the sample year
+  for (let i = 400; i >= 0; i--) {
+    const day = new Date(T0 - i * DAY), m = day.getMonth(), g = 1 + (400 - i) / 400 * .4, wk = [0, 6].includes(day.getDay()) ? 1.15 : 1;
+    const k = g * wk * ({11: 1.7, 10: 1.25, 0: .85}[m] || 1) * ([14, 15, 29, 30].includes(day.getDate()) ? 1.3 : 1); // December peak, paydays, weekends
+    const at = () => new Date(Math.min(T0 - rnd() * 36e5, new Date(day.getFullYear(), m, day.getDate(), 9 + Math.floor(rnd() * 12), Math.floor(rnd() * 60))));
+    for (let n = pois(1.9 * g); n--;) USERS.push({...person(), at: at(), type: rw(UTYPES, [62, 14, 24])});
+    for (let n = pois(1.05 * k); n--;) ORD.push({ref: 'ORD-' + (20000 + ORD.length), at: at(), cust: rp(USERS), ...piece(), pay: rw(['Bank transfer', 'GCash', 'Credit card', 'Cash on delivery', 'Cash on pick-up', 'Layaway'], [30, 28, 18, 6, 8, 10]),
+      st: i < 1 ? 'Processing' : i < 4 ? 'Shipped' : 'Delivered'});
+    for (let n = pois(.42 * g); n--;) { const r = rnd();
+      CONS.push({ref: 'CON-' + (5000 + CONS.length), at: at(), cust: rp(USERS), ...piece(), st: i < 2 ? 'Submitted' : i < 5 ? 'Received' : i < 9 ? 'Authenticated' : r < .08 ? 'Declined' : r < .13 ? 'Pulled out' : i < 25 || r > .8 ? 'Listed' : i < 50 ? 'Sold' : 'Paid out'}); }
+    for (let n = pois(.6 * g); n--;) {
+      const type = rw(['order', 'return', 'auth', 'app'], [36, 24, 14, 26]), o = type !== 'app' && ORD.length ? rp(ORD.slice(-50)) : null, c = o ? o.cust : rp(USERS), t0 = at();
+      const [msgs, first, last] = TXT[type], [subj, text] = rp(msgs), [lo, hi] = RESH[type], resH = lo + (hi - lo) * rnd() ** 1.5, firstH = .3 + rnd() * 20, age = (T0 - t0) / 36e5, late = age < 504 && rnd() < .4; // some of the last 3 weeks still waits on the customer or the team
+      const t = {ref: '', key: c.email, cust: c, type, subj, link: o && {kind: 'Order', ref: o.ref, title: o.brand + ' ' + o.title, amount: o.amount, at: o.at, status: o.st}, ch: rnd() < .3 ? 'Chatbot' : 'Form', chat: null, at: t0,
+        st: !late && age > resH ? 'Resolved' : age > firstH ? 'In progress' : 'Open', agent: null, msgs: [{by: 'user', name: c.name, text, at: t0}]};
+      if (t.ch === 'Chatbot') t.msgs.unshift({by: 'sys', text: 'Escalated from the FAQ assistant', at: t0});
+      if (t.st !== 'Open' || rnd() < .5) t.agent = rp(AGENTS);
+      if (t.st !== 'Open') t.msgs.push({by: 'agent', name: t.agent, text: first, at: new Date(+t0 + firstH * 36e5)});
+      if (t.st === 'Resolved') { t.done = new Date(+t0 + resH * 36e5); t.msgs.push({by: 'agent', name: t.agent, text: last, at: t.done}, {by: 'sys', text: 'Status changed to Resolved', at: t.done}); }
+      t.up = t.msgs.at(-1).at; TK.push(t);
+    }
+    BOTD.push({at: day, q: pois(27 * g * wk), fb: pois(1.6 * g * wk)});
+  }
+  TK.sort((a, b) => a.at - b.at).forEach(t => t.ref = 'TKT-' + (++tseq)); TK.reverse();
+  const TOPICS = {buy: ['Buying', 14.3], consign: ['Consigning', 15.8], sell: ['Selling for cash', 6.2], payout: ['Payouts', 4.7], shipping: ['Shipping', 12.6], payment: ['Payment', 11.9], layaway: ['Layaway', 8.8], authentic: ['Authenticity', 10.4],
+    returns: ['Returns', 7.3], support: ['Order help', 6.1], condition: ['Condition', 3.9], showroom: ['Showroom', 5.6], account: ['Accounts', 3.2], human: ['Talk to a person', 4.4], none: ['Not understood', 0]}; // share of questions
+
+  /* ---------- analytics + reports (read by the admin screens) ---------- */
+  const sum = (l, f) => l.reduce((n, x) => n + (typeof f === 'string' ? x[f] : f(x)), 0);
+  const hrs = h => h < 48 ? Math.round(h) + ' h' : (h / 24).toFixed(1) + ' days';
+  const compact = new Intl.NumberFormat('en-PH', {notation: 'compact', maximumFractionDigits: 1});
+  const pesoK = n => '₱' + compact.format(n);
+  const pct = n => Math.round(n * 100) + '%';
+  const vs = (a, b) => b ? (a >= b ? '▲ ' : '▼ ') + Math.abs(Math.round((a - b) / b * 100)) + '% vs previous' : ''; // change against the period before
+  const rtf = new Intl.RelativeTimeFormat('en', {numeric: 'auto'});
+  const ago = d => { const m = (d - Date.now()) / 6e4; return Math.abs(m) < 60 ? rtf.format(Math.round(m), 'minute') : Math.abs(m) < 1440 ? rtf.format(Math.round(m / 60), 'hour') : rtf.format(Math.round(m / 1440), 'day'); };
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const PERIODS = [[7, '7 days'], [30, '30 days'], [90, '90 days'], [365, '12 months']];
+  function range(days) { // 12 months starts on the 1st, so the chart shows whole months
+    const f = new Date(T0 - (days - 1) * DAY); f.setHours(0, 0, 0, 0); if (days === 365) { f.setMonth(f.getMonth() + 1, 1); }
+    return {f, t: new Date()};
+  }
+  function bins(f, t) { // days up to a month, then weeks up to about four months, then months
+    const days = (t - f) / DAY, u = days <= 32 ? 'd' : days <= 125 ? 'w' : 'm', out = [], s = new Date(f); s.setHours(0, 0, 0, 0); if (u === 'm') s.setDate(1);
+    while (s <= t) {
+      const e = new Date(s); u === 'd' ? e.setDate(e.getDate() + 1) : u === 'w' ? e.setDate(e.getDate() + 7) : e.setMonth(e.getMonth() + 1);
+      out.push({s: new Date(s), e, l: u === 'm' ? fmtDate(s, {month: 'short'}) : fmtDate(s), tl: u === 'm' ? fmtDate(s, {month: 'long', year: 'numeric'}) : u === 'w' ? 'Week of ' + fmtDate(s) : fmtDate(s, {weekday: 'short', month: 'short', day: 'numeric'})});
+      s.setTime(+e);
+    }
+    return out;
+  }
+  const series = (l, f, t, val = () => 1) => bins(f, t).map(b => [b.l, sum(l.filter(x => x.at >= b.s && x.at < b.e && x.at >= f && x.at <= t), val), b.tl]);
+  const botAll = () => [...BOTD, ...BOT.map(b => ({at: b.at, q: 1, fb: b.topic === 'none' ? 1 : 0}))];
+  function stats(f, t) {
+    const w = x => x.at >= f && x.at <= t, o = ORD.filter(w), done = TK.filter(x => x.done && x.done >= f && x.done <= t), b = botAll().filter(w), tk = TK.filter(w);
+    return {sales: sum(o, 'amount'), orders: o.length, users: USERS.filter(w).length, cons: CONS.filter(w).length, tickets: tk.length, esc: tk.filter(x => x.ch === 'Chatbot').length,
+      res: done.length ? sum(done, x => x.done - x.at) / done.length / 36e5 : 0, q: sum(b, 'q'), faq: sum(b, 'q') ? 1 - sum(b, 'fb') / sum(b, 'q') : 0};
+  }
+  const trend = (kind, f, t) => kind === 'sales' ? series(ORD, f, t, x => x.amount) : kind === 'tickets' ? series(TK, f, t) : series(botAll(), f, t, x => x.q);
+  const topCats = (f, t) => CATS.map(([c, l]) => [l, sum(ORD.filter(x => x.cat === c && x.at >= f && x.at <= t), 'amount')]).sort((a, b) => b[1] - a[1]);
+  const resByType = (f, t) => TTYPES.map(([k, , s]) => { const l = TK.filter(x => x.type === k && x.done && x.done >= f && x.done <= t); return [s, l.length ? sum(l, x => x.done - x.at) / l.length / 36e5 : 0]; });
+  function topics(f, t) {
+    const b = botAll().filter(x => x.at >= f && x.at <= t), w = sum(Object.values(TOPICS), x => x[1]), live = BOT.filter(x => x.at >= f && x.at <= t);
+    const n = sum(b, 'q') - live.length, fb = sum(b, 'fb') - live.filter(x => x.topic === 'none').length;
+    return Object.entries(TOPICS).map(([k, [l, wt]]) => [l, (k === 'none' ? fb : Math.round((n - fb) * wt / w)) + live.filter(x => x.topic === k).length]).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  }
+  const REPORTS = {sales: ['Sales', CATS], consignments: ['Consignments', CATS], tickets: ['Support tickets', TTYPES.map(([k, l]) => [k, l])], users: ['Users', UTYPES.map(x => [x, x])]};
+  const most = (l, f) => { const c = {}; l.forEach(x => c[f(x)] = (c[f(x)] || 0) + 1); return Object.entries(c).sort((a, b) => b[1] - a[1])[0]?.[0] || '—'; };
+  // report(kind, from, to, category) -> {title, sub, kpis, cols: [[label, 'd' date | 'p' peso | '']], rows (newest first), show (columns shown on the phone), trend, fmt}
+  function report(kind, f, t, cat = '') {
+    const w = x => x.at >= f && x.at <= t && (!cat || (x.cat ?? x.type) === cat), [title, cats] = REPORTS[kind];
+    const r = {kind, title: title + ' report', file: `aj-${kind}-report-${iso(f)}-to-${iso(t)}`, fmt: n => compact.format(n)};
+    if (kind === 'sales') { const l = ORD.filter(w).reverse(), s = sum(l, 'amount');
+      Object.assign(r, {kpis: [['Sales', peso(s)], ['Orders', l.length], ['Average order', peso(l.length ? s / l.length : 0)], ['Top category', most(l, x => catName(x.cat))]],
+        cols: [['Date', 'd'], ['Order'], ['Item'], ['Category'], ['Customer'], ['City'], ['Payment'], ['Status'], ['Amount', 'p']], show: [0, 2, 7, 8], fmt: pesoK, trend: series(l, f, t, x => x.amount),
+        rows: l.map(x => [x.at, x.ref, x.brand + ' ' + x.title, catName(x.cat), x.cust.name, x.cust.city, x.pay, x.st, x.amount])}); }
+    if (kind === 'consignments') { const l = CONS.filter(w).reverse();
+      Object.assign(r, {kpis: [['Requests', l.length], ['Listed now', l.filter(x => x.st === 'Listed').length], ['Sold or paid out', l.filter(x => /Sold|Paid/.test(x.st)).length], ['Declined', l.filter(x => x.st === 'Declined').length]],
+        cols: [['Submitted', 'd'], ['Reference'], ['Item'], ['Category'], ['Consignor'], ['Status'], ['Asking price', 'p']], show: [0, 2, 5, 6], trend: series(l, f, t),
+        rows: l.map(x => [x.at, x.ref, x.brand + ' ' + x.title, catName(x.cat), x.cust.name, x.st, x.amount])}); }
+    if (kind === 'tickets') { const l = TK.filter(w), done = l.filter(x => x.done);
+      Object.assign(r, {kpis: [['Tickets', l.length], ['Resolved', done.length], ['Average resolution', done.length ? hrs(sum(done, x => x.done - x.at) / done.length / 36e5) : '—'], ['Via chatbot', l.length ? pct(l.filter(x => x.ch === 'Chatbot').length / l.length) : '—']],
+        cols: [['Created', 'd'], ['Ticket'], ['Type'], ['Subject'], ['Customer'], ['Channel'], ['Assignee'], ['Status'], ['Resolution (hours)']], show: [0, 1, 3, 7], trend: series(l, f, t),
+        rows: l.map(x => [x.at, x.ref, ttype(x.type)[1], x.subj, x.cust.name, x.ch, x.agent || 'Unassigned', x.st, x.done ? Math.round((x.done - x.at) / 36e5 * 10) / 10 : ''])}); }
+    if (kind === 'users') { const l = USERS.filter(w).reverse();
+      Object.assign(r, {kpis: [['New users', l.length], ['Buyers', l.filter(x => x.type !== 'Consignor').length], ['Consignors', l.filter(x => x.type !== 'Buyer').length], ['Top city', most(l, x => x.city)]],
+        cols: [['Joined', 'd'], ['Name'], ['Email'], ['Type'], ['City']], show: [0, 1, 3, 4], trend: series(l, f, t), rows: l.map(x => [x.at, x.name, x.email, x.type, x.city])}); }
+    r.sub = `${fmtDate(f, {day: 'numeric', month: 'short', year: 'numeric'})} – ${fmtDate(t, {day: 'numeric', month: 'short', year: 'numeric'})} · ${cat ? cats.find(c => c[0] === cat)[1] : 'All categories'} · ${r.rows.length} rows`;
+    return r;
+  }
+  const cell = (v, k) => k === 'd' ? fmtDate(v, {day: 'numeric', month: 'short', year: 'numeric'}) : k === 'p' ? peso(v) : esc(v);
+  function csv(r) { // dates as yyyy-mm-dd and amounts as plain numbers, so a spreadsheet can sum them; text that starts like a formula is neutralised
+    const q = v => { let s = String(v ?? ''); if (/^[=+\-@]/.test(s) && typeof v === 'string') s = "'" + s; return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+    const text = [r.cols.map(([l, k]) => q(k === 'p' ? l + ' (PHP)' : l)).join(','), ...r.rows.map(row => row.map((v, i) => q(r.cols[i][1] === 'd' ? iso(v) : v)).join(','))].join('\r\n');
+    const a = Object.assign(document.createElement('a'), {href: URL.createObjectURL(new Blob(['﻿' + text], {type: 'text/csv'})), download: r.file + '.csv'});
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  function printReport(r) { // the browser's print dialog, where "Save as PDF" makes the PDF; phone.css prints only this sheet
+    const p = $('#ajprint') || document.body.appendChild(Object.assign(document.createElement('div'), {id: 'ajprint'}));
+    p.innerHTML = `<h1>A&amp;J Luxury · ${esc(r.title)}</h1><p>${esc(r.sub)} · Generated ${fmtDate(new Date(), {day: 'numeric', month: 'short', year: 'numeric'})}</p>
+     <dl>${r.kpis.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>${cols(r.trend, r.fmt)}
+     <table><thead><tr>${r.cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${r.rows.map(row => `<tr>${row.map((v, i) => `<td>${cell(v, r.cols[i][1])}</td>`).join('')}</tr>`).join('')}</tbody></table>
+     <p>Sample data generated for the prototype. These are not A&amp;J figures.</p>`;
+    print();
+  }
+
+  /* ---------- charts: one-series inline SVG, columns for change over time and bars for rankings. Each prototype colours them with
+     --ch (marks), --chg (gridlines) and --cht (axis text). Hovering or tapping a mark shows its value in the chart's readout line. ---------- */
+  const nice = v => { const p = 10 ** Math.floor(Math.log10(v || 1)); return [1, 2, 2.5, 5, 10].map(k => k * p).find(k => k >= v); };
+  function cols(rows, f = String) { // rows: [[axis label, value, tooltip label]]
+    const W = 340, H = 150, L = 36, B = 20, T = 8, max = nice(Math.max(...rows.map(r => r[1]), 1)), bw = (W - L) / rows.length, w = Math.min(24, bw * .7), step = Math.ceil(rows.length / 6);
+    const y = v => H - B - (H - B - T) * v / max;
+    const bar = (x, v) => { const h = H - B - y(v), r = Math.min(4, h, w / 2); return h > 0 ? `<path class="ch-b" d="M${x} ${H - B}V${y(v) + r}Q${x} ${y(v)} ${x + r} ${y(v)}H${x + w - r}Q${x + w} ${y(v)} ${x + w} ${y(v) + r}V${H - B}Z"/>` : ''; };
+    return `<svg class="ch-s" viewBox="0 0 ${W} ${H}">${[0, .5, 1].map(k => `<line class="ch-g" x1="${L}" x2="${W}" y1="${y(max * k)}" y2="${y(max * k)}"/><text class="ch-ax" x="${L - 6}" y="${y(max * k) + 3}" text-anchor="end">${f(max * k)}</text>`).join('')}
+     ${rows.map(([l, v, tl], i) => { const x = L + i * bw + (bw - w) / 2; return `<g data-tip="${esc(tl || l)}: ${esc(f(v))}">${bar(x, v)}<rect x="${L + i * bw}" y="0" width="${bw}" height="${H - B}" fill="transparent"/>${(rows.length - 1 - i) % step ? '' : `<text class="ch-ax" x="${x + w / 2}" y="${H - 6}" text-anchor="middle">${esc(l)}</text>`}</g>`; }).join('')}</svg>`;
+  }
+  function hbars(rows, f = String) { // rows: [[label, value]], largest first
+    const W = 340, rh = 26, L = 108, R = 64, max = Math.max(...rows.map(r => r[1]), 1);
+    return `<svg class="ch-s" viewBox="0 0 ${W} ${rows.length * rh}">${rows.map(([l, v], i) => { const w = v ? Math.max(3, (W - L - R) * v / max) : 0, y = i * rh + 7, r = Math.min(4, w / 2);
+      return `<g data-tip="${esc(l)}: ${esc(f(v))}"><text class="ch-ax" x="0" y="${y + 9}">${esc(l)}</text>${w ? `<path class="ch-b" d="M${L} ${y}H${L + w - r}Q${L + w} ${y} ${L + w} ${y + r}V${y + 12 - r}Q${L + w} ${y + 12} ${L + w - r} ${y + 12}H${L}Z"/>` : ''}<text class="ch-v" x="${L + w + 6}" y="${y + 10}">${esc(f(v))}</text><rect x="0" y="${i * rh}" width="${W}" height="${rh}" fill="transparent"/></g>`; }).join('')}</svg>`;
+  }
+  const chart = (svg, tip) => `<div class="ch"><p class="ch-r" aria-live="polite">${esc(tip)}</p>${svg}</div>`;
+  const colChart = (rows, f = String) => { const l = rows.at(-1); return chart(cols(rows, f), `${l[2] || l[0]}: ${f(l[1])}`); }; // readout starts on the latest period
+  const barChart = (rows, f = String) => chart(hbars(rows, f), `${rows[0][0]}: ${f(rows[0][1])}`);
+  const showTip = e => { const g = e.target.closest?.('.ch [data-tip]'); if (g) g.closest('.ch').querySelector('.ch-r').textContent = g.dataset.tip; };
+  addEventListener('pointerover', showTip); addEventListener('click', showTip);
 
   const SB ='<div class="island"></div><div class="status"><span>9:41</span><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.500" width="3" height="6.500" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg viewBox="0 0 17 12"><path d="M8.500 2.500c2.300 0 4.400.9 6 2.400l1.200-1.300A10.600 10.600 0 0 0 8.500.7 10.600 10.600 0 0 0 1.300 3.600L2.500 4.900a8.800 8.800 0 0 1 6-2.400zm0 3.700c1.300 0 2.500.5 3.400 1.300l1.200-1.300a7.100 7.100 0 0 0-9.200 0l1.200 1.300c.9-.8 2.100-1.300 3.400-1.300zm0 3.600l1.800-1.900a2.600 2.600 0 0 0-3.600 0z"/></svg><svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="22" height="11" rx="3.200" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="19" height="8" rx="2"/><rect x="24" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="homebar"></div>';
   document.body.insertAdjacentHTML('afterbegin', sprite);
@@ -447,5 +674,7 @@ const AJ = (() => {
   fit();
 
   return {$, $$, esc, peso, fmtDate, isEmail, isMobile, ref, S, isGuest, D, req, ticked, mobileRule, emailRule, validate, fld, sel, chk, ic, CATS, catName, ITEMS, BRANDS, item, pic, art, PHOTO_SLOTS,
-    FAQ, faq, CHIPS, GREETING, reply, paras, info, CONTACT, toast, route, gestures, skeleton, pop, center, INTRO};
+    FAQ, faq, CHIPS, GREETING, reply, answer, paras, info, CONTACT, toast, route, gestures, skeleton, pop, center, INTRO,
+    TTYPES, ttype, TSTEPS, AGENTS, ADMIN, isAdmin, who, TK, ticket, addTicket, post, setStatus, assign, mine, myTickets, QUEUES, queue, lastAsked, chatLog,
+    PERIODS, range, stats, trend, topCats, resByType, topics, REPORTS, report, cell, csv, printReport, colChart, barChart, hrs, pesoK, pct, vs, compact, ago, iso};
 })();

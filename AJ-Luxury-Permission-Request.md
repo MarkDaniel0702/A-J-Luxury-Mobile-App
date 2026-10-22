@@ -163,3 +163,42 @@ The same six drawings are styled three ways, one per prototype: soft tint with t
 - The chatbot matches keywords against fixed answers. It is not an AI model and gives a fallback reply to questions outside the FAQ.
 - Tested in Chromium only: automated checks of every screen and flow, plus every swipe tested with a mouse drag and with simulated touch. Not yet tried on Safari, Firefox or a real phone.
 - Dark mode is in Prototype 2 only. Prototype 3 is already dark, and Prototype 4's bright colours are its identity.
+
+---
+
+## Task 5 — Technical Support and admin access (Prototypes 2, 3 and 4)
+
+**Not done in Prototype 1.** Prototype 1 has no login, guest mode or chatbot to build on, and it uses A&J website photos, which the adviser's instruction does not allow. Support and admin were added to Prototypes 2, 3 and 4 only.
+
+**Open:** same files as Task 4. To try both sides in one sitting, stay in the **same browser tab**:
+1. Log in as a customer (any email and password) and open a support ticket.
+2. Log out, tap **Admin login** on the log-in screen and sign in with the sample staff account **admin@ajluxury.test / Admin2026**. The new ticket is at the top of the dashboard under "Needs attention".
+3. Reply, assign or change the status, log out, and log back in with the **same customer email**. The ticket shows "Updated", with the new status and the reply.
+
+Everything still resets when the page reloads, and another tab does not see this tab's tickets.
+
+**Technical Support (customers):**
+- Reachable from the main navigation: a **Support** tab in Prototype 2's tab bar, **Support** in Prototype 3's menu, and a **Help** tab in Prototype 4's dock (it was "Ava") with an "Ask Ava | Support tickets" switch. Also linked from the account or Me page, the footer, Prototype 4's "+" button, and the chatbot.
+- **New ticket:** choose the type (order issue, return or refund request, authenticity concern, app problem), look up the order or consignment it is about, then add a subject and description. Each customer gets five sample past orders and consignments to choose from, plus any inquiry, consignment, viewing or layaway request they made in the session. A confirmation screen shows the ticket reference.
+- **My tickets:** a list with status filters (All, Open, In progress, Resolved). Swipe the list left or right to change the filter. Each customer starts with one resolved ticket labelled **Sample**.
+- **Ticket page:** status timeline, the linked order or consignment, who is handling it, the full message history, and a reply box. Replying to a resolved ticket reopens it.
+- **Chatbot escalation:** when the customer asks for a person, or the chatbot does not understand, the answer shows **Talk to a support agent**. It opens a new ticket with the question as the subject and attaches the recent chat. A new FAQ answer covers "help with an order or consignment".
+- Guests can see Support and use the chatbot, but must log in to open or view tickets (the same rule as other account actions).
+
+**Admin (staff only):**
+- Separate **Admin login** screen with its own staff account. Customer and guest sessions that open an admin address see a "Staff only" page. Logged-out visits go to Admin login. The staff email is refused on the customer log-in form. Once signed in, staff stay in the admin area.
+- **Dashboard:** period switch (7 days, 30 days, 90 days, 12 months); tiles for sales, orders, new users, consignments (each with the change against the previous period), open tickets, average resolution time, chatbot questions and escalations; "Needs attention" list (new or unassigned tickets); charts for sales over time, sales by category, tickets opened, average resolution time by ticket type, chatbot questions over time and top chatbot topics. Tap or hover a bar to read its value.
+- **Tickets:** queues (Active, Unassigned, Mine, Open, In progress, Resolved, All) and search by ticket, customer or order number. A ticket shows the customer, the linked order or consignment, the attached chat, and the message history. Staff can change the status, assign it (or "Assign to me"), reply, and close or reopen it. Every change is logged in the history the customer sees.
+- **Reports:** sales, consignments, support tickets or users, filtered by date range (or Last 7 days to 12 months) and by category (item category, ticket type or user type). Shows totals, a chart and the first 50 rows. **CSV** downloads every row and column. **PDF** opens the browser's print dialog with a clean report page: choose "Save as PDF".
+- **Team:** each sample agent's active and recently resolved tickets, and log out.
+- Prototype 4's admin keeps its "+" button for quick actions (unassigned tickets, my tickets, sales report, ticket report).
+
+**Sample data:** about a year of orders, consignment requests, sign-ups, support tickets and chatbot questions, generated in `shared/core.js` with a fixed seed so the numbers are the same on every load. Dates count back from today, so recent periods always have data. Names are invented and emails use `example.com`. Brands and items are the invented catalogue from Task 4. Tickets submitted and chatbot questions asked in the session are added to the dashboard and reports.
+
+**Known limits:**
+- Access control and data live in the browser only. A real app must check staff access on the server, use A&J's own staff accounts and roles, and store tickets in a database.
+- One sample staff account (Bea Santos, support lead). The other three agents can be assigned but cannot log in.
+- No email, SMS or push notifications are sent. Prototype 4 adds an in-app notification when a ticket is submitted or updated.
+- Response times, refund rules and escalation hours are not shown, because A&J has not provided them. Ticket text says response times are still to be confirmed by A&J.
+- PDF export uses the browser's "Save as PDF" rather than a generated file.
+- Tested in Chromium only, at 1920×957 and at phone width: automated checks of every new flow (customer, guest, admin), the status round trip, the CSV contents, the print layout, and a regression run of the existing flows. Not yet tried on Safari, Firefox or a real phone.

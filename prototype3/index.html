@@ -75,7 +75,7 @@ main>:nth-child(2){animation-delay:.07s}main>:nth-child(3){animation-delay:.14s}
 .lnk{background:none;border:0;color:var(--gold2);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .fld{display:block;margin-bottom:18px;position:relative}
 .fld>span{display:block;font:500 11px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--mute)}
-input[type=email],input[type=password],input[type=search],input[type=text],input[type=tel],select,textarea{width:100%;min-height:46px;padding:10px 0;border:0;border-bottom:1px solid #efe8da4d;border-radius:0;background:transparent;font-size:17px;font-family:var(--ui);font-weight:300;color:var(--ink)}
+input[type=email],input[type=password],input[type=search],input[type=text],input[type=tel],input[type=date],select,textarea{width:100%;min-height:46px;padding:10px 0;border:0;border-bottom:1px solid #efe8da4d;border-radius:0;background:transparent;font-size:17px;font-family:var(--ui);font-weight:300;color:var(--ink)}
 input::placeholder,textarea::placeholder{color:#efe8da55}
 input:focus,select:focus,textarea:focus{outline:0;border-bottom-color:var(--gold)}
 select option{background:#131315}
@@ -330,6 +330,33 @@ details[open] summary .i{transform:rotate(180deg)}
 .intro .h2{margin:8px 0 10px}
 .intro p{color:var(--mute)}
 .ibar{display:flex;justify-content:space-between;align-items:center;padding:4px 28px 0}
+/* Support tickets + admin */
+.pill.on{background:var(--gold);color:#000}
+.tlog{display:flex;flex-direction:column;gap:12px;padding:0 24px 8px}
+.tlog .m.me small{color:#000;opacity:.65}
+.sysm{align-self:center;font:500 10px var(--ui);letter-spacing:1.6px;text-transform:uppercase;color:var(--mute);text-align:center}
+.sec.sm{padding:32px 24px 12px}
+.sec.sm .h2{font-size:25px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:14px 24px 0;background:var(--line);border:1px solid var(--line)}
+.kpi{padding:14px;background:var(--bg2);min-width:0}
+.kpi small{display:block;font:500 10px var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi b{display:block;margin-top:4px;font:500 30px/1.1 var(--disp);overflow-wrap:anywhere}
+.kpi span{display:block;font-size:12px;line-height:1.3;color:var(--mute)}
+.ch{margin:0 24px;padding:12px 14px 8px;border:1px solid var(--line);background:var(--bg2);--ch:var(--gold);--chg:#efe8da1f;--cht:var(--mute)}
+.ch-r{min-height:18px;margin-bottom:6px;font:500 11px var(--ui);letter-spacing:1.4px;text-transform:uppercase;color:var(--gold2)}
+.ch-s{display:block;width:100%;height:auto;overflow:visible}
+.ch-b{fill:var(--ch)}
+.ch g:hover .ch-b{fill:var(--gold2)}
+.ch-g{stroke:var(--chg);stroke-width:1}
+.ch-ax{font:300 11px var(--ui);fill:var(--cht)}
+.ch-v{font:500 11px var(--ui);fill:var(--ink)}
+.two{display:flex;gap:16px}
+.two>*{flex:1;min-width:0}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{padding:8px 4px;border-bottom:1px solid var(--line);font:500 10px var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-align:left}
+.tbl td{padding:9px 4px;border-bottom:1px solid #efe8da14;vertical-align:top;white-space:nowrap}
+.tbl td.w{white-space:normal}
+.tbl th:last-child,.tbl td:last-child{text-align:right}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -356,7 +383,7 @@ details[open] summary .i{transform:rotate(180deg)}
    </div>
   </div>
  </div>
- <div class="cap"><b>Prototype 3 · Noir Salon</b>Log in with any email and password, or browse as a guest. Nothing is sent or saved. Drag with the mouse to swipe.</div>
+ <div class="cap"><b>Prototype 3 · Noir Salon</b>Log in with any email and password, or browse as a guest. Admin: “Admin login” on the log-in screen (admin@ajluxury.test / Admin2026), in the same tab, to see tickets you sent. Nothing is sent or saved. Drag with the mouse to swipe.</div>
 </div>
 
 <script src="../shared/core.js"></script>
@@ -369,8 +396,10 @@ const colOf = c => c === 'all' ? ['All pieces', 'Every piece currently listed'] 
 const enc = encodeURIComponent;
 let sort = 'featured', tab = 'all', bsel = 'all', sq = '';
 let W = {photos: new Set()};
+let tf = 'all', af = 'active', aq = '', aper = 30, rep = null; // support ticket filter; admin queue, search, dashboard period, last report
 S.msgs.push({who: 'bot', text: AJ.GREETING});
-const MEMBER = 'saved inquire viewing requests request consignform settings'.split(' ');
+const MEMBER = 'saved inquire viewing requests request consignform settings ticketnew ticket'.split(' ');
+const STAFF = 'admin atickets aticket areports ateam'.split(' '); // admin routes: staff only
 const count = c => ITEMS.filter(p => p.cat === c).length;
 
 /* ---------- pieces ---------- */
@@ -397,10 +426,18 @@ const drawer = on => { $('#drawer').classList.toggle('on', on); $('#drawer').set
 function buildDrawer() {
   const u = S.user, here = AJ.route().name;
   const L = (h, t, n, small = '') => `<a class="dl" href="#/${h}" ${here === n ? 'aria-current="page"' : ''}>${t}${small ? `<small>${small}</small>` : ''}</a>`;
+  if (AJ.isAdmin()) { // staff menu
+    $('#dp').innerHTML = `<div class="dh"><span class="eyebrow">A&amp;J · Admin</span><button class="ib" data-act="dclose" aria-label="Close menu">${ic('close')}</button></div>
+     <div class="who"><small class="lab" style="margin:0 0 2px">Staff</small><b>${esc(u.name)}</b></div>
+     ${L('admin', 'Dashboard', 'admin')}${L('atickets', 'Tickets', 'atickets', AJ.queue('active').length + ' active')}${L('areports', 'Reports', 'areports')}${L('ateam', 'Team', 'ateam')}
+     <div class="dsub"><span>Prototype · sample data</span></div><button class="btn blk" data-act="logout">Log out</button>`;
+    return;
+  }
+  const upd = u && !isGuest() ? AJ.myTickets(u).filter(t => t.newU).length : 0;
   $('#dp').innerHTML = `<div class="dh"><span class="eyebrow">A&amp;J Luxury</span><button class="ib" data-act="dclose" aria-label="Close menu">${ic('close')}</button></div>
    <div class="who"><small class="lab" style="margin:0 0 2px">${isGuest() ? 'Browsing as' : 'Signed in'}</small><b>${u ? (isGuest() ? 'Guest' : esc(u.name)) : ''}</b></div>
    ${L('home', 'Home', 'home')}${L('collections', 'Collections', 'collections')}${L('brands', 'Brands', 'brands')}${L('consign', 'Consign with us', 'consign')}${L('viewing', 'Book a viewing', 'viewing')}${L('authenticity', 'Authenticity', 'authenticity')}
-   ${L('saved', 'Saved', 'saved', S.wish.size || '')}${L('requests', 'My requests', 'requests', S.req.length || '')}
+   ${L('saved', 'Saved', 'saved', S.wish.size || '')}${L('requests', 'My requests', 'requests', S.req.length || '')}${L('support', 'Support', 'support', upd ? upd + ' updated' : '')}
    <div class="dsub"><a href="#/faqs">FAQs</a><a href="#/contact">Contact</a><a href="#/settings">Profile</a><a href="#/info/terms">Terms</a><a href="#/info/privacy">Privacy</a></div>
    <button class="btn blk" data-act="${isGuest() ? 'login' : 'logout'}">${isGuest() ? 'Log in' : 'Log out'}</button>`;
 }
@@ -419,7 +456,16 @@ function vLogin() {
    <button class="btn f blk" type="submit">Enter</button></form>
   <p class="fine"><a href="#/forgot">Forgot password?</a></p><div class="or">or</div>
   <button class="btn blk" data-act="guest">Browse as a guest</button>
-  <p class="fine">New here? <a href="#/join">Create an account</a></p><p class="fine" style="font-size:11px">Prototype: any email and password works. <a href="#/welcome">View intro</a></p></div>`;
+  <p class="fine">New here? <a href="#/join">Create an account</a></p><p class="fine" style="font-size:11px">Prototype: any email and password works. <a href="#/welcome">View intro</a></p>
+  <p class="fine" style="font-size:11px">A&amp;J staff? <a href="#/adminlogin">Admin login</a></p></div>`;
+}
+function vAdminLogin() {
+  return `<div class="login lat"><div class="glow"></div><div class="eyebrow">Staff only · Admin console</div><h1 class="logo">A&amp;J</h1><p>The <i>back office.</i></p>
+  <form id="adminform" novalidate>${fld('Staff email', 'aemail', {type: 'email', ac: 'username'})}
+   <label class="fld"><span>Password</span><input type="password" name="apw" autocomplete="current-password" value="${esc(D.apw || '')}">${eye}<small class="err" data-for="apw"></small></label>
+   <button class="btn f blk" type="submit">Enter admin</button></form>
+  <p class="fine" style="font-size:12px">Prototype staff account: <b>${AJ.ADMIN.email}</b>, password <b>${AJ.ADMIN.pw}</b>. Customer and guest logins can’t open admin screens.</p>
+  <p class="fine"><a href="#/login">Back to customer log in</a></p></div>`;
 }
 function vJoin() {
   return `<div class="formpage"><a class="back" href="#/login">${ic('back', 's')} Back</a><div class="eyebrow">Join A&amp;J</div><h1 class="h2" style="margin:6px 0 20px">Create your <i>account</i></h1>
@@ -452,7 +498,7 @@ function vHome() {
    <a href="#/info/shipping">${ic('truck')}<div><b>Nationwide delivery</b><small>Same-day in Metro Manila before the cut-off</small></div></a>
    <a href="#/info/layaway">${ic('card')}<div><b>Layaway</b><small>30% down, balance in equal monthly payments</small></div></a></div>
   <section class="band" style="margin-top:34px"><div class="eyebrow">Showroom</div><h2 class="h2" style="margin-top:8px">See it <i>in person</i></h2><p>Request a private viewing of the pieces you love.</p><a class="btn" href="#/viewing">Book a viewing</a></section>
-  <div class="foot"><a href="#/faqs">FAQs</a><a href="#/contact">Contact</a><a href="#/info/terms">Terms</a><a href="#/info/privacy">Privacy</a></div>
+  <div class="foot"><a href="#/faqs">FAQs</a><a href="#/support">Support</a><a href="#/contact">Contact</a><a href="#/info/terms">Terms</a><a href="#/info/privacy">Privacy</a></div>
   <p class="note">Prototype: pieces, prices and pictures are made-up samples. Pictures are generated placeholders, not photos.</p>`;
 }
 function vCollections() {
@@ -652,12 +698,120 @@ function vInfo(id) {
   return `<div class="chead"><div class="eyebrow">Information</div><h1 class="h1" style="margin-top:6px">${esc(i.t)}</h1></div><div class="info">${i.html}<p><button class="lnk" data-act="concierge">Ask the concierge about this</button></p></div>`;
 }
 
+/* ---------- support: after-sales tickets ---------- */
+const NOLINK = 'Not about an order or consignment';
+const myRefs = () => [...AJ.mine(S.user), ...S.req.map(r => ({kind: r.type, ref: r.ref, item: r.item, title: r.title, status: r.status}))];
+const refLabel = r => `${r.ref} · ${r.title} · ${r.status}`;
+const day = d => AJ.fmtDate(d, {day: 'numeric', month: 'short', year: 'numeric'});
+const tpill = t => `<span class="pill">${t.st}</span>${t.sample ? ' <span class="pill">Sample</span>' : ''}`;
+const linkRow = l => `<div class="req" style="display:flex;gap:14px;align-items:center;padding:12px 0">${l.item ? `<img src="${art(item(l.item), 'Front', false)}" alt="" style="width:72px;height:72px;object-fit:cover;border:1px solid var(--line)">` : ''}
+  <div><small>${l.kind} · ${l.ref}${l.at ? ' · ' + day(l.at) : ''}</small><b style="font-size:19px">${esc(l.title)}</b><span class="sub">${l.amount ? peso(l.amount) + ' · ' : ''}${esc(l.status)}</span></div></div>`;
+const tmsg = (m, side) => m.by === 'sys' ? `<p class="sysm">${esc(m.text)} · ${AJ.ago(m.at)}</p>`
+  : `<div class="m ${m.by === side ? 'me' : 'bot'}">${esc(m.text)}<small>${m.by === 'user' ? (side === 'user' ? 'You' : esc(m.name)) : esc(m.name) + ' · A&amp;J Support'} · ${AJ.ago(m.at)}</small></div>`;
+const chatBox = t => t.chat ? `<details><summary>Chat with the concierge (${t.chat.length})${ic('down')}</summary><div class="dbody">${t.chat.map(l => `<p>${esc(l)}</p>`).join('')}</div></details>` : '';
+const steps = t => `<ol class="tl">${AJ.TSTEPS.map((s, i) => `<li class="${i <= AJ.TSTEPS.indexOf(t.st) ? 'on' : ''}">${s}</li>`).join('')}</ol>`;
+function vSupport() {
+  const g = isGuest(), l = g ? [] : AJ.myTickets(S.user), show = l.filter(t => tf === 'all' || t.st === tf);
+  return `<div class="chead"><div class="eyebrow">After-sales</div><h1 class="h1" style="margin-top:6px">Support <i>desk</i></h1><p>Help with an order, a return or refund, an authenticity concern or the app.</p></div>
+  <div class="pad"><a class="btn f blk" href="#/ticketnew">Open a support ticket</a><button class="btn blk" style="margin-top:10px" data-act="concierge">Ask the concierge first</button></div>
+  <div class="sec sm" style="padding-top:8px"><h2 class="h2">My <i>tickets</i></h2></div>` + (g ? `<div class="empty">${ic('lock')}<p>Log in to open and track support tickets.</p><button class="btn f" data-act="login">Log in</button></div>`
+    : `<div class="bar">${[['all', 'All'], ...AJ.TSTEPS.map(s => [s, s])].map(([v, x]) => `<button class="chip" data-act="tf" data-v="${v}" aria-pressed="${tf === v}">${x} · ${v === 'all' ? l.length : l.filter(t => t.st === v).length}</button>`).join('')}</div>
+     <div data-swipe="swtf" style="min-height:160px">${show.length ? show.map(t => `<a class="req" href="#/ticket/${t.ref}"><small>${t.ref} · ${AJ.ttype(t.type)[2]} · updated ${AJ.ago(t.up)}</small><b>${esc(t.subj)}</b>${tpill(t)}${t.newU ? ' <span class="pill on">Updated</span>' : ''}</a>`).join('')
+       : `<div class="empty">${ic('headset')}<p>No ${tf === 'all' ? '' : tf.toLowerCase() + ' '}tickets.</p></div>`}</div>`) + '<div style="height:24px"></div>';
+}
+function vTicketNew() {
+  const chat = AJ.route().q.has('chat');
+  D.ttype ||= 'order'; if (chat && D.tsubj === undefined) D.tsubj = AJ.lastAsked();
+  return `<div class="chead"><div class="eyebrow">Support</div><h1 class="h1" style="margin-top:6px">A new <i>ticket</i></h1><p>Tell us what happened. The A&amp;J team replies inside the ticket.</p></div>
+  <form class="formpage" id="tform" novalidate><span class="lab">What is it about?</span><div class="chips">${AJ.TTYPES.map(([k, l]) => pick('ttype', k, l)).join('')}</div>
+   <p id="thint" style="margin:-8px 0 18px;font-size:13px;color:var(--mute)">${AJ.ttype(D.ttype)[3]}</p>
+   ${sel('Order or consignment', 'tlink', [...myRefs().map(refLabel), NOLINK], 'Look up your order or consignment')}
+   ${fld('Subject', 'tsubj', {ph: 'e.g. Item not delivered yet'})}${fld('What happened?', 'ttext', {area: 1, ph: 'Describe the issue, with dates and what you expected.'})}
+   ${chat ? '<p class="pend">Your recent chat with the concierge will be attached, so the team has the context.</p>' : ''}</form>`;
+}
+function vTicket(ref) {
+  const t = AJ.ticket(ref); if (!t || t.key !== AJ.who(S.user)) return `<div class="empty">${ic('headset')}<p>Ticket not found.</p><a class="btn" href="#/support">My tickets</a></div>`;
+  const fresh = AJ.route().q.has('new'); t.newU = false;
+  return `${fresh ? `<div class="ok"><div class="dmb">${ic('check')}</div><h1 class="h2">Ticket submitted</h1><p>Reference ${t.ref}. The A&amp;J team replies here. Response times are still to be confirmed by A&amp;J.</p></div>` : ''}
+  <div class="pad"><div class="eyebrow">${AJ.ttype(t.type)[1]} · ${t.ref}</div><h2 class="h2" style="margin:4px 0 8px">${esc(t.subj)}</h2>${tpill(t)}
+   <h3 class="lab" style="margin-top:22px">Progress</h3>${steps(t)}
+   ${t.link ? `<h3 class="lab">Linked ${t.link.kind.toLowerCase()}</h3>${linkRow(t.link)}` : ''}
+   <dl class="kv"><dt>Opened</dt><dd>${day(t.at)}</dd><dt>Handled by</dt><dd>${esc(t.agent || 'Not assigned yet')}</dd><dt>Last update</dt><dd>${AJ.ago(t.up)}</dd></dl></div>
+  ${chatBox(t)}<div class="eyebrow" style="padding:22px 24px 12px">Messages</div><div class="tlog">${t.msgs.map(m => tmsg(m, 'user')).join('')}</div>
+  <form class="formpage" id="treply" data-ref="${t.ref}" novalidate>${fld(t.st === 'Resolved' ? 'Reply to reopen this ticket' : 'Your reply', 'treply', {area: 1, ph: 'Write to the A&J team'})}<button class="btn f blk" type="submit">Send reply</button></form>`;
+}
+
+/* ---------- admin (staff only) ---------- */
+const kpi = (l, v, s = '') => `<div class="kpi"><small>${l}</small><b>${esc(v)}</b>${s ? `<span>${esc(s)}</span>` : ''}</div>`;
+const num = n => AJ.compact.format(n);
+const arow = t => `<a class="req" href="#/aticket/${t.ref}"><small>${t.ref} · ${AJ.ttype(t.type)[2]} · ${AJ.ago(t.up)}</small><b>${esc(t.subj)}</b><span class="sub">${esc(t.cust.name)} · ${esc(t.agent || 'Unassigned')}</span><br>
+  <span class="pill">${t.st}</span>${t.newA ? ' <span class="pill on">New</span>' : ''}${t.ch === 'Chatbot' ? ' <span class="pill">From chatbot</span>' : ''}</a>`;
+function vAdmin() {
+  const {f, t} = AJ.range(aper), s = AJ.stats(f, t), p = AJ.stats(new Date(2 * f - t), f), open = AJ.queue('active'), hot = open.filter(x => x.newA || !x.agent).slice(0, 4);
+  const sec = (h, x) => `<div class="sec sm"><h2 class="h2">${h}</h2></div>${x}`;
+  return `<div class="chead"><div class="eyebrow">Admin · last ${AJ.PERIODS.find(x => x[0] === aper)[1]}</div><h1 class="h1" style="margin-top:6px">The <i>dashboard</i></h1></div>
+  <div class="bar" style="margin-top:6px">${AJ.PERIODS.map(([d, l]) => `<button class="chip" data-act="aper" data-v="${d}" aria-pressed="${aper === d}">${l}</button>`).join('')}</div>
+  <div class="kpis">${kpi('Sales', AJ.pesoK(s.sales), AJ.vs(s.sales, p.sales))}${kpi('Orders', s.orders, AJ.vs(s.orders, p.orders))}${kpi('New users', s.users, AJ.vs(s.users, p.users))}${kpi('Consignments', s.cons, AJ.vs(s.cons, p.cons))}
+   ${kpi('Open tickets', open.length, open.filter(x => !x.agent).length + ' unassigned')}${kpi('Avg resolution', s.res ? AJ.hrs(s.res) : '—', s.tickets + ' tickets opened')}
+   ${kpi('Chatbot questions', num(s.q), AJ.pct(s.faq) + ' answered from FAQs')}${kpi('Escalations', s.esc, s.tickets ? AJ.pct(s.esc / s.tickets) + ' of tickets came from the chatbot' : '')}</div>
+  <div class="sec sm"><h2 class="h2">Needs <i>attention</i></h2><a href="#/atickets">All tickets</a></div>${hot.length ? hot.map(arow).join('') : '<p class="cnt" style="padding-top:0">Nothing waiting. Every active ticket is assigned and seen.</p>'}
+  ${sec('Sales', AJ.colChart(AJ.trend('sales', f, t), AJ.pesoK))}${sec('Sales by <i>category</i>', AJ.barChart(AJ.topCats(f, t), AJ.pesoK))}
+  ${sec('Tickets <i>opened</i>', AJ.colChart(AJ.trend('tickets', f, t), num))}${sec('Average <i>resolution</i>', AJ.barChart(AJ.resByType(f, t), AJ.hrs))}
+  ${sec('Chatbot <i>questions</i>', AJ.colChart(AJ.trend('chat', f, t), num))}${sec('Top chatbot <i>topics</i>', AJ.barChart(AJ.topics(f, t), num))}
+  <p class="note">Sample data generated for the prototype, not A&amp;J figures. Tickets and concierge questions from this session are included. Tap a bar to see its value.</p>`;
+}
+const alist = l => `<p class="cnt">${l.length} ticket${l.length === 1 ? '' : 's'}${l.length > 60 ? ' · showing the 60 most recent' : ''}</p>` + (l.length ? l.slice(0, 60).map(arow).join('') : `<div class="empty">${ic('headset')}<p>No tickets match.</p></div>`);
+function vATickets() {
+  return `<div class="chead"><div class="eyebrow">Admin</div><h1 class="h1" style="margin-top:6px">Support <i>tickets</i></h1></div>
+  <div style="padding:4px 24px 0"><input type="search" id="aq" placeholder="Search ticket, customer or order" aria-label="Search tickets" value="${esc(aq)}" autocomplete="off"></div>
+  <div class="bar" style="margin-top:10px">${AJ.QUEUES.map(([k, x]) => `<button class="chip" data-act="af" data-v="${k}" aria-pressed="${af === k}">${x}</button>`).join('')}</div><div id="al">${alist(AJ.queue(af, aq))}</div>`;
+}
+function vATicket(ref) {
+  const t = AJ.ticket(ref); if (!t) return `<div class="empty">${ic('headset')}<p>Ticket not found.</p><a class="btn" href="#/atickets">All tickets</a></div>`;
+  t.newA = false; D.aag = t.agent || 'Unassigned'; const L = t.link;
+  return `<div class="pad"><div class="eyebrow">${AJ.ttype(t.type)[1]} · ${t.ref}</div><h2 class="h2" style="margin:4px 0 8px">${esc(t.subj)}</h2><span class="pill">${t.st}</span>${t.ch === 'Chatbot' ? ' <span class="pill">From chatbot</span>' : ''}
+   <dl class="kv" style="margin-top:16px"><dt>Customer</dt><dd>${esc(t.cust.name)}</dd><dt>Contact</dt><dd>${esc(t.cust.email || '—')}</dd><dt>Opened</dt><dd>${day(t.at)}, ${AJ.ago(t.at)}</dd><dt>Channel</dt><dd>${t.ch === 'Chatbot' ? 'Escalated from the chatbot' : 'Support form'}</dd>${t.done ? `<dt>Resolved in</dt><dd>${AJ.hrs((t.done - t.at) / 36e5)}</dd>` : ''}</dl>
+   <span class="lab" style="margin-top:22px">Status</span><div class="seg">${AJ.TSTEPS.map(s => `<button type="button" class="chip" data-act="ast" data-v="${s}" aria-pressed="${t.st === s}">${s}</button>`).join('')}</div>
+   ${sel('Assigned to', 'aag', ['Unassigned', ...AJ.AGENTS])}${t.agent === AJ.ADMIN.name ? '' : '<button class="lnk" data-act="ame">Assign to me</button>'}</div>
+  <section class="check" style="margin-top:0"><h3>${ic('box', 's')} Linked order or consignment</h3>${L ? `<dl class="kv"><dt>Reference</dt><dd>${L.ref} (${L.kind})</dd><dt>Item</dt><dd>${esc(L.title)}</dd>${L.amount ? `<dt>Amount</dt><dd>${peso(L.amount)}</dd>` : ''}${L.at ? `<dt>Date</dt><dd>${day(L.at)}</dd>` : ''}<dt>Status</dt><dd>${esc(L.status)}</dd></dl>` : '<p style="font-size:14px;color:var(--mute)">None linked.</p>'}</section>
+  ${chatBox(t)}<div class="eyebrow" style="padding:22px 24px 12px">Messages</div><div class="tlog">${t.msgs.map(m => tmsg(m, 'agent')).join('')}</div>
+  <form class="formpage" id="areply" data-ref="${t.ref}" novalidate>${fld('Reply to the customer', 'areply', {area: 1, ph: 'The customer sees this in their ticket.'})}</form>`;
+}
+function vAReports() {
+  D.rkind ||= 'sales'; if (!D.rfrom) { const {f, t} = AJ.range(30); D.rfrom = AJ.iso(f); D.rto = AJ.iso(t); }
+  const opt = (v, l, cur) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(l)}</option>`, today = AJ.iso(new Date());
+  return `<div class="chead"><div class="eyebrow">Admin</div><h1 class="h1" style="margin-top:6px">The <i>reports</i></h1></div>
+  <div class="formpage" style="padding-bottom:0"><label class="fld"><span>Report</span><select name="rkind">${Object.entries(AJ.REPORTS).map(([k, [l]]) => opt(k, l, D.rkind)).join('')}</select></label>
+   <div class="two"><label class="fld"><span>From</span><input type="date" name="rfrom" value="${D.rfrom}" max="${today}"></label><label class="fld"><span>To</span><input type="date" name="rto" value="${D.rto}" max="${today}"></label></div>
+   <div class="chips" style="margin-top:-6px">${AJ.PERIODS.map(([d, l]) => `<button class="chip" data-act="rquick" data-v="${d}">${l}</button>`).join('')}</div>
+   <label class="fld"><span>${{tickets: 'Ticket type', users: 'User type'}[D.rkind] || 'Category'}</span><select name="rcat">${opt('', 'All', D.rcat || '')}${AJ.REPORTS[D.rkind][1].map(([k, l]) => opt(k, l, D.rcat)).join('')}</select></label></div>
+  <div id="rep">${repBody()}</div>`;
+}
+const WIDE = ['Item', 'Subject', 'Name']; // the one text column that may wrap in the phone table
+function repBody() {
+  const f = new Date(D.rfrom + 'T00:00'), t = new Date(D.rto + 'T23:59:59');
+  if (!(f <= t)) { rep = null; return '<p class="err" style="padding:0 24px 24px">Choose a start date on or before the end date.</p>'; }
+  const r = rep = AJ.report(D.rkind, f, t, D.rcat || '');
+  return `<p class="cnt" style="padding-top:0">${esc(r.sub)}</p><div class="kpis">${r.kpis.map(([k, v]) => kpi(k, v)).join('')}</div><div style="height:14px"></div>${AJ.colChart(r.trend, r.fmt)}
+  <div style="padding:18px 24px 0"><table class="tbl"><thead><tr>${r.show.map(i => `<th>${r.cols[i][0]}</th>`).join('')}</tr></thead><tbody>${r.rows.slice(0, 50).map(row => `<tr>${r.show.map(i => `<td class="${WIDE.includes(r.cols[i][0]) ? 'w' : ''}">${AJ.cell(row[i], r.cols[i][1])}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${r.show.length}">No rows for these filters.</td></tr>`}</tbody></table></div>
+  <p class="cnt">${r.rows.length > 50 ? `Showing 50 of ${r.rows.length} rows. ` : ''}Export below: CSV and PDF include every row and column. PDF opens the print dialog: choose “Save as PDF”.</p><div style="height:20px"></div>`;
+}
+function vATeam() {
+  const {f} = AJ.range(30);
+  return `<div class="chead"><div class="eyebrow">Admin</div><h1 class="h1" style="margin-top:6px">The <i>team</i></h1><p>Signed in as ${esc(AJ.ADMIN.name)}, support lead (${AJ.ADMIN.email}).</p></div><div style="height:10px"></div>
+  ${AJ.AGENTS.map(a => `<div class="req"><small>${a === AJ.ADMIN.name ? 'You' : 'Agent'}</small><b>${esc(a)}</b><span class="sub">${AJ.TK.filter(x => x.agent === a && x.st !== 'Resolved').length} active · ${AJ.TK.filter(x => x.agent === a && x.done >= f).length} resolved in the last 30 days</span></div>`).join('')}
+  <p class="note" style="text-align:left">Prototype: one sample staff account. Real staff accounts, roles and permissions need to be set up with A&amp;J.</p>
+  <div class="pad" style="padding-top:0"><button class="btn blk" data-act="logout">Log out</button></div>`;
+}
+const staffGate = () => `<div class="gate">${ic('lock')}<h1>Staff only</h1><p>Admin screens are for A&amp;J staff. Log out, then use Admin login.</p>
+  <button class="btn f" data-act="tostaff">Log out and open Admin login</button><br><a class="lnk" href="#/home">Back to the salon</a></div>`;
+
 /* ---------- concierge chat ---------- */
 const ACTIONS = {human: ['See contact details', '#/contact'], showroom: ['Book a viewing', '#/viewing'], consign: ['Request an appraisal', '#/consignform'], sell: ['Request an appraisal', '#/consignform'],
   authentic: ['Read the authenticity guide', '#/authenticity'], layaway: ['Layaway terms', '#/info/layaway'], buy: ['Browse collections', '#/collections'], shipping: ['Shipping details', '#/info/shipping'],
-  returns: ['Return policy', '#/info/returns'], payment: ['Payment options', '#/info/payment']};
+  returns: ['Return policy', '#/info/returns'], payment: ['Payment options', '#/info/payment'], support: ['Open Support', '#/support']};
 const bubble = m => m.typing ? '<div class="m bot typing" aria-label="Typing"><i></i><i></i><i></i></div>'
-  : `<div class="m ${m.who}">${esc(m.text)}${m.who === 'bot' && m.topic !== 'hi' && m.topic !== 'thanks' ? '<small>Concierge · FAQ answers based on A&amp;J’s public policies, to be confirmed by A&amp;J</small>' : ''}${ACTIONS[m.topic] ? `<a class="btn sm" href="${ACTIONS[m.topic][1]}">${ACTIONS[m.topic][0]}</a>` : ''}</div>`;
+  : `<div class="m ${m.who}">${esc(m.text)}${m.who === 'bot' && m.topic !== 'hi' && m.topic !== 'thanks' ? '<small>Concierge · FAQ answers based on A&amp;J’s public policies, to be confirmed by A&amp;J</small>' : ''}${m.topic === 'human' || m.topic === 'none' ? '<a class="btn f sm" href="#/ticketnew?chat">Talk to a support agent</a> ' : ''}${ACTIONS[m.topic] ? `<a class="btn sm" href="${ACTIONS[m.topic][1]}">${ACTIONS[m.topic][0]}</a>` : ''}</div>`;
 const drawLog = () => { $('#log').innerHTML = S.msgs.map(bubble).join(''); $('#log').scrollTop = 1e6; };
 function openChat(id) {
   drawer(false); $('#qs').innerHTML = AJ.CHIPS.map(c => `<button class="chip" data-act="ask" data-id="${c}">${esc(AJ.faq(c).q)}</button>`).join('');
@@ -666,14 +820,19 @@ function openChat(id) {
 function say(text, id) {
   S.msgs.push({who: 'me', text}, {typing: 1}); drawLog();
   setTimeout(() => {
-    S.msgs.pop(); const f = id && AJ.faq(id);
-    S.msgs.push({who: 'bot', ...(f ? {text: f.a, topic: f.id} : AJ.reply(text))}); drawLog();
+    S.msgs.pop(); S.msgs.push({who: 'bot', ...AJ.answer(text, id)}); drawLog();
   }, 650);
 }
 
 /* ---------- router ---------- */
 const R = {
-  welcome: {bare: 1, view: vWelcome}, login: {bare: 1, view: vLogin}, join: {bare: 1, view: vJoin}, forgot: {bare: 1, view: vForgot},
+  welcome: {bare: 1, view: vWelcome}, login: {bare: 1, view: vLogin}, join: {bare: 1, view: vJoin}, forgot: {bare: 1, view: vForgot}, adminlogin: {bare: 1, view: vAdminLogin},
+  support: {top: 1, title: 'Support', view: vSupport}, ticket: {title: 'Ticket', up: '#/support', view: vTicket},
+  ticketnew: {title: 'New ticket', up: '#/support', view: vTicketNew, dock: () => `<button class="btn f" form="tform" type="submit">Submit ticket</button>`},
+  admin: {top: 1, title: 'Dashboard', view: vAdmin}, atickets: {top: 1, title: 'Tickets', view: vATickets},
+  aticket: {title: 'Ticket', up: '#/atickets', view: vATicket, dock: a => `<button class="btn" data-act="aclose">${AJ.ticket(a)?.st === 'Resolved' ? 'Reopen' : 'Resolve'}</button><button class="btn f" form="areply" type="submit">Send reply</button>`},
+  areports: {top: 1, title: 'Reports', view: vAReports, dock: () => `<button class="btn" data-act="csv">${ic('download', 's')} CSV</button><button class="btn f" data-act="pdf">${ic('doc', 's')} PDF</button>`},
+  ateam: {top: 1, title: 'Team', view: vATeam},
   home: {top: 1, wm: 1, view: vHome}, collections: {top: 1, title: 'Collections', view: vCollections},
   collection: {title: 'Collection', up: '#/collections', view: vCollection}, brands: {top: 1, title: 'Brands', view: vBrands}, brand: {title: 'Brand', up: '#/brands', view: vBrand},
   search: {title: 'Search', up: '#/home', view: vSearch}, p: {title: 'Piece', up: '#/collections', view: vProduct, dock: dockProduct},
@@ -689,23 +848,24 @@ const redirect = h => { history.replaceState(null, '', h); render(false); };
 const refresh = (keep = true) => { const t = $('#main').scrollTop; render(false); if (keep) { $('#main').scrollTop = t; $('#main').classList.add('still'); } }; // in-place updates keep scroll and skip the entry animation
 function render(nav = true) {
   const {name, args} = AJ.route(), r = name || 'login', a = args[0] || '';
-  if (!S.user && !['welcome', 'login', 'join', 'forgot', 'info'].includes(r)) return redirect('#/login');
-  if (S.user && (r === 'login' || r === 'welcome')) return redirect('#/home');
-  const d = R[r] || R.home;
+  if (!S.user && !['welcome', 'login', 'join', 'forgot', 'info', 'adminlogin'].includes(r)) return redirect(STAFF.includes(r) ? '#/adminlogin' : '#/login');
+  if (S.user && ['login', 'welcome', 'adminlogin'].includes(r)) return redirect(AJ.isAdmin() ? '#/admin' : '#/home');
+  if (AJ.isAdmin() && !STAFF.includes(r) && r !== 'info') return redirect('#/admin'); // staff stay in the admin area
+  const d = R[r] || R.home, staff = AJ.isAdmin(), shut = STAFF.includes(r) && !staff;
   if (nav && !first) depth++; first = false;
   closeSheet(); drawer(false); $('#cs').hidden = true;
   const bare = !!d.bare, top = $('#top');
   top.className = 'top' + (bare ? ' bare' : ''); $('#gb').hidden = !isGuest() || bare;
   const title = r === 'info' ? (AJ.info(a)?.t || 'Information') : d.title;
-  top.innerHTML = bare ? '' : `<div class="l">${!d.top || (depth > 0 && r !== 'home') ? `<button class="ib" data-act="back" aria-label="Back">${ic('back')}</button>` : ''}${d.top ? `<button class="ib" data-act="dopen" aria-label="Open menu">${ic('menu')}</button>` : ''}</div>
+  top.innerHTML = bare ? '' : `<div class="l">${!d.top || (depth > 0 && !['home', 'admin'].includes(r)) ? `<button class="ib" data-act="back" aria-label="Back">${ic('back')}</button>` : ''}${d.top ? `<button class="ib" data-act="dopen" aria-label="Open menu">${ic('menu')}</button>` : ''}</div>
    ${d.wm ? '<div class="wm">A&amp;J</div>' : `<div class="tt">${esc(title || '')}</div>`}
-   <div class="r">${S.user ? `<a class="ib" href="#/search" aria-label="Search">${ic('search')}</a><a class="ib" href="#/saved" aria-label="Saved">${ic('heart')}${S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''}</a>` : ''}</div>`;
+   <div class="r">${S.user && !staff ? `<a class="ib" href="#/search" aria-label="Search">${ic('search')}</a><a class="ib" href="#/saved" aria-label="Saved">${ic('heart')}${S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''}</a>` : ''}</div>`;
   const m = $('#main'), dock = $('#dock');
   m.classList.remove('still');
-  m.innerHTML = isGuest() && MEMBER.includes(r) ? gateView({saved: 'see your saved pieces', inquire: 'send an inquiry', viewing: 'book a viewing', requests: 'see your requests', request: 'see your requests', consignform: 'request an appraisal', settings: 'edit your profile'}[r]) : d.view(a);
-  const showDock = d.dock && !(isGuest() && MEMBER.includes(r));
+  m.innerHTML = shut ? staffGate() : isGuest() && MEMBER.includes(r) ? gateView({saved: 'see your saved pieces', inquire: 'send an inquiry', viewing: 'book a viewing', requests: 'see your requests', request: 'see your requests', consignform: 'request an appraisal', settings: 'edit your profile', ticketnew: 'open a support ticket', ticket: 'see your tickets'}[r]) : d.view(a);
+  const showDock = d.dock && !(isGuest() && MEMBER.includes(r)) && !shut;
   dock.hidden = !showDock; dock.innerHTML = showDock ? d.dock(a) : '';
-  $('#fab').hidden = bare; $('#fab').classList.toggle('lift', !!showDock);
+  $('#fab').hidden = bare || staff; $('#fab').classList.toggle('lift', !!showDock);
   m.scrollTop = 0; m.focus({preventScroll: true});
   if (r === 'search' && nav) $('#sq')?.focus();
   buildDrawer();
@@ -746,9 +906,20 @@ const ACT = {
   },
   inext() { const s = $('#intro'), i = Math.round(s.scrollLeft / s.clientWidth); i < s.children.length - 1 ? s.scrollTo({left: (i + 1) * s.clientWidth, behavior: 'smooth'}) : go('#/login'); },
   swtab(el, d) { const L = ['all', 'new', 'pre'], n = L[L.indexOf(tab) + d]; if (!n) return false; tab = n; refresh(); }, // swipe a collection between All / Brand new / Pre-loved
-  pick(el) { const {k, v} = el.dataset; D[k] = v; $$(`[data-act=pick][data-k="${k}"]`).forEach(b => b.setAttribute('aria-pressed', b === el)); $(`[data-for="${k}"]`)?.replaceChildren(); },
+  pick(el) { const {k, v} = el.dataset; D[k] = v; $$(`[data-act=pick][data-k="${k}"]`).forEach(b => b.setAttribute('aria-pressed', b === el)); $(`[data-for="${k}"]`)?.replaceChildren(); if (k === 'ttype') $('#thint').textContent = AJ.ttype(v)[3]; },
   tgl(el) { const k = el.dataset.k; D[k] = !D[k]; el.setAttribute('aria-pressed', !!D[k]); },
-  slot(el) { const i = +el.dataset.i; W.photos.has(i) ? W.photos.delete(i) : W.photos.add(i); refresh(); $(`.slot[data-i="${i}"]`)?.focus({preventScroll: true}); }
+  slot(el) { const i = +el.dataset.i; W.photos.has(i) ? W.photos.delete(i) : W.photos.add(i); refresh(); $(`.slot[data-i="${i}"]`)?.focus({preventScroll: true}); },
+  tf(el) { tf = el.dataset.v; refresh(); },
+  swtf(el, d) { const L = ['all', ...AJ.TSTEPS], n = L[L.indexOf(tf) + d]; if (!n) return false; tf = n; refresh(); }, // swipe my tickets between status filters
+  tostaff() { ACT.logout(); go('#/adminlogin'); },
+  aper(el) { aper = +el.dataset.v; refresh(); },
+  af(el) { af = el.dataset.v; refresh(); },
+  ame() { AJ.assign(AJ.ticket(AJ.route().args[0]), AJ.ADMIN.name); toast('Assigned to you'); refresh(); },
+  ast(el) { AJ.setStatus(AJ.ticket(AJ.route().args[0]), el.dataset.v); toast('Status changed to ' + el.dataset.v); refresh(); },
+  aclose() { const t = AJ.ticket(AJ.route().args[0]), st = t.st === 'Resolved' ? 'Open' : 'Resolved'; AJ.setStatus(t, st); toast(st === 'Open' ? 'Ticket reopened' : 'Ticket closed as resolved'); refresh(); },
+  rquick(el) { const {f, t} = AJ.range(+el.dataset.v); D.rfrom = AJ.iso(f); D.rto = AJ.iso(t); refresh(); },
+  csv() { if (rep) { AJ.csv(rep); toast('CSV downloaded'); } else toast('Fix the dates first.'); },
+  pdf() { if (rep) AJ.printReport(rep); else toast('Fix the dates first.'); }
 };
 document.addEventListener('click', e => { const el = e.target.closest('[data-act]'); if (el) ACT[el.dataset.act]?.(el); });
 document.addEventListener('input', e => {
@@ -757,13 +928,18 @@ document.addEventListener('input', e => {
   if (t.id === 'bsel') { bsel = t.value; $('#list').innerHTML = plist($('#list').dataset.cat); }
   if (t.id === 'sq') { sq = t.value; $('#sres').innerHTML = results(sq); }
   if (t.id === 'fq') $('#fl').innerHTML = faqList(t.value);
+  if (t.id === 'aq') { aq = t.value; $('#al').innerHTML = alist(AJ.queue(af, aq)); }
+  if (t.name === 'aag') { const v = t.value; AJ.assign(AJ.ticket(AJ.route().args[0]), v === 'Unassigned' ? null : v); toast(v === 'Unassigned' ? 'Ticket unassigned' : 'Assigned to ' + v); refresh(); }
+  if (t.name === 'rkind') { D.rkind = t.value; D.rcat = ''; refresh(); } // category options depend on the report
+  if (['rfrom', 'rto', 'rcat'].includes(t.name)) { D[t.name] = t.value; $('#rep').innerHTML = repBody(); }
 });
 document.addEventListener('submit', e => {
   e.preventDefault();
   const f = e.target, id = f.id;
   if (id === 'chatform') { const t = $('#msg').value.trim(); if (t) { $('#msg').value = ''; say(t); } return; }
   if (id === 'loginform') {
-    if (!validate(f, {email: emailRule, pw: req('Enter your password.')})) return;
+    const staffMail = (D.email || '').trim().toLowerCase() === AJ.ADMIN.email;
+    if (!validate(f, {email: staffMail ? [() => false, 'Staff accounts sign in through Admin login, below.'] : emailRule, pw: req('Enter your password.')})) return;
     const n = D.email.split('@')[0].replace(/[._-]+/g, ' ');
     S.user = {name: n.replace(/\b\w/g, c => c.toUpperCase()), email: D.email.trim(), mobile: ''}; delete D.pw; AJ.skeleton(); go('#/home');
   }
@@ -772,6 +948,25 @@ document.addEventListener('submit', e => {
     S.user = {name: D.name.trim(), email: D.email.trim(), mobile: D.mobile.trim()}; delete D.pw; delete D.terms; go('#/home'); toast('Welcome to A&J, ' + S.user.name.split(' ')[0]);
   }
   if (id === 'forgotform') { if (!validate(f, {email: emailRule})) return; D.sent = 1; refresh(false); }
+  if (id === 'adminform') {
+    const ok = (D.aemail || '').trim().toLowerCase() === AJ.ADMIN.email && D.apw === AJ.ADMIN.pw;
+    if (!validate(f, {aemail: emailRule, apw: [() => ok, 'Wrong staff email or password.']})) return;
+    S.user = {name: AJ.ADMIN.name, email: AJ.ADMIN.email, mobile: '', admin: true}; delete D.apw; AJ.skeleton(); go('#/admin');
+  }
+  if (id === 'tform') {
+    if (!validate(f, {tlink: [v => D.ttype === 'app' ? !!v : v && v !== NOLINK, D.ttype === 'app' ? 'Choose an order, or “Not about an order”.' : 'Choose the order or consignment this is about.'],
+      tsubj: req('Add a short subject.'), ttext: [v => v.trim().length >= 10, 'Describe the issue in at least 10 characters.']})) return;
+    const t = AJ.addTicket(S.user, {type: D.ttype, link: myRefs().find(r => D.tlink.startsWith(r.ref + ' ')), subj: D.tsubj.trim(), text: D.ttext.trim(), chat: AJ.route().q.has('chat') ? AJ.chatLog() : null});
+    ['ttype', 'tlink', 'tsubj', 'ttext'].forEach(k => delete D[k]); go('#/ticket/' + t.ref + '?new');
+  }
+  if (id === 'treply') {
+    const t = AJ.ticket(f.dataset.ref), x = (D.treply || '').trim(); if (!x) return toast('Write a reply first.');
+    const was = t.st; AJ.post(t, 'user', x, S.user.name); D.treply = ''; refresh(); toast(was === 'Resolved' ? 'Reply sent. Ticket reopened.' : 'Reply sent');
+  }
+  if (id === 'areply') {
+    const t = AJ.ticket(f.dataset.ref), x = (D.areply || '').trim(); if (!x) return toast('Write a reply first.');
+    AJ.post(t, 'agent', x, AJ.ADMIN.name); D.areply = ''; toast('Reply sent to the customer'); refresh();
+  }
   if (id === 'inqform') {
     if (!validate(f, {iname: req('Enter your name.'), imobile: mobileRule})) return;
     const p = item(f.dataset.id);
@@ -814,8 +1009,8 @@ document.addEventListener('scroll', e => { // gallery dots + counter, and the co
 }, true);
 AJ.gestures({ // swipe: back from the left edge, pull down to refresh lists, menu / concierge / sheets drag to close
   act: (n, el, d) => ACT[n]?.(el, d),
-  edge: () => { const r = AJ.route().name, d = R[r] || R.home; if (d.bare) return ['join', 'forgot'].includes(r) ? () => go('#/login') : null; return !d.top || (depth > 0 && r !== 'home') ? ACT.back : null; },
-  pull: () => ['home', 'collections', 'collection', 'brand', 'saved', 'requests'].includes(AJ.route().name) ? () => refresh() : null
+  edge: () => { const r = AJ.route().name, d = R[r] || R.home; if (d.bare) return ['join', 'forgot', 'adminlogin'].includes(r) ? () => go('#/login') : null; return !d.top || (depth > 0 && !['home', 'admin'].includes(r)) ? ACT.back : null; },
+  pull: () => ['home', 'collections', 'collection', 'brand', 'saved', 'requests', 'support', 'admin', 'atickets'].includes(AJ.route().name) ? () => refresh() : null
 });
 addEventListener('hashchange', () => render());
 if (!location.hash) history.replaceState(null, '', '#/welcome');
