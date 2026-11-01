@@ -1,7 +1,9 @@
 /* Shared by prototype2, prototype3 and prototype4. One place for: phone-fit scaling, icons, placeholder pictures,
    sample catalogue, FAQ chatbot engine, policy text and small helpers. Each prototype supplies its own layout, look and features.
-   No A&J photos, logo or testimonials are used anywhere. Pictures are drawn here as inline SVG. Brands, titles and prices are invented samples. */
+   Default (Prototype 4): no A&J photos, logo or testimonials. Pictures are drawn here as inline SVG. Brands, titles and prices are invented samples.
+   Opt-in (Prototypes 2 and 3): if shared/aj-brand.js ran first, window.AJ_BRAND swaps in A&J's real items, photos, FAQ and contact text. */
 const AJ = (() => {
+  const B = window.AJ_BRAND; // undefined in Prototype 4: every `B ? … : …` below then keeps the invented samples
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -13,7 +15,7 @@ const AJ = (() => {
   const ref = p => p + '-' + (++seq);
 
   /* ---------- in-memory state (a prototype: nothing is sent or saved) ---------- */
-  const S = {user: null, wish: new Set(), inq: [], con: [], req: [], msgs: []}; // user: null | 'guest' | {name,email,mobile}
+  const S = {user: null, wish: new Set(), cart: new Set(), inq: [], con: [], req: [], msgs: []}; // user: null | 'guest' | {name,email,mobile}
   const isGuest = () => S.user === 'guest';
 
   /* ---------- window fit: scale the phone so it is fully visible without page scroll ---------- */
@@ -72,13 +74,14 @@ const AJ = (() => {
     settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>',
     headset: '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><path d="M4 14h3v6H5a1 1 0 0 1-1-1zM20 14h-3v6h2a1 1 0 0 0 1-1z"/>',
     chart: '<path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/>',
-    download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
+    download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+    bag: '<path d="M5 8h14l1 12H4z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'
   };
   const sprite = '<svg width="0" height="0" style="position:absolute" aria-hidden="true">' + Object.entries(I).map(([k, v]) => `<symbol id="i-${k}" viewBox="0 0 24 24">${v}</symbol>`).join('') + '</svg>';
   const ic = (n, c = '') => `<svg class="i ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 
   /* ---------- placeholder pictures: drawn line-art, three looks (line / noir / pop). Always labelled as placeholders ---------- */
-  const CATS = [['bags', 'Bags'], ['watches', 'Watches'], ['jewelry', 'Jewelry'], ['shoes', 'Shoes'], ['wallets', 'Wallets'], ['accessories', 'Accessories']];
+  const CATS = B?.cats ?? [['bags', 'Bags'], ['watches', 'Watches'], ['jewelry', 'Jewelry'], ['shoes', 'Shoes'], ['wallets', 'Wallets'], ['accessories', 'Accessories']];
   const catName = c => CATS.find(x => x[0] === c)?.[1] ?? c;
   const SHAPE = {
     bags: '<path d="M32 38C32 18 68 18 68 38"/><path d="M20 38h60l6 46H14z"/><path d="M40 52h20"/>',
@@ -151,17 +154,18 @@ const AJ = (() => {
     ['accessories', 'Casa Verdi', 'Leather Belt with Gold Buckle', 26000, '9.3/10', 'Dustbag', 'Minor hole stretching', 'Black', 'Leather, gold-tone buckle', '85 cm'],
     ['accessories', 'Nocturne', 'Wool-Silk Shawl in Charcoal', 34000, '9.8/10', 'Box', 'None', 'Charcoal', 'Wool-silk blend', '140 × 140 cm']
   ];
-  const ITEMS = RAW.map(([cat, brand, title, price, rank, inc, flaw, color, mat, size], i) => ({
+  const ITEMS = B ? B.items.map((x, i) => ({...x, id: String(i), img: B.dir + x.img, isNew: x.rank === 'Brand New', views: ['Photo']})) // A&J: one real photo per item
+    : RAW.map(([cat, brand, title, price, rank, inc, flaw, color, mat, size], i) => ({
     id: String(i), cat, brand, title, price, rank, inc, flaw, color, mat, size, isNew: rank === 'Brand New',
     views: ['Front', 'Back', 'Detail', ...(flaw === 'None' ? [] : ['Flaw close-up']), 'Inclusions']
   }));
   const BRANDS = [...new Set(ITEMS.map(p => p.brand))].sort((a, b) => a.localeCompare(b));
   const item = id => ITEMS.find(p => p.id === id);
-  const pic = (p, s = 'line', v = 'Front', cap = true) => art(p.cat, +p.id, {s, v, cap});
+  const pic = (p, s = 'line', v = 'Front', cap = true) => p.img ?? art(p.cat, +p.id, {s, v, cap}); // p.img only exists for A&J's real photos
   const PHOTO_SLOTS = [['Front', 1], ['Back', 1], ['Sides'], ['Bottom'], ['Interior'], ['Hardware'], ['Serial / date code', 1], ['Logo / stamp'], ['Flaws'], ['Inclusions']].map(([label, req]) => ({label, req: !!req}));
 
   /* ---------- FAQ chatbot: keyword match over approved answers. Policy text paraphrases A&J's public website and is NOT yet confirmed by A&J ---------- */
-  const FAQ = [
+  const FAQ = B?.faq ?? [
     {id: 'buy', q: 'How do I buy?', k: ['buy', 'order', 'purchase', 'how to', 'inquire', 'inquiry', 'enquire'],
       a: 'Browse the shop, open an item and send an inquiry. The A&J team confirms the item is still available, then sends payment details by chat.\nGuests can browse only. Log in to send an inquiry.'},
     {id: 'consign', q: 'How does consignment work?', k: ['consign', 'sell my', 'selling my', 'pull out', 'pull-out', 'pullout', 'commission', 'accepted items', 'what items'],
@@ -215,9 +219,9 @@ const AJ = (() => {
   const paras = s => s.split('\n').map(l => `<p>${esc(l)}</p>`).join('');
 
   /* ---------- information pages (policy text; pending items are flagged) ---------- */
-  const PEND = '<p class="pend">Paraphrased from A&amp;J’s public website. Not yet confirmed by A&amp;J.</p>';
+  const PEND = '<p class="pend">' + (B ? esc(B.pend) : 'Paraphrased from A&amp;J’s public website. Not yet confirmed by A&amp;J.') + '</p>';
   const INFO = {
-    authenticity: {t: 'Authenticity', f: 'authentic', x: '<h3>What every listing shows</h3><ul><li>Condition rank out of 10, or “Brand New”</li><li>Inclusions such as box, dustbag and papers</li><li>Any flaws, with a close-up photo</li><li>Photos from several angles</li></ul>'},
+    authenticity: {t: 'Authenticity', f: 'authentic', x: '<h3>What every listing shows</h3><ul><li>Condition rank out of 10, or “Brand New”</li><li>Inclusions such as box, dustbag and papers</li>' + (B ? '<li>Any flaws, described in the listing</li><li>A&amp;J’s own photo of the piece</li>' : '<li>Any flaws, with a close-up photo</li><li>Photos from several angles</li>') + '</ul>'},
     shipping: {t: 'Shipping & delivery', f: 'shipping'},
     payment: {t: 'Payment options', f: 'payment'},
     layaway: {t: 'Layaway', f: 'layaway'},
@@ -227,7 +231,7 @@ const AJ = (() => {
     privacy: {t: 'Privacy notice', raw: '<p class="pend">Placeholder. A&amp;J must provide the approved privacy notice, consent text and a named privacy contact (Data Privacy Act, RA 10173).</p><p>This prototype collects no personal data. Anything you type stays on this page and is lost when you close it.</p>'}
   };
   const info = id => { const i = INFO[id]; return i && {t: i.t, html: (i.raw ?? PEND + paras(faq(i.f).a)) + (i.x || '')}; };
-  const CONTACT = [['Showroom', 'Address to be confirmed by A&J'], ['Opening hours', 'To be confirmed by A&J'], ['Viber / WhatsApp', 'Number to be provided by A&J'], ['Instagram / Facebook', 'Accounts to be confirmed by A&J'], ['Email', 'To be provided by A&J']];
+  const CONTACT = B?.contact ?? [['Showroom', 'Address to be confirmed by A&J'], ['Opening hours', 'To be confirmed by A&J'], ['Viber / WhatsApp', 'Number to be provided by A&J'], ['Instagram / Facebook', 'Accounts to be confirmed by A&J'], ['Email', 'To be provided by A&J']];
 
   /* ---------- small UI helpers shared by all three ---------- */
   function toast(msg) { const t = $('#toast'); if (!t) return; t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2400); }
@@ -448,7 +452,7 @@ const AJ = (() => {
     r.scrollTo({left: r.scrollLeft + (b.left - a.left - (a.width - b.width) / 2) / scale(), behavior: 'smooth'});
   }
   // first-run intro slides; each prototype draws them in its own style
-  const INTRO = [['Luxury, checked and graded', 'Pre-loved and brand-new pieces. Every listing shows its condition, inclusions and flaws.', 'bags'],
+  const INTRO = B?.intro ?? [['Luxury, checked and graded', 'Pre-loved and brand-new pieces. Every listing shows its condition, inclusions and flaws.', 'bags'],
     ['Consign with ease', 'Send photos and details, hand the piece over, and get paid after it sells.', 'watches'],
     ['Help when you need it', 'Ask the FAQ assistant, or open a support ticket after you buy or consign.', 'jewelry']];
 
@@ -527,7 +531,9 @@ const AJ = (() => {
   const PRICE = {bags: [45, 260], watches: [40, 320], jewelry: [15, 160], shoes: [18, 55], wallets: [15, 95], accessories: [12, 45]}; // thousands of pesos
   const COLOURS = ['Black', 'Cream', 'Tan', 'Burgundy', 'Navy', 'White', 'Gold', 'Silver', 'Rose', 'Olive'];
   const person = () => { const f = rp(FIRST), l = rp(LAST); return {name: f + ' ' + l, email: (f + '.' + l.replace(/ /g, '')).toLowerCase() + '@example.com', city: rw(CITY, [16, 15, 14, 11, 7, 7, 6, 8, 6, 4, 3, 3])}; };
-  const piece = () => { const cat = rw(CATS.map(c => c[0]), [34, 14, 15, 12, 15, 10]), [lo, hi] = PRICE[cat];
+  const piece = () => {
+    if (B) { const c = rw(CATS.map(c => c[0]), B.catWeights), p = rp(ITEMS.filter(x => x.cat === c)); return {cat: p.cat, brand: p.brand, title: p.title, amount: p.price}; } // A&J's real titles and prices; customers, dates and counts stay sample data
+    const cat = rw(CATS.map(c => c[0]), [34, 14, 15, 12, 15, 10]), [lo, hi] = PRICE[cat];
     return {cat, brand: rp(BRANDS), title: `${rp(MODELS[cat])} in ${rp(COLOURS)}`, amount: Math.round((lo + (hi - lo) * rnd() ** 1.8) * 2) * 500}; };
   const TXT = { // [subject, customer message] per type, then the agent's first reply and the closing reply
     order: [[['Item not delivered yet', 'My order still hasn’t arrived. Can you check where it is?'], ['Wrong delivery address', 'I entered the wrong address. Can the rider deliver to my office instead?'], ['Payment not reflected', 'I paid by bank transfer yesterday but the order still shows unpaid.'], ['Tracking link not working', 'The courier’s tracking link shows an error.']],
@@ -673,7 +679,7 @@ const AJ = (() => {
   $$('.screen').forEach(s => s.insertAdjacentHTML('afterbegin', SB));
   fit();
 
-  return {$, $$, esc, peso, fmtDate, isEmail, isMobile, ref, S, isGuest, D, req, ticked, mobileRule, emailRule, validate, fld, sel, chk, ic, CATS, catName, ITEMS, BRANDS, item, pic, art, PHOTO_SLOTS,
+  return {B, $, $$, esc, peso, fmtDate, isEmail, isMobile, ref, S, isGuest, D, req, ticked, mobileRule, emailRule, validate, fld, sel, chk, ic, CATS, catName, ITEMS, BRANDS, item, pic, art, PHOTO_SLOTS,
     FAQ, faq, CHIPS, GREETING, reply, answer, paras, info, CONTACT, toast, route, gestures, skeleton, pop, center, INTRO,
     TTYPES, ttype, TSTEPS, AGENTS, ADMIN, isAdmin, who, TK, ticket, addTicket, post, setStatus, assign, mine, myTickets, QUEUES, queue, lastAsked, chatLog,
     PERIODS, range, stats, trend, topCats, resByType, topics, REPORTS, report, cell, csv, printReport, colChart, barChart, hrs, pesoK, pct, vs, compact, ago, iso};

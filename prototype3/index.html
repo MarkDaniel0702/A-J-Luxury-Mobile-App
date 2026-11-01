@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0c">
 <title>A&amp;J Luxury · Prototype 3 · Noir Salon</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap">
+<link rel="icon" href="../shared/aj/logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
 <link rel="stylesheet" href="../shared/phone.css">
 <style>
-/* Prototype 3 "Noir Salon": dark, champagne gold, serif display type, editorial one-column layout.
+/* Prototype 3 "Noir Salon": dark, A&J brand yellow-gold (#E4D266), light Poppins (A&J's site font), editorial one-column layout.
    Navigation is a slide-out drawer (no tab bar) plus a floating Concierge chat button on every screen.
-   Own features: Collections, Brand directory, showroom Viewing booking, Authenticity guide, one-page appraisal request, Saved pieces, Requests inbox.
-   No A&J website images, logo or text assets. Pictures are generated placeholders (shared/core.js). */
-:root{color-scheme:dark;--bg:#0b0b0c;--bg2:#131315;--bg3:#1c1c1f;--ink:#efe8da;--mute:#a39d90;--gold:#c9a96a;--gold2:#e6d09f;--line:rgba(201,169,106,.24);--err:#ee8a79;--sw:1.1;
- --disp:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;--ui:"Hanken Grotesk","Avenir Next","Segoe UI",system-ui,sans-serif;
+   Own features: Collections, Brand directory, showroom Viewing booking, Authenticity guide, one-page appraisal request, Saved pieces, Cart, Requests inbox.
+   Uses A&J Luxury's logo, photos, item details and FAQ wording (shared/aj-brand.js, with A&J's permission). Orders, accounts, tickets and admin figures are samples. */
+:root{color-scheme:dark;--bg:#0b0b0c;--bg2:#131315;--bg3:#1c1c1f;--ink:#efe8da;--mute:#a39d90;--gold:#e4d266;--gold2:#f1e69b;--line:rgba(228,210,102,.24);--err:#ee8a79;--sw:1.1;
+ --disp:"Poppins","Segoe UI",system-ui,sans-serif;--ui:"Poppins","Segoe UI",system-ui,sans-serif;
  --stage:radial-gradient(circle at 50% 38%,#26221b 0,#0a0a0a 64%);--bg:#0b0b0c;--sbc:#efe8da;--hbc:#efe8da;--capc:#867f71;--capb:#e2d7bd}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
@@ -36,10 +37,10 @@ main>*{animation:up .55s cubic-bezier(.2,.7,.2,1) both}
 main.still>*{animation:none}
 main>:nth-child(2){animation-delay:.07s}main>:nth-child(3){animation-delay:.14s}main>:nth-child(4){animation-delay:.21s}main>:nth-child(n+5){animation-delay:.28s}
 @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-.lat{background:repeating-linear-gradient(45deg,transparent 0 11px,rgba(201,169,106,.06) 11px 12px),repeating-linear-gradient(-45deg,transparent 0 11px,rgba(201,169,106,.06) 11px 12px)}
+.lat{background:repeating-linear-gradient(45deg,transparent 0 11px,rgba(228,210,102,.06) 11px 12px),repeating-linear-gradient(-45deg,transparent 0 11px,rgba(228,210,102,.06) 11px 12px)}
 .eyebrow{font:500 11px/1.3 var(--ui);letter-spacing:3.4px;text-transform:uppercase;color:var(--gold)}
-.h1{font:500 42px/1.02 var(--disp);letter-spacing:-.3px}
-.h2{font:500 31px/1.08 var(--disp)}
+.h1{font:300 29px/1.02 var(--disp);letter-spacing:-.3px}
+.h2{font:400 22px/1.08 var(--disp)}
 .h1 i,.h2 i,.disp i{color:var(--gold2)}
 .dm{display:inline-block;width:7px;height:7px;border:1px solid var(--gold);transform:rotate(45deg);flex:none}
 .orn{display:flex;align-items:center;gap:12px;margin:0 24px}
@@ -50,15 +51,23 @@ main>:nth-child(2){animation-delay:.07s}main>:nth-child(3){animation-delay:.14s}
 .top.bare{display:none}
 .top .l,.top .r{display:flex;align-items:center}
 .top .r{justify-content:flex-end}
-.wm{font:500 26px/1 var(--disp);letter-spacing:8px;padding-left:8px}
-.tt{font:500 12px/1 var(--ui);letter-spacing:3.2px;text-transform:uppercase;max-width:176px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .r .ib{width:38px;margin:0 1px}
+.top .r .dot{right:0}
+.ajl{display:block;height:48px;width:auto;margin:0 auto;filter:invert(1)} /* A&J logo is black line art: white on this dark app */
+.wm{line-height:0}
+#splash{position:absolute;inset:0;z-index:150;display:grid;place-items:center;background:var(--bg);transition:opacity .45s}
+#splash.off{opacity:0;pointer-events:none}
+#splash .ajl{height:230px;animation:in2 .9s both}
+@keyframes in2{from{opacity:0;transform:scale(.94)}}
+.tt{font:500 11px/1 var(--ui);letter-spacing:2.4px;text-transform:uppercase;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ib{position:relative;width:46px;height:48px;margin:0 2px;display:grid;place-items:center;background:none;border:0;color:var(--ink);cursor:pointer}
 .ib:active{color:var(--gold)}
 .dot{position:absolute;top:6px;right:4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--gold);color:#000;font:600 10px/16px var(--ui);text-align:center}
 #gb{display:flex;align-items:center;justify-content:center;gap:10px;padding:4px 16px;border-bottom:1px solid var(--line);font:400 11px var(--ui);letter-spacing:1.6px;text-transform:uppercase;color:var(--mute);position:relative;z-index:3}
 #gb button{background:none;border:0;color:var(--gold);letter-spacing:1.6px;text-transform:uppercase;font:500 11px var(--ui);text-decoration:underline;cursor:pointer;min-height:32px}
 .dock{position:relative;z-index:3;display:flex;gap:8px;align-items:center;padding:10px 14px calc(10px + var(--sab));background:var(--bg2);border-top:1px solid var(--line)}
-.dock .btn{flex:1;padding:0 6px}
+.dock .btn{flex:1;padding:0 6px;letter-spacing:1.8px}
+.dock .btn.ibtn{flex:0 0 50px;padding:0}
 .fab{position:absolute;right:16px;bottom:calc(var(--sab) + 14px);z-index:30;width:56px;height:56px;border-radius:50%;background:var(--bg);color:var(--gold);border:1px solid var(--gold);cursor:pointer;display:grid;place-items:center;box-shadow:0 10px 30px #000a;transition:bottom .25s}
 .fab::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--gold);opacity:0;animation:ring 3.2s ease-out infinite}
 @keyframes ring{0%{opacity:.5;transform:scale(.9)}100%{opacity:0;transform:scale(1.35)}}
@@ -66,7 +75,7 @@ main>:nth-child(2){animation-delay:.07s}main>:nth-child(3){animation-delay:.14s}
 
 /* buttons + forms */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 24px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font:500 12px var(--ui);letter-spacing:2.6px;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
-.btn:hover{background:#c9a96a22}
+.btn:hover{background:#e4d26622}
 .btn.f{background:var(--gold);color:#0b0b0c}
 .btn.f:hover{background:var(--gold2)}
 .btn.blk{display:flex;width:100%}
@@ -102,10 +111,10 @@ textarea{min-height:76px;resize:none}
 
 /* login */
 .login{position:relative;min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:calc(var(--sat) + 8px) 28px 28px}
-.login .glow{position:absolute;left:50%;top:-80px;width:420px;height:420px;margin-left:-210px;background:radial-gradient(closest-side,#c9a96a40,transparent);pointer-events:none}
+.login .glow{position:absolute;left:50%;top:-80px;width:420px;height:420px;margin-left:-210px;background:radial-gradient(closest-side,#e4d26640,transparent);pointer-events:none}
 .login>*{position:relative}
-.logo{font:500 84px/1 var(--disp);letter-spacing:12px;padding-left:12px;text-align:center;margin:10px 0 0;text-shadow:0 0 40px #c9a96a40}
-.logo+p{text-align:center;font:italic 400 21px var(--disp);color:var(--gold2);margin:4px 0 32px}
+.login .ajl{height:170px;margin:6px auto 0;filter:invert(1) drop-shadow(0 0 24px #e4d26655)}
+.ajl+p{text-align:center;font:italic 400 15px var(--disp);color:var(--gold2);margin:4px 0 32px}
 .login .eyebrow{text-align:center}
 .or{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--mute);font:400 11px var(--ui);letter-spacing:3px;text-transform:uppercase}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
@@ -116,7 +125,7 @@ textarea{min-height:76px;resize:none}
 
 /* home */
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
-.hero img{width:100%;height:330px;object-fit:cover;object-position:50% 38%;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+.hero img{width:100%;height:360px;object-fit:cover;object-position:50% 58%;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
 .hero .ht{position:relative;margin:-56px 24px 0;padding-bottom:30px}
 .hero p{margin:10px 0 18px;color:var(--ink);opacity:.8}
 .rowb{display:flex;gap:10px}
@@ -129,15 +138,15 @@ textarea{min-height:76px;resize:none}
 .col::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0000 40%,#000c)}
 .col div{position:absolute;left:16px;right:16px;bottom:14px;z-index:1}
 .col small{font:500 10px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold)}
-.col b{display:block;font:italic 500 26px/1.05 var(--disp);color:var(--ink)}
+.col b{display:block;font:italic 400 18px/1.05 var(--disp);color:var(--ink)}
 .stag{display:grid;grid-template-columns:1fr 1fr;gap:20px 14px;padding:0 24px 40px}
 .stag>:nth-child(even){transform:translateY(34px)}
 .mini{position:relative;display:block;min-width:0}
 .mini img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--line)}
 .mini .b{margin-top:8px;font:500 10px var(--ui);letter-spacing:2.2px;text-transform:uppercase;color:var(--gold)}
-.mini .t{font:500 17px/1.2 var(--disp);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mini .t{font:400 14px/1.25 var(--disp);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mini .pr{font:400 14px var(--ui);color:var(--mute)}
-.brands{padding:0 24px;font:italic 400 30px/1.5 var(--disp)}
+.brands{padding:0 24px;font:italic 400 21px/1.5 var(--disp)}
 .brands a{color:var(--ink)}
 .brands a:hover{color:var(--gold2)}
 .brands .dm{margin:0 12px 4px}
@@ -146,7 +155,7 @@ textarea{min-height:76px;resize:none}
 .std{display:grid;gap:0;padding:0 24px}
 .std a{display:flex;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
 .std .i{color:var(--gold);width:28px;height:28px}
-.std b{display:block;font:500 20px var(--disp)}
+.std b{display:block;font:400 14px var(--disp)}
 .std small{color:var(--mute);font-size:13px;line-height:1.35;display:block}
 .foot{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;padding:36px 24px 12px;font:400 11px var(--ui);letter-spacing:2.2px;text-transform:uppercase}
 .foot a{color:var(--mute)}
@@ -160,7 +169,7 @@ textarea{min-height:76px;resize:none}
 .crow img{position:absolute;top:0;bottom:0;right:0;width:54%;height:100%;object-fit:cover}
 .crow::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--bg2) 42%,#0000 64%)}
 .crow div{position:absolute;left:18px;top:50%;transform:translateY(-50%);z-index:1;max-width:52%}
-.crow b{display:block;font:italic 500 28px/1.05 var(--disp)}
+.crow b{display:block;font:italic 400 20px/1.05 var(--disp)}
 .crow small{display:block;color:var(--mute);font-size:12px;line-height:1.35;margin-top:4px}
 .bar{display:flex;gap:8px;align-items:center;padding:6px 24px 4px;overflow-x:auto;scrollbar-width:none}
 .bar select{width:auto;min-width:120px;font-size:13px;letter-spacing:1px;text-transform:uppercase}
@@ -170,8 +179,8 @@ textarea{min-height:76px;resize:none}
 .pc img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--line)}
 .pc .meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:10px}
 .pc .b{font:500 10px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold)}
-.pc .t{font:500 23px/1.12 var(--disp);margin-top:2px}
-.pc .pr{font:500 22px var(--disp);white-space:nowrap}
+.pc .t{font:400 16px/1.3 var(--disp);margin-top:3px}
+.pc .pr{font:400 15px var(--disp);white-space:nowrap}
 .pc .cd{margin-top:4px;color:var(--mute);font-size:13px}
 .heart{position:absolute;top:8px;right:8px;width:44px;height:44px;display:grid;place-items:center;border:0;background:#0b0b0c99;color:var(--ink);border-radius:50%;cursor:pointer;backdrop-filter:blur(4px)}
 .heart.on{color:var(--gold)}.heart.on .i{fill:currentColor}
@@ -181,7 +190,7 @@ textarea{min-height:76px;resize:none}
 .empty .btn{margin-top:18px}
 .az{padding:0 24px}
 .az h3{font:500 13px var(--ui);letter-spacing:3px;color:var(--gold);padding:22px 0 6px;border-bottom:1px solid var(--line)}
-.az a{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid #efe8da14;font:500 24px var(--disp)}
+.az a{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid #efe8da14;font:400 17px var(--disp)}
 .az small{color:var(--mute);font:300 12px var(--ui)}
 
 /* product */
@@ -197,7 +206,7 @@ textarea{min-height:76px;resize:none}
 .dots i.on{background:var(--gold)}
 .pinfo{padding:6px 24px 8px}
 .pinfo .h2{margin:4px 0 8px}
-.ppr{font:500 28px var(--disp);color:var(--gold2)}
+.ppr{font:400 20px var(--disp);color:var(--gold2)}
 .check{margin:20px 24px;padding:18px;border:1px solid var(--line);background:var(--bg2)}
 .check h3{font:500 11px var(--ui);letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:0 18px}
@@ -207,7 +216,7 @@ textarea{min-height:76px;resize:none}
 .kv.free{margin:0 24px}
 details{border-top:1px solid var(--line);margin:0 24px}
 details:last-of-type{border-bottom:1px solid var(--line)}
-summary{display:flex;justify-content:space-between;align-items:center;min-height:56px;font:500 21px var(--disp);cursor:pointer;list-style:none}
+summary{display:flex;justify-content:space-between;align-items:center;min-height:56px;font:400 15px var(--disp);cursor:pointer;list-style:none}
 summary::-webkit-details-marker{display:none}
 details[open] summary .i{transform:rotate(180deg)}
 .dbody{padding:0 0 18px;color:var(--mute)}
@@ -224,7 +233,7 @@ details[open] summary .i{transform:rotate(180deg)}
 @keyframes slide{from{transform:translateY(100%)}}
 .cpanel header{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px 22px;border-bottom:1px solid var(--line)}
 .cpanel header small{display:block;font:500 10px var(--ui);letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
-.cpanel header b{font:italic 500 24px/1 var(--disp)}
+.cpanel header b{font:italic 400 17px/1 var(--disp)}
 .clog{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;scrollbar-width:none}
 .m{max-width:88%;padding:12px 15px;white-space:pre-line;line-height:1.5;font-size:15px}
 .m.bot{align-self:flex-start;background:var(--bg3);border-left:2px solid var(--gold)}
@@ -248,9 +257,10 @@ details[open] summary .i{transform:rotate(180deg)}
 .dp{position:absolute;left:0;top:0;bottom:0;width:86%;display:flex;flex-direction:column;background:var(--bg2);border-right:1px solid var(--gold);padding:calc(var(--sat) + 10px) 26px calc(var(--sab) + 18px);overflow-y:auto;scrollbar-width:none;transform:translateX(-103%);transition:transform .38s cubic-bezier(.2,.8,.2,1)}
 .drawer.on .dp{transform:none}
 .dp .dh{display:flex;justify-content:space-between;align-items:center;margin:0 -12px 6px 0}
+.dlogo{display:flex;align-items:center;gap:8px}.dlogo .ajl{height:56px;margin:0}
 .dp .who{padding:4px 0 12px;border-bottom:1px solid var(--line)}
-.dp .who b{display:block;font:italic 500 26px/1.1 var(--disp)}
-.dl{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;border-bottom:1px solid #efe8da14;font:500 27px/1.15 var(--disp)}
+.dp .who b{display:block;font:italic 400 18px/1.1 var(--disp)}
+.dl{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;border-bottom:1px solid #efe8da14;font:400 19px/1.15 var(--disp)}
 .dl small{font:500 11px var(--ui);color:var(--gold);letter-spacing:1px}
 .dl[aria-current]{color:var(--gold2);font-style:italic}
 .dsub{display:flex;flex-wrap:wrap;gap:6px 18px;padding:18px 0 14px;font:500 11px var(--ui);letter-spacing:2.2px;text-transform:uppercase;color:var(--mute)}
@@ -260,7 +270,7 @@ details[open] summary .i{transform:rotate(180deg)}
 .sheet{position:absolute;inset:0;z-index:80;display:flex;align-items:flex-end}
 .scrim{position:absolute;inset:0;background:#000b}
 .panel{position:relative;width:100%;max-height:90%;overflow-y:auto;padding:28px 24px calc(22px + var(--sab));background:var(--bg2);border-top:1px solid var(--gold);display:grid;gap:10px;animation:slide .3s both}
-.panel h2{font:500 28px/1.1 var(--disp)}
+.panel h2{font:400 20px/1.1 var(--disp)}
 .panel p{color:var(--mute);margin-bottom:6px}
 .panel.lb{height:100%;max-height:none;border:0;background:#000;padding:var(--sat) 0 var(--sab);align-content:center}
 .lb .x{position:absolute;top:calc(var(--sat) + 4px);right:8px;z-index:2}
@@ -272,7 +282,7 @@ details[open] summary .i{transform:rotate(180deg)}
 /* requests, timelines, days */
 .req{display:block;padding:16px 24px;border-bottom:1px solid var(--line)}
 .req small{font:500 10px var(--ui);letter-spacing:2.4px;text-transform:uppercase;color:var(--gold)}
-.req b{display:block;font:500 22px/1.15 var(--disp)}
+.req b{display:block;font:400 15px/1.15 var(--disp)}
 .req .sub{color:var(--mute);font-size:13px}
 .pill{display:inline-block;margin-top:6px;padding:1px 12px;border:1px solid var(--gold);font:500 10px/18px var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--gold2)}
 .tl{list-style:none;padding:6px 0 0 4px}
@@ -290,18 +300,19 @@ details[open] summary .i{transform:rotate(180deg)}
 .days{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:6px -24px 8px;padding-left:24px;padding-right:24px;scrollbar-width:none}
 .day{flex:none;width:64px;padding:10px 0;border:1px solid var(--line);background:transparent;text-align:center;cursor:pointer}
 .day small{display:block;font:500 10px var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
-.day b{display:block;font:500 26px/1.1 var(--disp)}
+.day b{display:block;font:400 18px/1.1 var(--disp)}
 .day[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#000}
 .day[aria-pressed=true] small{color:#000}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
-.slot{position:relative;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px dashed #c9a96a88;background:transparent;color:var(--mute);font:400 12px var(--ui);letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;overflow:hidden}
+.slot{position:relative;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px dashed #e4d26688;background:transparent;color:var(--mute);font:400 12px var(--ui);letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;overflow:hidden}
 .slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slot .ph{position:absolute;inset:0;display:grid;place-items:center;background:var(--bg2);color:var(--gold)}
 .slot em{position:absolute;left:0;right:0;bottom:0;padding:3px;background:#000b;font-style:normal;color:var(--gold2);text-align:center}
 .slot.on{border-style:solid;border-color:var(--gold)}
 .slot b{font-weight:500;color:var(--gold);font-size:10px}
-.num{font:italic 500 44px/1 var(--disp);color:var(--gold);width:46px;flex:none}
+.num{font:italic 300 31px/1 var(--disp);color:var(--gold);width:46px;flex:none}
 .jstep{display:flex;gap:14px;padding:16px 24px;border-bottom:1px solid var(--line)}
-.jstep b{display:block;font:500 21px/1.2 var(--disp)}
+.jstep b{display:block;font:400 15px/1.2 var(--disp)}
 .jstep span{color:var(--mute);font-size:14px}
 .info{padding:8px 24px 28px}
 .info h3{font:500 11px var(--ui);letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:22px 0 6px}
@@ -311,11 +322,11 @@ details[open] summary .i{transform:rotate(180deg)}
 .pend{padding:11px 14px;border:1px solid var(--line);background:var(--bg2);color:var(--mute)!important;font-size:12px}
 .gate{padding:70px 28px;text-align:center}
 .gate .i{width:36px;height:36px;color:var(--gold);stroke-width:.9}
-.gate h1{font:500 30px/1.1 var(--disp);margin:14px 0 8px}
+.gate h1{font:400 21px/1.1 var(--disp);margin:14px 0 8px}
 .gate p{color:var(--mute);margin-bottom:22px}
 .gate .btn{margin-top:10px}
 /* Swipe affordances, tap feedback, intro */
-:root{--gbg:#131315;--gfg:#c9a96a}
+:root{--gbg:#131315;--gfg:#e4d266}
 .panel:not(.lb)::before{content:"";justify-self:center;width:36px;height:2px;margin:-16px 0 6px;background:var(--line)}
 .cpanel::before{content:"";position:absolute;top:5px;left:50%;width:36px;height:2px;margin-left:-18px;background:var(--line)}
 .lb .snap>*{width:100%}
@@ -327,6 +338,7 @@ details[open] summary .i{transform:rotate(180deg)}
 .intro .snap{flex:1}
 .intro section{width:100%;display:flex;flex-direction:column;justify-content:center;padding:28px 32px 6px}
 .intro img{width:100%;height:300px;object-fit:cover;border:1px solid var(--line);margin-bottom:26px}
+.intro .ajl{width:auto;height:64px;margin:0 auto 16px;border:0;object-fit:contain}
 .intro .h2{margin:8px 0 10px}
 .intro p{color:var(--mute)}
 .ibar{display:flex;justify-content:space-between;align-items:center;padding:4px 28px 0}
@@ -340,7 +352,7 @@ details[open] summary .i{transform:rotate(180deg)}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:14px 24px 0;background:var(--line);border:1px solid var(--line)}
 .kpi{padding:14px;background:var(--bg2);min-width:0}
 .kpi small{display:block;font:500 10px var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi b{display:block;margin-top:4px;font:500 30px/1.1 var(--disp);overflow-wrap:anywhere}
+.kpi b{display:block;margin-top:4px;font:400 21px/1.1 var(--disp);overflow-wrap:anywhere}
 .kpi span{display:block;font-size:12px;line-height:1.3;color:var(--mute)}
 .ch{margin:0 24px;padding:12px 14px 8px;border:1px solid var(--line);background:var(--bg2);--ch:var(--gold);--chg:#efe8da1f;--cht:var(--mute)}
 .ch-r{min-height:18px;margin-bottom:6px;font:500 11px var(--ui);letter-spacing:1.4px;text-transform:uppercase;color:var(--gold2)}
@@ -381,33 +393,39 @@ details[open] summary .i{transform:rotate(180deg)}
     <div class="sheet" id="sheet" hidden><div class="scrim" data-act="close"></div><div class="panel" id="panel" role="dialog" aria-modal="true" data-dismiss="close" data-dir="down"></div></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
    </div>
+   <div id="splash" aria-hidden="true"><img class="ajl" src="../shared/aj/logo.png" alt=""></div>
   </div>
  </div>
  <div class="cap"><b>Prototype 3 · Noir Salon</b>Log in with any email and password, or browse as a guest. Admin: “Admin login” on the log-in screen (admin@ajluxury.test / Admin2026), in the same tab, to see tickets you sent. Nothing is sent or saved. Drag with the mouse to swipe.</div>
 </div>
 
+<script src="../shared/aj-brand.js"></script>
 <script src="../shared/core.js"></script>
 <script>
-const {$, $$, esc, peso, ic, S, ITEMS, CATS, BRANDS, isGuest, toast, pic, item, catName, D, req, ticked, mobileRule, emailRule, validate, fld, sel, chk} = AJ;
+const {$, $$, esc, peso, ic, S, ITEMS, CATS, BRANDS, isGuest, toast, pic, item, catName, D, req, ticked, mobileRule, emailRule, validate, fld, sel, chk, B} = AJ;
 const art = (p, v, cap) => pic(p, 'noir', v, cap);
-const COL = {bags: ['The Bag Edit', 'Top-handles, totes and chain bags'], watches: ['Timepieces', 'Steel, gold-tone and automatics'], jewelry: ['Jewelry', 'Rings, pearls and chains'],
-  shoes: ['Footwear', 'Flats, pumps, loafers and sneakers'], wallets: ['Small Leather Goods', 'Wallets, card holders and chains'], accessories: ['Finishing Touches', 'Scarves, shawls, belts and eyewear']};
+const LOGO = `<img class="ajl" src="${B.logo}" alt="A&amp;J Luxury">`;
+const photo = f => B.dir + f;
+const splash = $('#splash'), hideSplash = () => { splash.classList.add('off'); setTimeout(() => splash.remove(), 500); }; // logo screen on first load: fades out by itself, or on tap
+splash.addEventListener('click', hideSplash); setTimeout(hideSplash, 1400);
+const COL = {bags: ['The Bag Edit', 'Shoulder bags, buckets, backpacks and more'], watches: ['Timepieces', 'Watches, brand new and pre-loved'],
+  shoes: ['Footwear', 'Sneakers and sandals'], wallets: ['Small Leather Goods', 'Wallets, card holders and key holders'], accessories: ['Finishing Touches', 'Scarves and eyewear']};
 const colOf = c => c === 'all' ? ['All pieces', 'Every piece currently listed'] : COL[c];
 const enc = encodeURIComponent;
 let sort = 'featured', tab = 'all', bsel = 'all', sq = '';
 let W = {photos: new Set()};
 let tf = 'all', af = 'active', aq = '', aper = 30, rep = null; // support ticket filter; admin queue, search, dashboard period, last report
 S.msgs.push({who: 'bot', text: AJ.GREETING});
-const MEMBER = 'saved inquire viewing requests request consignform settings ticketnew ticket'.split(' ');
+const MEMBER = 'saved cart cartinquire inquire viewing requests request consignform settings ticketnew ticket'.split(' ');
 const STAFF = 'admin atickets aticket areports ateam'.split(' '); // admin routes: staff only
 const count = c => ITEMS.filter(p => p.cat === c).length;
 
 /* ---------- pieces ---------- */
 const heartBtn = id => `<button class="heart ${S.wish.has(id) ? 'on' : ''}" data-act="wish" data-id="${id}" aria-pressed="${S.wish.has(id)}" aria-label="Save piece">${ic('heart')}</button>`;
-const pcard = p => `<article class="pc"><a href="#/p/${p.id}"><img loading="lazy" src="${art(p)}" alt="${esc(p.title)} (placeholder image)">${p.isNew ? '<span class="badge">New</span>' : ''}
+const pcard = p => `<article class="pc"><a href="#/p/${p.id}"><img loading="lazy" src="${art(p)}" alt="${esc(p.brand + ' ' + p.title)}">${p.isNew ? '<span class="badge">New</span>' : ''}
   <div class="meta"><div><div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div></div><div class="pr">${peso(p.price)}</div></div>
   <div class="cd">${p.isNew ? 'Brand new' : 'Pre-loved · ' + esc(p.rank)} · ${esc(p.inc)}</div></a>${heartBtn(p.id)}</article>`;
-const mini = p => `<a class="mini" href="#/p/${p.id}"><img loading="lazy" src="${art(p, 'Front', false)}" alt="${esc(p.title)} (placeholder image)"><div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div><div class="pr">${peso(p.price)}</div></a>`;
+const mini = p => `<a class="mini" href="#/p/${p.id}"><img loading="lazy" src="${art(p, 'Front', false)}" alt="${esc(p.brand + ' ' + p.title)}"><div class="b">${esc(p.brand)}</div><div class="t">${esc(p.title)}</div><div class="pr">${peso(p.price)}</div></a>`;
 const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const pick = (k, v, label) => `<button type="button" class="chip" data-act="pick" data-k="${k}" data-v="${esc(v)}" aria-pressed="${D[k] === v}">${label ?? esc(v)}</button>`;
 const tgl = (k, label) => `<button type="button" class="chip" data-act="tgl" data-k="${k}" aria-pressed="${!!D[k]}">${label}</button>`;
@@ -427,30 +445,30 @@ function buildDrawer() {
   const u = S.user, here = AJ.route().name;
   const L = (h, t, n, small = '') => `<a class="dl" href="#/${h}" ${here === n ? 'aria-current="page"' : ''}>${t}${small ? `<small>${small}</small>` : ''}</a>`;
   if (AJ.isAdmin()) { // staff menu
-    $('#dp').innerHTML = `<div class="dh"><span class="eyebrow">A&amp;J · Admin</span><button class="ib" data-act="dclose" aria-label="Close menu">${ic('close')}</button></div>
+    $('#dp').innerHTML = `<div class="dh"><span class="dlogo">${LOGO}<span class="eyebrow">Admin</span></span><button class="ib" data-act="dclose" aria-label="Close menu">${ic('close')}</button></div>
      <div class="who"><small class="lab" style="margin:0 0 2px">Staff</small><b>${esc(u.name)}</b></div>
      ${L('admin', 'Dashboard', 'admin')}${L('atickets', 'Tickets', 'atickets', AJ.queue('active').length + ' active')}${L('areports', 'Reports', 'areports')}${L('ateam', 'Team', 'ateam')}
      <div class="dsub"><span>Prototype · sample data</span></div><button class="btn blk" data-act="logout">Log out</button>`;
     return;
   }
   const upd = u && !isGuest() ? AJ.myTickets(u).filter(t => t.newU).length : 0;
-  $('#dp').innerHTML = `<div class="dh"><span class="eyebrow">A&amp;J Luxury</span><button class="ib" data-act="dclose" aria-label="Close menu">${ic('close')}</button></div>
+  $('#dp').innerHTML = `<div class="dh"><span class="dlogo">${LOGO}</span><button class="ib" data-act="dclose" aria-label="Close menu">${ic('close')}</button></div>
    <div class="who"><small class="lab" style="margin:0 0 2px">${isGuest() ? 'Browsing as' : 'Signed in'}</small><b>${u ? (isGuest() ? 'Guest' : esc(u.name)) : ''}</b></div>
    ${L('home', 'Home', 'home')}${L('collections', 'Collections', 'collections')}${L('brands', 'Brands', 'brands')}${L('consign', 'Consign with us', 'consign')}${L('viewing', 'Book a viewing', 'viewing')}${L('authenticity', 'Authenticity', 'authenticity')}
-   ${L('saved', 'Saved', 'saved', S.wish.size || '')}${L('requests', 'My requests', 'requests', S.req.length || '')}${L('support', 'Support', 'support', upd ? upd + ' updated' : '')}
+   ${L('saved', 'Saved', 'saved', S.wish.size || '')}${L('cart', 'Cart', 'cart', S.cart.size || '')}${L('requests', 'My requests', 'requests', S.req.length || '')}${L('support', 'Support', 'support', upd ? upd + ' updated' : '')}
    <div class="dsub"><a href="#/faqs">FAQs</a><a href="#/contact">Contact</a><a href="#/settings">Profile</a><a href="#/info/terms">Terms</a><a href="#/info/privacy">Privacy</a></div>
    <button class="btn blk" data-act="${isGuest() ? 'login' : 'logout'}">${isGuest() ? 'Log in' : 'Log out'}</button>`;
 }
 
 /* ---------- views: auth ---------- */
 function vWelcome() {
-  return `<div class="intro lat"><div class="snap" id="intro" data-dots="ind">${AJ.INTRO.map(([t, s, c], k) => `<section><img src="${AJ.art(c, k * 5 + 1, {s: 'noir', cap: false})}" alt=""><div class="eyebrow">A&amp;J Luxury · ${k + 1} of ${AJ.INTRO.length}</div><h1 class="h2">${t}</h1><p>${s}</p></section>`).join('')}</div>
+  return `<div class="intro lat"><div class="snap" id="intro" data-dots="ind">${AJ.INTRO.map(([t, s, f], k) => `<section>${LOGO}<img src="${photo(f)}" alt=""><div class="eyebrow">A&amp;J Luxury · ${k + 1} of ${AJ.INTRO.length}</div><h1 class="h2">${t}</h1><p>${s}</p></section>`).join('')}</div>
   <div class="dots" id="ind">${AJ.INTRO.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div>
   <div class="ibar"><a class="lnk" href="#/login">Skip</a><button class="btn f" id="inext" data-act="inext">Next</button></div></div>`;
 }
 const eye = `<button type="button" class="eye" data-act="eye" aria-label="Show password">${ic('eye')}</button>`;
 function vLogin() {
-  return `<div class="login lat"><div class="glow"></div><div class="eyebrow">Buy · Consign · Authenticated</div><h1 class="logo">A&amp;J</h1><p>Luxury, <i>carefully</i> curated.</p>
+  return `<div class="login lat"><div class="glow"></div><div class="eyebrow">Buy · Consign · Authenticated</div>${LOGO}<p>Buy, sell &amp; <i>consign.</i></p>
   <form id="loginform" novalidate>${fld('Email', 'email', {type: 'email', ac: 'email'})}
    <label class="fld"><span>Password</span><input type="password" name="pw" autocomplete="current-password" value="${esc(D.pw || '')}">${eye}<small class="err" data-for="pw"></small></label>
    <button class="btn f blk" type="submit">Enter</button></form>
@@ -460,7 +478,7 @@ function vLogin() {
   <p class="fine" style="font-size:11px">A&amp;J staff? <a href="#/adminlogin">Admin login</a></p></div>`;
 }
 function vAdminLogin() {
-  return `<div class="login lat"><div class="glow"></div><div class="eyebrow">Staff only · Admin console</div><h1 class="logo">A&amp;J</h1><p>The <i>back office.</i></p>
+  return `<div class="login lat"><div class="glow"></div><div class="eyebrow">Staff only · Admin console</div>${LOGO}<p>The <i>back office.</i></p>
   <form id="adminform" novalidate>${fld('Staff email', 'aemail', {type: 'email', ac: 'username'})}
    <label class="fld"><span>Password</span><input type="password" name="apw" autocomplete="current-password" value="${esc(D.apw || '')}">${eye}<small class="err" data-for="apw"></small></label>
    <button class="btn f blk" type="submit">Enter admin</button></form>
@@ -484,12 +502,14 @@ function vForgot() {
 /* ---------- views: browse ---------- */
 function vHome() {
   const ji = [...ITEMS].reverse().slice(0, 4);
-  return `<section class="hero"><img src="${art(ITEMS[5], 'Front', false)}" alt=""><div class="ht"><div class="eyebrow">Authenticated luxury</div><h1 class="h1" style="margin-top:8px">Pieces worth<br><i>passing on.</i></h1>
+  return `<section class="hero"><img src="${photo(B.img.heroBags)}" alt=""><div class="ht"><div class="eyebrow">Authenticated luxury</div><h1 class="h1" style="margin-top:8px">Pieces worth<br><i>passing on.</i></h1>
    <p>Pre-loved and brand-new, checked and graded.</p><div class="rowb"><a class="btn f" href="#/collections">Explore</a><a class="btn" href="#/consign">Consign</a></div></div></section>
   <div class="sec"><h2 class="h2">Collections</h2><a href="#/collections">View all</a></div>
-  <div class="snap cols">${CATS.map(([c], i) => `<a class="col" href="#/collection/${c}"><img src="${art(ITEMS[i * 4 + 1], 'Front', false)}" alt=""><div><small>${count(c)} pieces</small><b>${COL[c][0]}</b></div></a>`).join('')}</div>
+  <div class="snap cols">${CATS.map(([c]) => `<a class="col" href="#/collection/${c}"><img src="${photo(B.tile[c])}" alt=""><div><small>${count(c)} pieces</small><b>${COL[c][0]}</b></div></a>`).join('')}</div>
   <div class="sec"><h2 class="h2">Just <i>in</i></h2><a href="#/collection/all">Shop all</a></div>
   <div class="stag">${ji.map(mini).join('')}</div>
+  <div class="sec" style="padding-top:44px"><h2 class="h2">Brand <i>new</i></h2><a href="#/collection/all">Shop all</a></div>
+  <div class="row">${ITEMS.filter(p => p.isNew).map(mini).join('')}</div>
   <div class="sec" style="padding-top:44px"><h2 class="h2">The <i>houses</i></h2><a href="#/brands">All brands</a></div>
   <div class="brands">${BRANDS.map(b => `<a href="#/brand/${enc(b)}">${esc(b)}</a>`).join('<i class="dm"></i>')}</div>
   <section class="band lat"><div class="eyebrow">Consignment</div><h2 class="h2" style="margin-top:8px">Have a piece to <i>pass on?</i></h2><p>Our concierge guides you from first photos to payout.</p><a class="btn f" href="#/consign">Consign with us</a></section>
@@ -499,12 +519,12 @@ function vHome() {
    <a href="#/info/layaway">${ic('card')}<div><b>Layaway</b><small>30% down, balance in equal monthly payments</small></div></a></div>
   <section class="band" style="margin-top:34px"><div class="eyebrow">Showroom</div><h2 class="h2" style="margin-top:8px">See it <i>in person</i></h2><p>Request a private viewing of the pieces you love.</p><a class="btn" href="#/viewing">Book a viewing</a></section>
   <div class="foot"><a href="#/faqs">FAQs</a><a href="#/support">Support</a><a href="#/contact">Contact</a><a href="#/info/terms">Terms</a><a href="#/info/privacy">Privacy</a></div>
-  <p class="note">Prototype: pieces, prices and pictures are made-up samples. Pictures are generated placeholders, not photos.</p>`;
+  <p class="note">Prototype: pieces, prices and photos are from A&amp;J Luxury’s listings. Orders, accounts, tickets and admin figures are samples. ${esc(B.note)}</p>`;
 }
 function vCollections() {
   return `<div class="chead"><div class="eyebrow">Browse</div><h1 class="h1" style="margin-top:6px">The <i>collections</i></h1></div><div style="height:16px"></div>
-  ${CATS.map(([c], i) => `<a class="crow" href="#/collection/${c}"><img src="${art(ITEMS[i * 4 + 2], 'Front', false)}" alt=""><div><b>${COL[c][0]}</b><small>${COL[c][1]} · ${count(c)} pieces</small></div></a>`).join('')}
-  <a class="crow" href="#/collection/all"><img src="${art(ITEMS[9], 'Detail', false)}" alt=""><div><b>All pieces</b><small>Every piece currently listed · ${ITEMS.length} pieces</small></div></a><div style="height:20px"></div>`;
+  ${CATS.map(([c]) => `<a class="crow" href="#/collection/${c}"><img src="${photo(B.tile[c])}" alt=""><div><b>${COL[c][0]}</b><small>${COL[c][1]} · ${count(c)} pieces</small></div></a>`).join('')}
+  <a class="crow" href="#/collection/all"><img src="${photo(B.img.promo)}" alt=""><div><b>All pieces</b><small>Every piece currently listed · ${ITEMS.length} pieces</small></div></a><div style="height:20px"></div>`;
 }
 function plist(cat) {
   let l = ITEMS.filter(p => (cat === 'all' || p.cat === cat) && (tab === 'all' || (tab === 'new') === p.isNew) && (bsel === 'all' || p.brand === bsel));
@@ -525,52 +545,70 @@ function vCollection(arg) {
 }
 function vBrands() {
   const g = {}; BRANDS.forEach(b => (g[b[0].toUpperCase()] ||= []).push(b));
-  return `<div class="chead"><div class="eyebrow">Directory</div><h1 class="h1" style="margin-top:6px">The <i>houses</i></h1><p>${BRANDS.length} brands in this sample catalogue.</p></div>
+  return `<div class="chead"><div class="eyebrow">Directory</div><h1 class="h1" style="margin-top:6px">The <i>houses</i></h1><p>${BRANDS.length} brands in A&amp;J’s current selection.</p></div>
   <div class="az">${Object.keys(g).sort().map(k => `<h3>${k}</h3>${g[k].map(b => `<a href="#/brand/${enc(b)}">${esc(b)}<small>${ITEMS.filter(p => p.brand === b).length} pieces</small></a>`).join('')}`).join('')}</div><div style="height:24px"></div>`;
 }
 function vBrand(name) {
   const l = ITEMS.filter(p => p.brand === name);
   if (!l.length) return `<div class="empty">${ic('search')}<p>Brand not found.</p><a class="btn" href="#/brands">All brands</a></div>`;
-  return `<div class="chead"><div class="eyebrow">The house of</div><h1 class="h1" style="margin-top:6px">${esc(name)}</h1><p>${l.length} piece${l.length === 1 ? '' : 's'} · invented sample brand</p></div><div class="plist">${l.map(pcard).join('')}</div>`;
+  return `<div class="chead"><div class="eyebrow">The house of</div><h1 class="h1" style="margin-top:6px">${esc(name)}</h1><p>${l.length} piece${l.length === 1 ? '' : 's'} · from A&amp;J’s listings</p></div><div class="plist">${l.map(pcard).join('')}</div>`;
 }
 const results = t => {
   const w = t.toLowerCase().split(/\s+/).filter(Boolean);
-  const l = w.length ? ITEMS.filter(p => w.every(x => (p.brand + ' ' + p.title + ' ' + catName(p.cat) + ' ' + p.color + ' ' + (p.isNew ? 'brand new' : 'pre-loved')).toLowerCase().includes(x))) : [];
-  if (!w.length) return `<p class="cnt">Try a brand, a category or a colour.</p>`;
+  const l = w.length ? ITEMS.filter(p => w.every(x => (p.brand + ' ' + p.title + ' ' + catName(p.cat) + ' ' + (p.isNew ? 'brand new' : 'pre-loved')).toLowerCase().includes(x))) : [];
+  if (!w.length) return `<p class="cnt">Try a brand or a category.</p>`;
   return l.length ? `<p class="cnt">${l.length} result${l.length === 1 ? '' : 's'}</p><div class="plist" style="gap:22px">${l.map(p => `<a class="req" style="display:flex;gap:14px;padding:0;border:0" href="#/p/${p.id}"><img src="${art(p, 'Front', false)}" alt="" style="width:78px;height:78px;object-fit:cover;border:1px solid var(--line)"><div><small>${esc(p.brand)}</small><b style="font-size:20px">${esc(p.title)}</b><span class="sub">${peso(p.price)}</span></div></a>`).join('')}</div>`
     : `<div class="empty">${ic('search')}<p>No pieces found for “${esc(t)}”.</p></div>`;
 };
 function vSearch() {
-  return `<div style="padding:18px 24px 0"><input type="search" id="sq" placeholder="Search brand, item or colour" aria-label="Search" value="${esc(sq)}" autocomplete="off">
-  <div class="chips" style="margin-top:14px">${['Bags', 'Watches', 'Lumière', 'Brand new', 'Black', 'Gold'].map(t => `<button class="chip" data-act="sq" data-t="${t}">${t}</button>`).join('')}</div></div><div id="sres">${results(sq)}</div>`;
+  return `<div style="padding:18px 24px 0"><input type="search" id="sq" placeholder="Search brand or item" aria-label="Search" value="${esc(sq)}" autocomplete="off">
+  <div class="chips" style="margin-top:14px">${['Bags', 'Watches', 'Chanel', 'Hermes', 'Gucci', 'Brand new'].map(t => `<button class="chip" data-act="sq" data-t="${t}">${t}</button>`).join('')}</div></div><div id="sres">${results(sq)}</div>`;
 }
 function vProduct(id) {
   const p = item(id); if (!p) return `<div class="empty">${ic('search')}<p>Piece not found.</p><a class="btn" href="#/collections">Collections</a></div>`;
   const more = ITEMS.filter(x => (x.cat === p.cat || x.brand === p.brand) && x.id !== p.id).slice(0, 5);
-  return `<div class="gal"><div class="snap" id="gal" data-dots="gd">${p.views.map((v, i) => `<div><img src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)" data-act="zoom" data-i="${i}"></div>`).join('')}</div>
-   <span class="gcount" id="gdn">1 / ${p.views.length}</span>${heartBtn(p.id)}</div>
-  <div class="dots" id="gd">${p.views.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>
+  return `<div class="gal"><div class="snap" id="gal" data-dots="gd">${p.views.map((v, i) => `<div><img src="${art(p, v)}" alt="${esc(p.brand + ' ' + p.title)}" data-act="zoom" data-i="${i}"></div>`).join('')}</div>
+   ${p.views.length > 1 ? `<span class="gcount" id="gdn">1 / ${p.views.length}</span>` : ''}${heartBtn(p.id)}</div>
+  ${p.views.length > 1 ? `<div class="dots" id="gd">${p.views.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : '<div style="height:6px"></div>'}
   <div class="pinfo"><div class="eyebrow">${esc(p.brand)}</div><h1 class="h2">${esc(p.title)}</h1><div class="ppr">${peso(p.price)}</div></div>
   <section class="check"><h3>${ic('shield', 's')} The A&amp;J check</h3><dl class="kv"><dt>Condition</dt><dd>${esc(p.rank)}</dd><dt>Inclusions</dt><dd>${esc(p.inc)}</dd><dt>Flaws</dt><dd>${esc(p.flaw)}</dd></dl>
    <p style="margin-top:12px;font-size:13px;color:var(--mute)">A&amp;J says every piece is authentic. <a class="lnk" href="#/authenticity">About authenticity</a></p></section>
-  <dl class="kv free"><dt>Category</dt><dd>${catName(p.cat)}</dd><dt>Colour</dt><dd>${esc(p.color)}</dd><dt>Material</dt><dd>${esc(p.mat)}</dd><dt>Size</dt><dd>${esc(p.size)}</dd></dl>
+  <dl class="kv free"><dt>Category</dt><dd>${catName(p.cat)}</dd></dl>
   <div style="height:22px"></div>
   <details><summary>Delivery &amp; payment${ic('down')}</summary><div class="dbody"><p>Nationwide delivery. Pay by bank transfer, GCash, card (+4%) or cash on pick-up.</p><p><a href="#/info/shipping">Shipping</a> · <a href="#/info/payment">Payment</a> · <a href="#/info/layaway">Layaway</a></p></div></details>
   <details><summary>Returns${ic('down')}</summary><div class="dbody"><p>All sales are final. Exchange only for undeclared flaws or missing inclusions.</p><p><a href="#/info/returns">Return policy</a></p></div></details>
-  <details><summary>About this listing${ic('down')}</summary><div class="dbody"><p>Sample listing for the prototype. Real listings will carry A&amp;J’s own photos, description and condition notes.</p></div></details>
+  <details><summary>About this listing${ic('down')}</summary><div class="dbody"><p>Listed by A&amp;J Luxury. Photo, condition, inclusions and flaws are from A&amp;J’s listing.</p><p>${esc(B.note)}</p></div></details>
   <div class="sec" style="padding-top:34px"><h2 class="h2">You may <i>also love</i></h2></div><div class="row">${more.map(mini).join('')}</div><div style="height:30px"></div>`;
 }
-const dockProduct = id => `<a class="btn" href="#/viewing?item=${id}">Showroom visit</a><button class="btn f" data-act="inquire" data-id="${id}">Inquire</button>`;
+const dockProduct = id => `<a class="btn ibtn" href="#/viewing?item=${id}" aria-label="Book a showroom visit">${ic('pin')}</a><button class="btn" data-act="cart" data-id="${id}" aria-pressed="${S.cart.has(id)}">${S.cart.has(id) ? 'In cart ✓' : 'Add to cart'}</button><button class="btn f" data-act="inquire" data-id="${id}">Inquire</button>`;
 function vInquire(id) {
   const p = item(id); if (!p) return vProduct(id);
   if (D.iname === undefined) { D.iname = S.user.name; D.imobile = S.user.mobile || ''; }
   D.icontact ||= 'Viber';
   return `<a class="req" href="#/p/${p.id}" style="display:flex;gap:14px;align-items:center"><img src="${art(p, 'Front', false)}" alt="" style="width:84px;height:84px;object-fit:cover;border:1px solid var(--line)"><div><small>${esc(p.brand)}</small><b>${esc(p.title)}</b><span class="sub">${peso(p.price)}</span></div></a>
   <form class="formpage" id="inqform" data-id="${p.id}" novalidate><p style="color:var(--mute);margin-bottom:18px">The A&amp;J team will confirm the piece is available and send payment details.</p>
-   ${fld('Your name', 'iname', {ac: 'name'})}${fld('Mobile number', 'imobile', {type: 'tel', ph: '09XX XXX XXXX'})}
+   ${inqFields()}<button class="btn f blk" type="submit">Send inquiry</button></form>`;
+}
+const inqFields = () => `${fld('Your name', 'iname', {ac: 'name'})}${fld('Mobile number', 'imobile', {type: 'tel', ph: '09XX XXX XXXX'})}
    <span class="lab">Contact me through</span><div class="chips">${['Viber', 'WhatsApp', 'Messenger', 'Instagram', 'Phone call'].map(v => pick('icontact', v)).join('')}</div>
    ${sel('Payment method', 'ipay', ['Bank transfer', 'GCash', 'Credit card (+4% fee)', 'Cash on delivery (Metro Manila)', 'Cash on pick-up', 'Layaway'])}
-   ${fld('Message (optional)', 'inote', {area: 1, ph: 'Anything you’d like to ask?'})}<button class="btn f blk" type="submit">Send inquiry</button></form>`;
+   ${fld('Message (optional)', 'inote', {area: 1, ph: 'Anything you’d like to ask?'})}`;
+/* cart: each piece is one of a kind, so no quantity. "Send inquiry" makes one request per piece in the existing inbox. */
+const cartItems = () => ITEMS.filter(p => S.cart.has(p.id));
+const crow = (p, rm) => `<div class="req" style="display:flex;gap:14px;align-items:center"><a href="#/p/${p.id}" style="display:flex;gap:14px;align-items:center;flex:1;min-width:0"><img src="${art(p, 'Front', false)}" alt="" style="width:84px;height:84px;object-fit:cover;border:1px solid var(--line);flex:none"><div><small>${esc(p.brand)}</small><b>${esc(p.title)}</b><span class="sub">${peso(p.price)}</span></div></a>${rm ? `<button class="ib" data-act="cartrm" data-id="${p.id}" aria-label="Remove ${esc(p.brand + ' ' + p.title)} from cart">${ic('close')}</button>` : ''}</div>`;
+function vCart() {
+  const l = cartItems();
+  return `<div class="chead"><div class="eyebrow">Your selection</div><h1 class="h1" style="margin-top:6px">Your <i>cart</i></h1></div>` + (l.length
+    ? `<div style="height:10px"></div>${l.map(p => crow(p, 1)).join('')}<dl class="kv free" style="margin-top:14px"><dt>Total</dt><dd class="ppr">${peso(l.reduce((n, p) => n + p.price, 0))}</dd></dl>
+      <p class="note" style="text-align:left;border:0;padding:0 24px;margin:14px 0 24px">Each piece is one of a kind, so there is no quantity. The A&amp;J team confirms availability, payment details and any delivery fee after you send your inquiry.</p>`
+    : `<div class="empty">${ic('bag')}<p>Your cart is empty.<br>Add the pieces you’d like to ask A&amp;J about.</p><a class="btn" href="#/collections">Browse collections</a></div>`);
+}
+function vCartInquire() {
+  const l = cartItems(); if (!l.length) return vCart();
+  if (D.iname === undefined) { D.iname = S.user.name; D.imobile = S.user.mobile || ''; }
+  D.icontact ||= 'Viber';
+  return `<div class="chead"><div class="eyebrow">Inquiry</div><h1 class="h1" style="margin-top:6px">Send <i>inquiry</i></h1></div><div style="height:10px"></div>${l.map(p => crow(p)).join('')}
+  <form class="formpage" id="cartform" novalidate><p style="color:var(--mute);margin-bottom:18px">One inquiry is sent for each piece. The A&amp;J team confirms availability and sends payment details.</p>${inqFields()}</form>`;
 }
 function vSaved() {
   const l = ITEMS.filter(p => S.wish.has(p.id));
@@ -597,7 +635,7 @@ function vRequest(ref) {
   <div class="pad"><div class="eyebrow">${r.type}</div><h2 class="h2" style="margin:4px 0 14px">${esc(r.title)}</h2>
   <dl class="kv"><dt>Reference</dt><dd>${r.ref}</dd><dt>Sent</dt><dd>${r.date}</dd>${r.rows.filter(x => x[1]).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
   <h3 class="lab" style="margin-top:22px">Progress</h3><ol class="tl">${STEPS[r.type].map((s, i) => `<li class="${i === 0 ? 'on' : ''}">${s}</li>`).join('')}</ol>
-  <p style="font-size:13px;color:var(--mute);margin-bottom:18px">Prototype: in the real app the A&amp;J team would update this status and reply by your chosen channel.${r.type === 'Viewing' ? ' Showroom address and hours are still to be confirmed by A&amp;J.' : ''}</p>
+  <p style="font-size:13px;color:var(--mute);margin-bottom:18px">Prototype: in the real app the A&amp;J team would update this status and reply by your chosen channel.${r.type === 'Viewing' ? ' A&amp;J needs to confirm the showroom address.' : ''}</p>
   <button class="btn f blk" data-act="concierge">Ask the concierge</button><a class="btn blk" style="margin-top:10px" href="#/requests">All my requests</a></div>`;
 }
 
@@ -622,7 +660,7 @@ function vViewing() {
    ${cand.length ? `<div class="chips">${cand.map(p => tgl('vp_' + p.id, esc(p.brand + ' · ' + p.title.split(' ').slice(0, 3).join(' ')))).join('')}</div>` : `<p style="color:var(--mute);font-size:14px;margin:6px 0 14px">No pieces chosen. Save pieces with the heart, or open a piece and tap “Showroom visit”. You can also describe what you’d like to see below.</p>`}
    ${sel('Guests', 'vparty', ['1', '2', '3', '4'])}${fld('Your name', 'vname', {ac: 'name'})}${fld('Mobile number', 'vmobile', {type: 'tel', ph: '09XX XXX XXXX'})}
    ${fld('Note (optional)', 'vnote', {area: 1, ph: 'Anything else you’d like us to prepare?'})}
-   <p style="font-size:12px;color:var(--mute);margin-bottom:16px">Showroom address and opening hours are still to be confirmed by A&amp;J. Your request is not a confirmed booking.</p>
+   <p style="font-size:12px;color:var(--mute);margin-bottom:16px">A&amp;J’s website lists the showroom in South Caloocan, open every day 12nn to 8pm. A&amp;J needs to confirm the address. Your request is not a confirmed booking.</p>
    <button class="btn f blk" type="submit">Request viewing</button></form>`;
 }
 
@@ -630,10 +668,10 @@ function vViewing() {
 function vConsign() {
   const st = [['Send photos and details', 'Use the appraisal request. A&J reviews the piece first.'], ['Hand it over', 'Drop off at the showroom, or ship via Grab, Lalamove or LBC.'], ['Authenticated and listed', 'A&J authenticates the piece and lists it with photos.'], ['You get paid', 'After the buyer receives it: cash, deposit or in-store credit.']];
   return `<div class="chead"><div class="eyebrow">Consignment</div><h1 class="h1" style="margin-top:6px">Consign with <i>a concierge</i></h1><p>Let A&amp;J sell your authentic luxury pieces.</p></div>
-  <div style="height:14px"></div>${st.map(([t, s], i) => `<div class="jstep"><div class="num">${i + 1}</div><div><b>${t}</b><span>${s}</span></div></div>`).join('')}
+  <img src="${photo(B.img.consign2)}" alt="" style="width:calc(100% - 48px);height:220px;object-fit:cover;object-position:50% 40%;margin:14px 24px 14px;border:1px solid var(--line)">${st.map(([t, s], i) => `<div class="jstep"><div class="num">${i + 1}</div><div><b>${t}</b><span>${s}</span></div></div>`).join('')}
   <div class="sec"><h2 class="h2">The <i>terms</i></h2></div>
   <dl class="kv free"><dt>Period</dt><dd>1 to 5 months</dd><dt>Pull-out fee</dt><dd>₱2,000 per item, before 1 month</dd><dt>Pull-out notice</dt><dd>At least 1 business day</dd><dt>Accepted</dt><dd>Authentic, excellent condition or better</dd></dl>
-  <p class="note" style="margin-top:14px;text-align:left;border:0;padding:0">Paraphrased from A&amp;J’s public website. Not yet confirmed by A&amp;J.</p>
+  <p class="note" style="margin-top:14px;text-align:left;border:0;padding:0">${esc(B.pend)}</p>
   <div class="pad"><a class="btn f blk" href="#/consignform">Request an appraisal</a><button class="btn blk" style="margin-top:10px" data-act="askc">Ask the concierge about consigning</button><a class="lnk" href="#/info/consignment" style="display:block;text-align:center;margin-top:16px">Full consignment terms</a></div>`;
 }
 function vConsignForm() {
@@ -650,7 +688,7 @@ function vConsignForm() {
    <span class="lab">Condition</span><div class="chips">${['Brand new', 'Excellent', 'Good', 'Fair'].map(v => pick('ccond', v)).join('')}</div><small class="err" data-for="ccond" style="margin-top:-14px"></small>
    ${fld('Expected price in ₱ (optional)', 'cprice', {mode: 'numeric', ph: 'e.g. 85000'})}
    <div class="eyebrow" style="margin:26px 0 6px">II · Photographs</div><p style="color:var(--mute);font-size:14px">Plain background, good lighting, no filters. Tap a frame to add a sample photo. Front, Back and Serial / date code are required.</p>
-   <div class="slots">${sl.map((o, i) => { const on = W.photos.has(i); return `<button type="button" class="slot ${on ? 'on' : ''}" data-act="slot" data-i="${i}" aria-pressed="${on}">${on ? `<img src="${AJ.art(catKey, 3, {s: 'noir', v: vw[i], cap: false})}" alt=""><em>${o.label} ✓</em>` : `${ic('camera')}${o.label}${o.req ? '<b>Required</b>' : ''}`}</button>`; }).join('')}</div>
+   <div class="slots">${sl.map((o, i) => { const on = W.photos.has(i); return `<button type="button" class="slot ${on ? 'on' : ''}" data-act="slot" data-i="${i}" aria-pressed="${on}">${on ? `<span class="ph">${ic('image')}</span><em>${o.label} ✓</em>` : `${ic('camera')}${o.label}${o.req ? '<b>Required</b>' : ''}`}</button>`; }).join('')}</div>
    <small class="err" data-for="photos"></small><p style="font-size:12px;color:var(--mute)">${W.photos.size} of 10 added · Prototype: no real photo is uploaded.</p>
    <div class="eyebrow" style="margin:26px 0 6px">III · Provenance</div><span class="lab">Inclusions</span><div class="chips">${incl.map(x => tgl('inc_' + x, x)).join('')}</div>
    ${fld('Flaws or wear (optional)', 'cflaws', {area: 1, ph: 'Scratches, stains, odor, repairs…'})}${fld('Where and when bought (optional)', 'cbought', {ph: 'e.g. boutique, 2022'})}
@@ -663,10 +701,10 @@ function vConsignForm() {
 
 /* ---------- guides, support, account ---------- */
 function vAuth() {
-  const rows = [['Condition rank', 'Each piece shows a rank out of 10, or “Brand New”.'], ['Inclusions', 'Box, dustbag, papers and extras are listed.'], ['Flaws', 'Any wear is described and shown in a close-up photo.'], ['Photographs', 'Several angles, so you can look closely before you inquire.']];
-  return `<div class="chead"><div class="eyebrow">The guide</div><h1 class="h1" style="margin-top:6px">On <i>authenticity</i></h1><p>A&amp;J says it sells only authentic pieces, judged by its own experts.</p></div><div style="height:14px"></div>
+  const rows = [['Condition rank', 'Each piece shows a rank out of 10, or “Brand New”.'], ['Inclusions', 'Box, dustbag, papers and extras are listed.'], ['Flaws', 'Any wear is described in the listing.'], ['Photographs', 'A&J’s own photos of the piece, so you can look closely before you inquire.']];
+  return `<div class="chead"><div class="eyebrow">The guide</div><h1 class="h1" style="margin-top:6px">On <i>authenticity</i></h1><p>A&amp;J says it sells only authentic pieces.</p></div><div style="height:14px"></div>
   <div class="eyebrow" style="padding:0 24px 4px">What every listing shows</div>${rows.map(([t, s]) => `<div class="jstep"><span class="dm" style="margin-top:9px"></span><div><b>${t}</b><span>${s}</span></div></div>`).join('')}
-  <div class="check"><h3>${ic('info', 's')} What this app can’t tell you</h3><p style="font-size:14px;color:var(--mute)">Neither this app nor the concierge can confirm whether a specific piece is authentic or fake. That decision belongs to A&amp;J’s human experts. Ask the team about any piece you’re considering.</p></div>
+  <div class="check"><h3>${ic('info', 's')} What this app can’t tell you</h3><p style="font-size:14px;color:var(--mute)">Neither this app nor the concierge can confirm whether a specific piece is authentic or fake. That decision belongs to A&amp;J. Ask the team about any piece you’re considering.</p></div>
   <p class="note" style="text-align:left;border:0;padding:0 24px;margin:0 0 20px">A&amp;J’s step-by-step authentication process and any certificates are still pending from A&amp;J, so they are not described here.</p>
   <div class="pad" style="padding-top:0"><button class="btn f blk" data-act="askauth">Ask the concierge</button><a class="btn blk" style="margin-top:10px" href="#/collections">Browse pieces</a></div>`;
 }
@@ -678,7 +716,7 @@ const faqList = t => { const l = AJ.FAQ.filter(f => (f.q + f.a).toLowerCase().in
 function vContact() {
   if (D.msent) return `<div class="ok"><div class="dmb">${ic('check')}</div><h1 class="h2">Message sent</h1><p>The team would reply by your chosen channel. Prototype: nothing was sent.</p></div><div class="pad"><a class="btn f blk" href="#/home" data-act="clearmsg">Back to home</a></div>`;
   return `<div class="chead"><div class="eyebrow">Showroom &amp; contact</div><h1 class="h1" style="margin-top:6px">Visit <i>us</i></h1></div>
-  <p class="pend" style="margin:16px 24px 0;padding:11px 14px">Contact details are still to be provided by A&amp;J.</p>
+  <p class="pend" style="margin:16px 24px 0;padding:11px 14px">Contact details are from A&amp;J’s website. A&amp;J to confirm the showroom address.</p>
   <dl class="kv free" style="margin-top:8px">${AJ.CONTACT.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
   <div class="pad"><a class="btn blk" href="#/viewing">Book a viewing</a></div>
   <form class="formpage" id="msgform" novalidate style="padding-top:0"><div class="eyebrow" style="margin-bottom:10px">Message the team</div>${sel('Topic', 'mtopic', ['Buying', 'Consigning', 'Showroom visit', 'Something else'])}
@@ -701,11 +739,11 @@ function vInfo(id) {
 /* ---------- support: after-sales tickets ---------- */
 const NOLINK = 'Not about an order or consignment';
 const myRefs = () => [...AJ.mine(S.user), ...S.req.map(r => ({kind: r.type, ref: r.ref, item: r.item, title: r.title, status: r.status}))];
-const refLabel = r => `${r.ref} · ${r.title} · ${r.status}`;
+const refLabel = r => `${r.ref} · ${r.title} · ${r.status}${r.sample ? ' · sample' : ''}`; // sample orders use real A&J items, so they are marked as samples
 const day = d => AJ.fmtDate(d, {day: 'numeric', month: 'short', year: 'numeric'});
 const tpill = t => `<span class="pill">${t.st}</span>${t.sample ? ' <span class="pill">Sample</span>' : ''}`;
 const linkRow = l => `<div class="req" style="display:flex;gap:14px;align-items:center;padding:12px 0">${l.item ? `<img src="${art(item(l.item), 'Front', false)}" alt="" style="width:72px;height:72px;object-fit:cover;border:1px solid var(--line)">` : ''}
-  <div><small>${l.kind} · ${l.ref}${l.at ? ' · ' + day(l.at) : ''}</small><b style="font-size:19px">${esc(l.title)}</b><span class="sub">${l.amount ? peso(l.amount) + ' · ' : ''}${esc(l.status)}</span></div></div>`;
+  <div><small>${l.kind} · ${l.ref}${l.at ? ' · ' + day(l.at) : ''}</small><b style="font-size:19px">${esc(l.title)}</b><span class="sub">${l.amount ? peso(l.amount) + ' · ' : ''}${esc(l.status)}${l.sample ? ' · Sample order' : ''}</span></div></div>`;
 const tmsg = (m, side) => m.by === 'sys' ? `<p class="sysm">${esc(m.text)} · ${AJ.ago(m.at)}</p>`
   : `<div class="m ${m.by === side ? 'me' : 'bot'}">${esc(m.text)}<small>${m.by === 'user' ? (side === 'user' ? 'You' : esc(m.name)) : esc(m.name) + ' · A&amp;J Support'} · ${AJ.ago(m.at)}</small></div>`;
 const chatBox = t => t.chat ? `<details><summary>Chat with the concierge (${t.chat.length})${ic('down')}</summary><div class="dbody">${t.chat.map(l => `<p>${esc(l)}</p>`).join('')}</div></details>` : '';
@@ -758,7 +796,7 @@ function vAdmin() {
   ${sec('Sales', AJ.colChart(AJ.trend('sales', f, t), AJ.pesoK))}${sec('Sales by <i>category</i>', AJ.barChart(AJ.topCats(f, t), AJ.pesoK))}
   ${sec('Tickets <i>opened</i>', AJ.colChart(AJ.trend('tickets', f, t), num))}${sec('Average <i>resolution</i>', AJ.barChart(AJ.resByType(f, t), AJ.hrs))}
   ${sec('Chatbot <i>questions</i>', AJ.colChart(AJ.trend('chat', f, t), num))}${sec('Top chatbot <i>topics</i>', AJ.barChart(AJ.topics(f, t), num))}
-  <p class="note">Sample data generated for the prototype, not A&amp;J figures. Tickets and concierge questions from this session are included. Tap a bar to see its value.</p>`;
+  <p class="note">Sample data generated for the prototype, not A&amp;J figures. Item names and prices come from A&amp;J’s listings; customers, dates and counts are made up. Tickets and concierge questions from this session are included. Tap a bar to see its value.</p>`;
 }
 const alist = l => `<p class="cnt">${l.length} ticket${l.length === 1 ? '' : 's'}${l.length > 60 ? ' · showing the 60 most recent' : ''}</p>` + (l.length ? l.slice(0, 60).map(arow).join('') : `<div class="empty">${ic('headset')}<p>No tickets match.</p></div>`);
 function vATickets() {
@@ -811,7 +849,7 @@ const ACTIONS = {human: ['See contact details', '#/contact'], showroom: ['Book a
   authentic: ['Read the authenticity guide', '#/authenticity'], layaway: ['Layaway terms', '#/info/layaway'], buy: ['Browse collections', '#/collections'], shipping: ['Shipping details', '#/info/shipping'],
   returns: ['Return policy', '#/info/returns'], payment: ['Payment options', '#/info/payment'], support: ['Open Support', '#/support']};
 const bubble = m => m.typing ? '<div class="m bot typing" aria-label="Typing"><i></i><i></i><i></i></div>'
-  : `<div class="m ${m.who}">${esc(m.text)}${m.who === 'bot' && m.topic !== 'hi' && m.topic !== 'thanks' ? '<small>Concierge · FAQ answers based on A&amp;J’s public policies, to be confirmed by A&amp;J</small>' : ''}${m.topic === 'human' || m.topic === 'none' ? '<a class="btn f sm" href="#/ticketnew?chat">Talk to a support agent</a> ' : ''}${ACTIONS[m.topic] ? `<a class="btn sm" href="${ACTIONS[m.topic][1]}">${ACTIONS[m.topic][0]}</a>` : ''}</div>`;
+  : `<div class="m ${m.who}">${esc(m.text)}${m.who === 'bot' && m.topic !== 'hi' && m.topic !== 'thanks' ? '<small>Concierge · FAQ answers based on A&amp;J’s website, to be confirmed by A&amp;J</small>' : ''}${m.topic === 'human' || m.topic === 'none' ? '<a class="btn f sm" href="#/ticketnew?chat">Talk to a support agent</a> ' : ''}${ACTIONS[m.topic] ? `<a class="btn sm" href="${ACTIONS[m.topic][1]}">${ACTIONS[m.topic][0]}</a>` : ''}</div>`;
 const drawLog = () => { $('#log').innerHTML = S.msgs.map(bubble).join(''); $('#log').scrollTop = 1e6; };
 function openChat(id) {
   drawer(false); $('#qs').innerHTML = AJ.CHIPS.map(c => `<button class="chip" data-act="ask" data-id="${c}">${esc(AJ.faq(c).q)}</button>`).join('');
@@ -837,6 +875,8 @@ const R = {
   collection: {title: 'Collection', up: '#/collections', view: vCollection}, brands: {top: 1, title: 'Brands', view: vBrands}, brand: {title: 'Brand', up: '#/brands', view: vBrand},
   search: {title: 'Search', up: '#/home', view: vSearch}, p: {title: 'Piece', up: '#/collections', view: vProduct, dock: dockProduct},
   inquire: {title: 'Inquire', up: '#/collections', view: vInquire}, viewing: {title: 'Viewing', up: '#/home', view: vViewing, dock: () => `<button class="btn f" form="viewform" type="submit">Request viewing</button>`},
+  cart: {top: 1, title: 'Cart', view: vCart, dock: () => S.cart.size ? `<a class="btn f" href="#/cartinquire">Send inquiry · ${S.cart.size}</a>` : ''},
+  cartinquire: {title: 'Send inquiry', up: '#/cart', view: vCartInquire, dock: () => S.cart.size ? `<button class="btn f" form="cartform" type="submit">Send ${S.cart.size} inquir${S.cart.size === 1 ? 'y' : 'ies'}</button>` : ''},
   saved: {top: 1, title: 'Saved', view: vSaved}, requests: {top: 1, title: 'My requests', view: vRequests}, request: {title: 'Request', up: '#/requests', view: vRequest},
   consign: {top: 1, title: 'Consign', view: vConsign},
   consignform: {title: 'Appraisal', up: '#/consign', view: vConsignForm, dock: () => `<button class="btn f" form="conform" type="submit">Submit for appraisal</button>`},
@@ -858,14 +898,14 @@ function render(nav = true) {
   top.className = 'top' + (bare ? ' bare' : ''); $('#gb').hidden = !isGuest() || bare;
   const title = r === 'info' ? (AJ.info(a)?.t || 'Information') : d.title;
   top.innerHTML = bare ? '' : `<div class="l">${!d.top || (depth > 0 && !['home', 'admin'].includes(r)) ? `<button class="ib" data-act="back" aria-label="Back">${ic('back')}</button>` : ''}${d.top ? `<button class="ib" data-act="dopen" aria-label="Open menu">${ic('menu')}</button>` : ''}</div>
-   ${d.wm ? '<div class="wm">A&amp;J</div>' : `<div class="tt">${esc(title || '')}</div>`}
-   <div class="r">${S.user && !staff ? `<a class="ib" href="#/search" aria-label="Search">${ic('search')}</a><a class="ib" href="#/saved" aria-label="Saved">${ic('heart')}${S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''}</a>` : ''}</div>`;
+   ${d.wm ? `<div class="wm">${LOGO}</div>` : `<div class="tt">${esc(title || '')}</div>`}
+   <div class="r">${S.user && !staff ? `<a class="ib" href="#/search" aria-label="Search">${ic('search')}</a><a class="ib" href="#/saved" aria-label="Saved">${ic('heart')}${S.wish.size ? `<span class="dot">${S.wish.size}</span>` : ''}</a><a class="ib" href="#/cart" aria-label="Cart">${ic('bag')}${S.cart.size ? `<span class="dot">${S.cart.size}</span>` : ''}</a>` : ''}</div>`;
   const m = $('#main'), dock = $('#dock');
   m.classList.remove('still');
-  m.innerHTML = shut ? staffGate() : isGuest() && MEMBER.includes(r) ? gateView({saved: 'see your saved pieces', inquire: 'send an inquiry', viewing: 'book a viewing', requests: 'see your requests', request: 'see your requests', consignform: 'request an appraisal', settings: 'edit your profile', ticketnew: 'open a support ticket', ticket: 'see your tickets'}[r]) : d.view(a);
-  const showDock = d.dock && !(isGuest() && MEMBER.includes(r)) && !shut;
-  dock.hidden = !showDock; dock.innerHTML = showDock ? d.dock(a) : '';
-  $('#fab').hidden = bare || staff; $('#fab').classList.toggle('lift', !!showDock);
+  m.innerHTML = shut ? staffGate() : isGuest() && MEMBER.includes(r) ? gateView({saved: 'see your saved pieces', cart: 'see your cart', cartinquire: 'send an inquiry', inquire: 'send an inquiry', viewing: 'book a viewing', requests: 'see your requests', request: 'see your requests', consignform: 'request an appraisal', settings: 'edit your profile', ticketnew: 'open a support ticket', ticket: 'see your tickets'}[r]) : d.view(a);
+  const dk = d.dock && !(isGuest() && MEMBER.includes(r)) && !shut ? d.dock(a) : ''; // a route's dock may be empty (e.g. an empty cart)
+  dock.hidden = !dk; dock.innerHTML = dk;
+  $('#fab').hidden = bare || staff; $('#fab').classList.toggle('lift', !!dk);
   m.scrollTop = 0; m.focus({preventScroll: true});
   if (r === 'search' && nav) $('#sq')?.focus();
   buildDrawer();
@@ -878,7 +918,7 @@ function resetWizard() { Object.keys(D).filter(k => WIZ.test(k)).forEach(k => de
 const ACT = {
   login() { S.user = null; go('#/login'); },
   guest() { S.user = 'guest'; AJ.skeleton(); go('#/home'); },
-  logout() { S.user = null; S.wish.clear(); S.req.length = 0; for (const k in D) delete D[k]; resetWizard(); go('#/login'); },
+  logout() { S.user = null; S.wish.clear(); S.cart.clear(); S.req.length = 0; for (const k in D) delete D[k]; resetWizard(); go('#/login'); },
   close: closeSheet, dopen() { buildDrawer(); drawer(true); $('#dp button')?.focus(); }, dclose() { drawer(false); },
   concierge() { closeSheet(); openChat(); }, cclose() { $('#cs').hidden = true; },
   askc() { openChat('consign'); }, askauth() { openChat('authentic'); },
@@ -895,12 +935,20 @@ const ACT = {
     if (AJ.route().name === 'saved') refresh();
   },
   inquire(el) { if (!gate('send an inquiry')) go('#/inquire/' + el.dataset.id); },
+  cart(el) { // add to / remove from the cart
+    if (gate('use the cart')) return;
+    const id = el.dataset.id, on = !S.cart.has(id); on ? S.cart.add(id) : S.cart.delete(id);
+    el.textContent = on ? 'In cart ✓' : 'Add to cart'; el.setAttribute('aria-pressed', on);
+    toast(on ? 'Added to cart' : 'Removed from cart'); if (on) AJ.pop(el);
+    $('#top a[href="#/cart"]').innerHTML = ic('bag') + (S.cart.size ? `<span class="dot">${S.cart.size}</span>` : ''); buildDrawer();
+  },
+  cartrm(el) { S.cart.delete(el.dataset.id); toast('Removed from cart'); refresh(); }, // refresh redraws the header and drawer, so the counts follow
   tab(el) { tab = el.dataset.v; refresh(); },
   reset() { tab = 'all'; bsel = 'all'; refresh(false); },
   sq(el) { sq = el.dataset.t; $('#sq').value = sq; $('#sres').innerHTML = results(sq); },
   zoom(el) { // full-screen viewer: swipe between photos, double-tap or pinch to zoom, swipe down to close
     const p = item(AJ.route().args[0]), n = p.views.length;
-    openSheet(`<button class="ib x" data-act="close" aria-label="Close">${ic('close')}</button><div class="snap" id="lbs">${p.views.map((v, i) => `<div><div style="overflow:hidden"><img class="zoomable" src="${art(p, v)}" alt="${esc(p.title)}, ${v.toLowerCase()} (placeholder image)"></div><p>${v} · ${i + 1} / ${n}</p></div>`).join('')}</div>
+    openSheet(`<button class="ib x" data-act="close" aria-label="Close">${ic('close')}</button><div class="snap" id="lbs">${p.views.map((v, i) => `<div><div style="overflow:hidden"><img class="zoomable" src="${art(p, v)}" alt="${esc(p.brand + ' ' + p.title)}"></div><p>${n > 1 ? `${i + 1} / ${n}` : esc(p.brand)}</p></div>`).join('')}</div>
      <p style="color:var(--mute);text-transform:none;letter-spacing:.3px;font-size:12px">Swipe for more · double-tap to zoom · swipe down to close</p>`, 'lb');
     const s = $('#lbs'); s.scrollLeft = el.dataset.i * s.clientWidth;
   },
@@ -972,6 +1020,12 @@ document.addEventListener('submit', e => {
     const p = item(f.dataset.id);
     const r = addReq('Inquiry', p.title, p.brand + ' · ' + peso(p.price), [['Piece', p.brand + ' ' + p.title], ['Contact via', D.icontact], ['Payment', D.ipay || 'Bank transfer'], ['Message', (D.inote || '').trim()]], {item: p.id});
     delete D.inote; go('#/request/' + r.ref + '?new');
+  }
+  if (id === 'cartform') { // one inquiry request per cart item, then the cart is emptied
+    if (!validate(f, {iname: req('Enter your name.'), imobile: mobileRule})) return;
+    const l = cartItems();
+    l.forEach(p => addReq('Inquiry', p.title, p.brand + ' · ' + peso(p.price), [['Piece', p.brand + ' ' + p.title], ['Contact via', D.icontact], ['Payment', D.ipay || 'Bank transfer'], ['Message', (D.inote || '').trim()]], {item: p.id}));
+    S.cart.clear(); delete D.inote; go('#/requests'); toast(l.length + (l.length === 1 ? ' inquiry sent' : ' inquiries sent'));
   }
   if (id === 'viewform') {
     const ok = validate(f, {vdate: [v => !!v, 'Choose a day.'], vtime: [v => !!v, 'Choose a time of day.'], vname: req('Enter your name.'), vmobile: mobileRule});
